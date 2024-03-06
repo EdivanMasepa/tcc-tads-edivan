@@ -1,10 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { dbConfigService } from './config/db.config.service';
+import { UsuarioModule } from './usuario/usuario.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [ConfigModule.forRoot({
+    isGlobal:true
+  }),
+  TypeOrmModule.forRootAsync({
+    useClass: dbConfigService, 
+    inject:[dbConfigService]}),
+  AuthModule]
 })
 export class AppModule {}
