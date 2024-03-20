@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from "@nestjs/typeorm";
-import { dirname } from "path";
 
 @Injectable()
 export class dbConfigService implements TypeOrmOptionsFactory{
@@ -9,12 +8,12 @@ export class dbConfigService implements TypeOrmOptionsFactory{
 
     createTypeOrmOptions(): TypeOrmModuleOptions{
         return{
-            type: 'mariadb',
-            host: this.configService.get<string>('DB_HOST'),
-            port: this.configService.get<number>('DB_PORT'),
-            username: this.configService.get<string>('DB_USER'),
-            password: this.configService.get<string>('DB_PASSWORD'),
-            database:  this.configService.get<string>('DB_NAME'),
+            type: 'mysql',
+            host: 'localhost',
+            port: 3306,
+            username: 'root' ,
+            password: '1234',
+            database:  'db_projeto',
             entities: [__dirname + '/../**/*.entity{.js,.ts}'],
             synchronize: true
         }

@@ -1,37 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsuarioService as UsuarioService } from './usuario.service';
 import { CriaUsuarioDto } from './dto/criaUsuario.dto';
 import { UsuarioEntity } from './entities/usuario.entity';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('/usuario')
+
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
   @Post('/cadastrar')
   async criar(@Body() usuario: CriaUsuarioDto) {
-    const usuarioCriada = await this.usuarioService.criarUsuario(usuario);
-    if(usuarioCriada)
-    return {'Usuario cadastrada' : usuarioCriada};
-  else
-    return {Mensagem : 'Erro ao cadastrar.'};
+      return await this.usuarioService.criarUsuario(usuario);
   }
-
+ 
   @Get()
   async listar() {
-    const listaUsuarios = await this.usuarioService.listarUsuarios();
-    if(listaUsuarios)
-      return {'Usuarios cadastradas' : listaUsuarios};
-    else
-      return {Mensagem : '0 registros encontrados.'};
+      return await this.usuarioService.listarUsuarios();
   }
 
-  @Get(':id')
-  async buscar(@Param('id') id: string) {
-    const usuarioEncontrada = await this.usuarioService.buscarUsuario(+id);
-    if(usuarioEncontrada)
-      return {'Cadastro localizado' : usuarioEncontrada};
-    else
-      return{Mensagem : 'Nenhum registro localizado.'};
+  @Get(':parametro')
+  async buscar(@Param('parametro') parametro: any) {
+    return await this.usuarioService.buscarUsuario(parametro); 
   }
 
   @Patch(':id')
@@ -43,11 +34,5 @@ export class UsuarioController {
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return await this.usuarioService.deletarUsuario(+id);
-   
-  }
-
-  @Post(':cpf')
-  async validacpf(@Param('cpf') cpf: string){
-    return this.usuarioService.validarCPF(cpf);
   }
 }
