@@ -1,3 +1,5 @@
+import { ListaServicosDTO } from "./listaServicos.dto";
+
 export class ListaUsuarioDTO {
     constructor(
         private readonly id:number, 
@@ -7,6 +9,7 @@ export class ListaUsuarioDTO {
         private readonly genero:string, 
         private readonly telefone:string, 
         private readonly email:string, 
-        private readonly situcao:string
+        private readonly situcao:string,
+        private readonly servicos:ListaServicosDTO[]
     ) {}
 }

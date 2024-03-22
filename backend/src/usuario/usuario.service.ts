@@ -3,12 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsuarioEntity } from './entities/usuario.entity';
 import { ListaUsuarioDTO } from './dto/listaUsuario.dto';
 import { CriaUsuarioDto } from './dto/criaUsuario.dto';
-import { Repository } from 'typeorm';
+import { Repository, ServerCapabilities } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { CriaServicoDto } from './dto/criaServico.dto';
+import { ServicoEntity } from './entities/servico.entity';
+import { ListaServicosDTO } from './dto/listaServicos.dto';
 
 @Injectable()
 export class UsuarioService {
-  constructor(@InjectRepository(UsuarioEntity) private readonly usuarioRepository: Repository<UsuarioEntity>){}
+  constructor(@InjectRepository(UsuarioEntity) private readonly usuarioRepository: Repository<UsuarioEntity>,
+              @InjectRepository(ServicoEntity) private readonly servicoRepository: Repository<ServicoEntity>){}
 
   async criarUsuario(usuario: CriaUsuarioDto) {
     const usuarioEntity = new UsuarioEntity();
@@ -17,13 +21,13 @@ export class UsuarioService {
     if(!this.validarCPF(usuario.cpf))
       throw new BadRequestException('CPF inválido.')
 
-    if(await this.buscarUsuario(usuario.email))
+    if(await this.validaBuscaUsuario(usuario.email))
       throw new BadRequestException('Endereço de e-mail já cadastrado.')
 
-    if(await this.buscarUsuario(usuario.telefone))
+    if(await this.validaBuscaUsuario(usuario.telefone))
       throw new BadRequestException('Número de celular já cadastrado.')
 
-    if(await this.buscarUsuario(usuario.cpf))
+    if(await this.validaBuscaUsuario(usuario.cpf))
       throw new BadRequestException('CPF já cadastrado.')
 
     try{
@@ -47,14 +51,14 @@ export class UsuarioService {
   }
 
   async listarUsuarios() {
-    const usuarios = await this.usuarioRepository.find();
+    const usuarios = await this.usuarioRepository.find({relations:{servicos:false}});
 
     if(!usuarios)
       throw new NotFoundException('Erro ao buscar usuários.')
 
     try{
       const listaUsuarios = usuarios.map( 
-        (usuario)=> new ListaUsuarioDTO(usuario.id, usuario.nome, usuario.cpf, usuario.dataNascimento, usuario.genero, usuario.telefone, usuario.email, usuario.situacao));
+        (usuario)=> new ListaUsuarioDTO(usuario.id, usuario.nome, usuario.cpf, usuario.dataNascimento, usuario.genero, usuario.telefone, usuario.email, usuario.situacao, []));
      
       return listaUsuarios;
     }
@@ -130,6 +134,34 @@ export class UsuarioService {
       throw new BadRequestException('Erro ao excluir cadastro.');
     }
 
+  }
+
+  async criarServico(idUsuario: number, servico:CriaServicoDto){
+    const usuarioEncontrado:UsuarioEntity = await this.usuarioRepository.findOne({where:{id : idUsuario}, relations:{servicos:true}});
+    
+    if(!usuarioEncontrado)
+      throw new NotFoundException('Usuário não encontrado.');
+
+    const servicoEntity = new ServicoEntity();
+
+    servicoEntity.titulo = servico.titulo
+    servicoEntity.descricao = servico.descricao
+    servicoEntity.dataServico = servico.dataServico
+    servicoEntity.status = servico.status
+    servicoEntity.usuario = usuarioEncontrado
+    
+    await this.servicoRepository.save(servicoEntity)
+
+    return {message: 'Servico criado com sucesso.'}
+  
+  }
+
+  async listaServicos(){
+    const listaServico= await this.servicoRepository.find()
+    const servicos = listaServico.map( 
+      (servico)=> new ListaServicosDTO(servico.id, servico.titulo, servico.descricao, servico.dataServico, servico.status, servico.usuario));
+     
+    return servicos;
   }
 
   validarCPF(cpf: string){

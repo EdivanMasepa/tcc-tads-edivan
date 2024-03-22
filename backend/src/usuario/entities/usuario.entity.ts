@@ -31,6 +31,6 @@ export class UsuarioEntity {
     @Column({name: 'senha', length:100, nullable:false})
     senha: string;
 
-    @OneToMany(type => ServicoEntity, servico => servico.usuario)
+    @OneToMany(() => ServicoEntity, servico => servico.usuario)
     servicos: ServicoEntity[];
 }

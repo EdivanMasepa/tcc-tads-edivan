@@ -8,15 +8,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import { ServicoEntity } from 'src/usuario/entities/servico.entity';
 
 @Module({
   imports:[PassportModule, UsuarioModule, ConfigModule.forRoot(), JwtModule.register({
     privateKey: process.env.JWT_SECRET,
     secret: process.env.JWT_SECRET,
     signOptions:{expiresIn:'50000s'}}),
-    TypeOrmModule.forFeature([UsuarioEntity])],
+    TypeOrmModule.forFeature([UsuarioEntity, ServicoEntity])],
   controllers: [AuthController],
-  providers: [AuthService, UsuarioService, JwtStrategy],
+  providers: [AuthService, UsuarioService],
 })
 export class AuthModule {}
