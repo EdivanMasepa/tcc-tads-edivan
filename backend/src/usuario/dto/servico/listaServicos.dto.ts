@@ -1,4 +1,5 @@
-import { UsuarioEntity } from "../entities/usuario.entity";
+import { UsuarioEntity } from "src/usuario/entities/usuario.entity";
+import { PessoaEntity } from "../../entities/pessoa.entity";
 
 export class ListaServicosDTO{
     constructor(
@@ -7,6 +8,6 @@ export class ListaServicosDTO{
         private readonly descricao:string, 
         private readonly dataServico: Date,
         private readonly status: string,
-        private readonly usuario: UsuarioEntity
+        private readonly usuarioSolicitante: string
     ){}
 }

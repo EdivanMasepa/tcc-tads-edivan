@@ -1,10 +1,7 @@
 import { IsDate, IsNotEmpty, IsNumber, IsString, Min, isNotEmpty } from "class-validator";
+import { CriaUsuarioDTO } from "../criaUsuario.dto";
 
-export class CriaUsuarioDto {
-
-    @IsString()
-    @IsNotEmpty({ message: "Nome não pode ser vazio." })
-    nome: string;
+export class CriaPessoaDto extends CriaUsuarioDTO {
   
     @IsString()
     @IsNotEmpty({ message: "CPF não pode ser vazio." })
@@ -19,18 +16,6 @@ export class CriaUsuarioDto {
     genero: string;
 
     @IsString()
-    @IsNotEmpty({ message: "Telefone não pode ser vazio." })
-    telefone: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "Email não pode ser vazio." })
-    email: string;
-
-    @IsString()
     @IsNotEmpty({ message: "Situação não pode ser vazia." })
     situacao: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "Senha não pode ser vazia." })
-    senha: string;
 }

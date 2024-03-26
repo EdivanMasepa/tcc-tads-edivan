@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { PessoaEntity } from "./pessoa.entity";
 import { UsuarioEntity } from "./usuario.entity";
 
 @Entity({name:'servico'})
@@ -19,6 +20,6 @@ export class ServicoEntity{
     @Column({name:'status', length:30, nullable:false})
     status: string;
 
-    @ManyToOne(() => UsuarioEntity, usuario => usuario.servicos)
+    @ManyToOne(() => PessoaEntity, pessoa => pessoa.solicitacoesDeServicos)
     usuario: UsuarioEntity;
 }

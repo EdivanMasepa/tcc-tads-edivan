@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -15,6 +14,7 @@ export class AuthService {
         throw new BadRequestException('Login inválido')
     
         usuario = await this.usuarioService.buscarUsuario(loginUsuario)
+        
         const senhaValida = await bcrypt.compare(senha, usuario.senha);
 
         if(!senhaValida)

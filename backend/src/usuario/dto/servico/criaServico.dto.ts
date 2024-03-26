@@ -1,5 +1,5 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString, Min, isNotEmpty } from "class-validator";
-import { UsuarioEntity } from "../entities/usuario.entity";
+import { IsDate, IsNotEmpty, IsString,  } from "class-validator";
+import { UsuarioEntity } from "src/usuario/entities/usuario.entity";
 
 export class CriaServicoDto {
 

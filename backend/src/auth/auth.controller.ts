@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -7,6 +7,11 @@ export class AuthController {
   
   @Post('/login')
   async login(@Body('login') login:string, @Body('senha') senha:string ){
-    return await this.authService.login(login, senha);
+    try{
+      return await this.authService.login(login, senha);
+    }catch(erro){
+      throw new BadRequestException("Erro na requisição")
+    }
+    
   }
 }
