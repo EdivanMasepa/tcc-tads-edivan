@@ -1,8 +1,12 @@
 import { IsDate, IsNotEmpty, IsNumber, IsString, Min, isNotEmpty } from "class-validator";
 import { CriaUsuarioDTO } from "../criaUsuario.dto";
 
-export class CriaInstituicaoDto extends CriaUsuarioDTO {
-  
+export class CriaInstituicaoDTO extends CriaUsuarioDTO {
+
+    @IsNumber()
+    @IsNotEmpty({ message: "id do usuário não informado." })
+    idUsuario: number;
+
     @IsString()
     @IsNotEmpty({ message: "CNPJ não pode ser vazio." })
     cnpj: string;

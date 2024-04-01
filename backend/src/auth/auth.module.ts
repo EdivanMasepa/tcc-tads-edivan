@@ -10,13 +10,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PessoaEntity } from 'src/usuario/entities/pessoa.entity';
 import { ServicoEntity } from 'src/usuario/entities/servico.entity';
 import { InstituicaoEntity } from 'src/usuario/entities/instituicao.entity';
+import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
 
 @Module({
   imports:[PassportModule, UsuarioModule, ConfigModule.forRoot(), JwtModule.register({
     privateKey: process.env.JWT_SECRET,
     secret: process.env.JWT_SECRET,
     signOptions:{expiresIn:'50000s'}}),
-    TypeOrmModule.forFeature([PessoaEntity, ServicoEntity, InstituicaoEntity])],
+    TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, ServicoEntity, InstituicaoEntity])],
   controllers: [AuthController],
   providers: [AuthService, UsuarioService],
 })

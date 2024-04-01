@@ -21,5 +21,5 @@ export class ServicoEntity{
     status: string;
 
     @ManyToOne(() => PessoaEntity, pessoa => pessoa.solicitacoesDeServicos)
-    usuario: UsuarioEntity;
+    usuario: PessoaEntity;
 }

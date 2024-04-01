@@ -6,9 +6,10 @@ import { ServicoEntity } from './entities/servico.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { InstituicaoEntity } from './entities/instituicao.entity';
+import { UsuarioEntity } from './entities/usuario.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([PessoaEntity, ServicoEntity, InstituicaoEntity])],
+  imports:[TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, ServicoEntity, InstituicaoEntity])],
   controllers: [UsuarioController],
   providers: [UsuarioService, JwtService],
 })

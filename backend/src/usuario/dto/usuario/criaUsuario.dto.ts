@@ -1,6 +1,10 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CriaUsuarioDTO{
+    @IsString()
+    @IsNotEmpty({ message: "Tipo do usuário não informado." })
+    tipoUsuario:string;
+    
     @IsString()
     @IsNotEmpty({ message: "Nome não pode ser vazio." })
     nome: string;

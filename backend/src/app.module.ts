@@ -6,12 +6,11 @@ import { UsuarioModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({
+  imports: [UsuarioModule, AuthModule, ConfigModule.forRoot({
     isGlobal:true
   }),
   TypeOrmModule.forRootAsync({
     useClass: dbConfigService, 
-    inject:[dbConfigService]}),
-  AuthModule, UsuarioModule]
+    inject:[dbConfigService]})]
 })
 export class AppModule {}

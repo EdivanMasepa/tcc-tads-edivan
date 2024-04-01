@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { PessoaEntity } from './entities/pessoa.entity';
 import { ListaPessoaDTO } from './dto/usuario/pessoa/listaPessoa.dto';
-import { CriaPessoaDto } from './dto/usuario/pessoa/criaPessoa.dto';
+import { CriaPessoaDTO } from './dto/usuario/pessoa/criaPessoa.dto';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { CriaServicoDto } from './dto/servico/criaServico.dto';
@@ -10,89 +10,98 @@ import { ServicoEntity } from './entities/servico.entity';
 import { ListaServicosDTO } from './dto/servico/listaServicos.dto';
 import { AtualizaPessoaDTO } from './dto/usuario/pessoa/atualizaPessoa.dto';
 import { InstituicaoEntity } from './entities/instituicao.entity';
-import { CriaInstituicaoDto } from './dto/usuario/instituicao/criaInstituicao.dto';
+import { CriaInstituicaoDTO } from './dto/usuario/instituicao/criaInstituicao.dto';
 import { ListaInstituicaoDTO } from './dto/usuario/instituicao/listaInstituicao.dto';
+import { CriaUsuarioDTO } from './dto/usuario/criaUsuario.dto';
+import { UsuarioEntity } from './entities/usuario.entity';
+import { ListaUsuarioDTO } from './dto/usuario/listaUsuario.dto';
 
 @Injectable()
 export class UsuarioService {
-  constructor(@InjectRepository(PessoaEntity) private readonly usuarioPessoaRepository: Repository<PessoaEntity>,
+  constructor(@InjectRepository(UsuarioEntity) private readonly usuarioRepository: Repository<UsuarioEntity>,
+              @InjectRepository(PessoaEntity) private readonly usuarioPessoaRepository: Repository<PessoaEntity>,
               @InjectRepository(InstituicaoEntity) private readonly usuarioInstituicaoRepository: Repository<InstituicaoEntity>,
               @InjectRepository(ServicoEntity) private readonly servicoRepository: Repository<ServicoEntity>){}
 
-  async criarUsuario(usuarioPessoa?: CriaPessoaDto, usuarioInstituicao?: CriaInstituicaoDto) {
+  async criarUsuario(usuario: CriaUsuarioDTO, usuarioPessoa?: CriaPessoaDTO, usuarioInstituicao?: CriaInstituicaoDTO){
+    const usuarioEntity= new UsuarioEntity();
     const usuarioPessoaEntity = new PessoaEntity();
     const usuarioInstituicaoEntity = new InstituicaoEntity();
 
-    if(usuarioPessoa){
-      const senhaHasheada = await bcrypt.hash(usuarioPessoa.senha, 10);
-
-      if(!this.validarCPF(usuarioPessoa.cpf))
-        throw new BadRequestException('CPF inválido.')
-  
-      if(await this.validaBuscaUsuario(usuarioPessoa.email, 1))
+    try{
+      const senhaHasheada = await bcrypt.hash(usuario.senha, 10);
+    
+      if(await this.validaBuscaUsuario(usuario.email))
         throw new BadRequestException('Endereço de e-mail já cadastrado.')
-  
-      if(await this.validaBuscaUsuario(usuarioPessoa.telefone, 1))
+
+      if(await this.validaBuscaUsuario(usuario.telefone))
         throw new BadRequestException('Número de celular já cadastrado.')
-  
-      if(await this.validaBuscaUsuario(usuarioPessoa.cpf, 1))
-        throw new BadRequestException('CPF já cadastrado.')
-  
-      try{
+
+      usuarioEntity.tipoUsuario = usuario.tipoUsuario,
+      usuarioEntity.nome = usuario.nome;
+      usuarioEntity.email = usuario.email;
+      usuarioEntity.telefone = usuario.telefone;
+      usuarioEntity.senha = senhaHasheada;
+
+      if(usuarioPessoa != null){
+
+        if(!this.validarCPF(usuarioPessoa.cpf))
+          throw new BadRequestException('CPF inválido.')
+
+        if(await this.validaBuscaUsuario(usuarioPessoa.cpf))
+          throw new BadRequestException('CPF já cadastrado.')
+
+        const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
+
+        usuarioPessoaEntity.idUsuario = usuarioCriado.id;
         usuarioPessoaEntity.cpf = usuarioPessoa.cpf;
         usuarioPessoaEntity.dataNascimento = usuarioPessoa.dataNascimento;
-        usuarioPessoaEntity.nome = usuarioPessoa.nome;
         usuarioPessoaEntity.genero = usuarioPessoa.genero;
-        usuarioPessoaEntity.telefone = usuarioPessoa.telefone;
-        usuarioPessoaEntity.email = usuarioPessoa.email;
         usuarioPessoaEntity.situacao = usuarioPessoa.situacao;
-        usuarioPessoaEntity.senha = senhaHasheada;
-  
-        const usuarioCriado = await this.usuarioPessoaRepository.save(usuarioPessoaEntity);
-    
-        if(usuarioCriado)
+
+        const usuarioPessoaCriado = await this.usuarioPessoaRepository.save(usuarioPessoaEntity);    
+
+        if(usuarioPessoaCriado){
+          usuarioCriado.usuarioPessoa = usuarioPessoaCriado;
+
+          await this.usuarioRepository.save(usuarioCriado);
+
           return{message: 'Usuário cadastrado com sucesso.'};
-        
-      }catch(erro){
-        throw new BadRequestException('Erro ao cadastrar.');
-      }
-    }
-    else if(usuarioInstituicao){
-     
-      const senhaHasheada = await bcrypt.hash(usuarioInstituicao.senha, 10);
-  
-      if(await this.validaBuscaUsuario(usuarioInstituicao.email, 2))
-        throw new BadRequestException('Endereço de e-mail já cadastrado.')
-  
-      if(await this.validaBuscaUsuario(usuarioInstituicao.telefone, 2))
-        throw new BadRequestException('Número de celular já cadastrado.')
-  
-      if(await this.validaBuscaUsuario(usuarioInstituicao.cnpj, 2))
-        throw new BadRequestException('CNPJ já cadastrado.')
-  
-      try{
+          
+        }else
+          throw new BadRequestException('Erro ao cadastrar.')
+      }    
+      else if(usuarioInstituicao != null){
+
+        if(await this.validaBuscaUsuario(usuarioInstituicao.cnpj))
+          throw new BadRequestException('CNPJ já cadastrado.')
+
+        const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
+
+        usuarioInstituicaoEntity.idUsuario = usuarioEntity.id;
         usuarioInstituicaoEntity.cnpj = usuarioInstituicao.cnpj;
         usuarioInstituicaoEntity.dataFundacao = usuarioInstituicao.dataFundacao;
-        usuarioInstituicaoEntity.nome = usuarioInstituicao.nome;
         usuarioInstituicaoEntity.areaAtuacao = usuarioInstituicao.areaAtuacao;
-        usuarioInstituicaoEntity.telefone = usuarioInstituicao.telefone;
-        usuarioInstituicaoEntity.email = usuarioInstituicao.email;
-        usuarioInstituicaoEntity.senha = senhaHasheada;
-  
-        const usuarioCriado = await this.usuarioInstituicaoRepository.save(usuarioInstituicaoEntity);
-    
-        if(usuarioCriado)
+
+        const usuarioInstituicaoCriado = await this.usuarioInstituicaoRepository.save(usuarioInstituicaoEntity);
+
+        if(usuarioInstituicaoCriado){
+          usuarioCriado.usuarioInstituicao = usuarioInstituicaoEntity;
+
+          await this.usuarioRepository.save(usuarioCriado);
+
           return{message: 'Usuário cadastrado com sucesso.'};
-        else
-          throw new BadRequestException('Não foi possivel concluir o cadastro. Verifique os dados informados.')
-        
-      }catch(erro){
-        throw erro;
-      }
+
+        }else
+          throw new BadRequestException('Erro ao cadastrar.')
+    }      
+    }catch(erro){
+      throw erro
     }
   }
 
-  async listarUsuarios() {
+  async listarUsuarios(opcao: number) {
+    const usuarios = await this.usuarioRepository.find({relations: ['usuarioPessoa', 'usuarioPessoa.solicitacoesDeServicos', 'usuarioInstituicao']})
     const usuariosPessoas = await this.usuarioPessoaRepository.find({relations:{solicitacoesDeServicos:true}});
     const usuariosInstituicoes = await this.usuarioInstituicaoRepository.find();
 
@@ -100,77 +109,80 @@ export class UsuarioService {
       throw new NotFoundException('Erro ao buscar usuários.')
  
     try{
-      const listaUsuariosPessoas = usuariosPessoas.map( 
-        (usuario)=> new ListaPessoaDTO(usuario.id, usuario.nome, usuario.email, usuario.telefone, usuario.cpf, usuario.dataNascimento, usuario.genero, usuario.situacao, usuario.solicitacoesDeServicos.length));
-      const listaUsuariosInstituicoes = usuariosInstituicoes.map( 
-        (usuario)=> new ListaInstituicaoDTO(usuario.id, usuario.nome, usuario.email, usuario.telefone, usuario.cnpj, usuario.dataFundacao,  usuario.areaAtuacao));
-     
-      return {Pessoas: listaUsuariosPessoas, Instituições: listaUsuariosInstituicoes};
+      if(opcao === 1){
+        return usuarios.map((usuario) => {
+          if(usuario.tipoUsuario === 'pessoa'){
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, new ListaPessoaDTO(usuario.usuarioPessoa.id, 
+              usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao, usuario.usuarioPessoa.solicitacoesDeServicos.length))
+          }else if(usuario.tipoUsuario === 'instituicao'){
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, 
+              usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
+          }
+        }) 
+      }else if(opcao === 2){
+        return usuarios.map((usuario) => {
+          if(usuario.tipoUsuario === 'pessoa'){
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, new ListaPessoaDTO(usuario.usuarioPessoa.id, 
+              usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao, usuario.usuarioPessoa.solicitacoesDeServicos.length))
+          }
+        }) 
+      }else if(opcao === 3){
+        return usuarios.map((usuario) => {
+          if(usuario.tipoUsuario === 'instituicao'){
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, 
+              usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
+          }
+        }) 
+      }else
+        throw new NotFoundException('Opção inválida.')
     }
     catch(erro){
-      throw new NotFoundException('Erro ao listar usuários.')
+      throw erro
     }
   }
 
-  async validaBuscaUsuario(parametro: any, tipoUsuario: number){
+  async validaBuscaUsuario(parametro: any){
+    let usuario:UsuarioEntity;
     let usuarioPessoa:PessoaEntity;
     let usuarioInstituicao:InstituicaoEntity;
 
-    if(tipoUsuario === 1){
+    usuario = await this.usuarioRepository.findOneBy({id: parametro});
+  
+    if(!usuario){
+      usuario = await this.usuarioRepository.findOneBy({email: parametro});
 
-      usuarioPessoa = await this.usuarioPessoaRepository.findOneBy({id: parametro});
-        
-      if(!usuarioPessoa){
-        usuarioPessoa = await this.usuarioPessoaRepository.findOneBy({cpf: parametro});
-      
-        if(!usuarioPessoa){
-          usuarioPessoa = await this.usuarioPessoaRepository.findOneBy({email: parametro});
-        
+      if(!usuario){
+        usuario = await this.usuarioRepository.findOneBy({telefone: parametro});
+
+        if(!usuario){
+          usuarioPessoa = await this.usuarioPessoaRepository.findOneBy({cpf: parametro});
+
           if(!usuarioPessoa){
-            usuarioPessoa = await this.usuarioPessoaRepository.findOneBy({telefone: parametro});
-          }
-        }
-      }
-      if(usuarioPessoa != null)
-        return usuarioPessoa
+            usuarioInstituicao = await this.usuarioInstituicaoRepository.findOneBy({cnpj: parametro});
 
-      else
-        return false
-    }
+            if(!usuarioInstituicao)
+              return false
+            else
+              return usuarioInstituicao
 
-    else if( tipoUsuario === 2){
-
-      usuarioInstituicao = await this.usuarioInstituicaoRepository.findOneBy({id: parametro});
-
-      if(!usuarioInstituicao){
-        usuarioInstituicao = await this.usuarioInstituicaoRepository.findOneBy({cnpj: parametro});
-      
-        if(!usuarioInstituicao){
-          usuarioInstituicao = await this.usuarioInstituicaoRepository.findOneBy({email: parametro});
+          }else
+            return usuarioPessoa
+          
+        }else
+          return usuario
         
-          if(!usuarioInstituicao){
-            usuarioInstituicao = await this.usuarioInstituicaoRepository.findOneBy({telefone: parametro});
-          }
-        }
-      }
-
-      if(usuarioInstituicao != null)
-        return usuarioInstituicao
-
-      else
-        return false
-    }
+      }else
+        return usuario
+      
+    }else
+      return usuario
+    
   }
 
   async buscarUsuario(parametro:any) {  
     try{
-      let usuarioBuscado = await this.validaBuscaUsuario(parametro, 1)
+      let usuarioBuscado = await this.validaBuscaUsuario(parametro)
       
-      if(usuarioBuscado)
-        return usuarioBuscado;
-      else
-        usuarioBuscado = await this.validaBuscaUsuario(parametro, 2)
-
       if(usuarioBuscado)
         return usuarioBuscado;
       else
@@ -182,13 +194,13 @@ export class UsuarioService {
   }
 
   async alterarUsuario(idUsuario: number, novosDados: AtualizaPessoaDTO) {
-    const usuarioEncontrado = await this.usuarioPessoaRepository.findOneBy({id : idUsuario});
-
-    if('cpf' in  novosDados || 'email' in  novosDados || 'telefone' in  novosDados || 'senha' in  novosDados)
-      throw new NotFoundException('Dados não podem ser atualizados.');
+    const usuarioEncontrado = await this.buscarUsuario(idUsuario);
 
     if(!usuarioEncontrado)
       throw new NotFoundException('Usuário não encontrado.');
+
+    if('cpf' || 'email' || 'telefone' || 'senha' in  novosDados)
+      throw new NotFoundException('Dados não podem ser atualizados.');
 
     const usuarioAtualizado = await this.usuarioPessoaRepository.update(usuarioEncontrado, novosDados)
         
@@ -216,6 +228,7 @@ export class UsuarioService {
 
   async criarServico(idUsuario: number, servico:CriaServicoDto){
     const usuarioEncontrado:PessoaEntity = await this.usuarioPessoaRepository.findOne({where:{id : idUsuario}, relations:{solicitacoesDeServicos:true}});
+    console.log(usuarioEncontrado)
     
     if(!usuarioEncontrado)
       throw new NotFoundException('Usuário não encontrado.');
@@ -237,7 +250,7 @@ export class UsuarioService {
   async listarServicos(){
     const listaServico= await this.servicoRepository.find({relations:{usuario:true}})
     const servicos = listaServico.map( 
-      (servico)=> new ListaServicosDTO(servico.id, servico.titulo, servico.descricao, servico.dataServico, servico.status, servico.usuario.nome));
+      (servico)=> new ListaServicosDTO(servico.id, servico.titulo, servico.descricao, servico.dataServico, servico.status, 'servico.usuario.nome'));
      
     return servicos;
   }

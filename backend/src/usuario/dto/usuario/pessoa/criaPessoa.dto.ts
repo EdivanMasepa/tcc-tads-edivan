@@ -1,7 +1,11 @@
 import { IsDate, IsNotEmpty, IsNumber, IsString, Min, isNotEmpty } from "class-validator";
 import { CriaUsuarioDTO } from "../criaUsuario.dto";
 
-export class CriaPessoaDto extends CriaUsuarioDTO {
+export class CriaPessoaDTO extends CriaUsuarioDTO {
+
+    @IsNumber()
+    @IsNotEmpty({ message: "id do usuário não informado." })
+    idUsuario: number;
   
     @IsString()
     @IsNotEmpty({ message: "CPF não pode ser vazio." })

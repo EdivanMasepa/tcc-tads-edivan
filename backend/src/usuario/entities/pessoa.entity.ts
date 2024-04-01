@@ -1,9 +1,18 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ServicoEntity } from "./servico.entity";
 import { UsuarioEntity } from "./usuario.entity";
 
 @Entity({name:'pessoa'})
-export class PessoaEntity extends UsuarioEntity{
+export class PessoaEntity{
+
+    @PrimaryGeneratedColumn()
+    id:number;
+
+    @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioPessoa)
+    usuario: UsuarioEntity;
+
+    @Column({name:'id_usuario', nullable:false})
+    idUsuario: number;
 
     @Column({name: 'cpf', nullable:false})
     cpf: string;  
