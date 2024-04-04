@@ -25,7 +25,4 @@ export class PessoaEntity{
 
     @Column({name: 'situacao', length:20, nullable:false})
     situacao: string;
-
-    @OneToMany(() => ServicoEntity, servico => servico.usuario)
-    solicitacoesDeServicos: ServicoEntity[];
 }

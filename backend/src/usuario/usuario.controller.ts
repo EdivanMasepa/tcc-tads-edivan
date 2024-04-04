@@ -6,6 +6,7 @@ import { CriaServicoDto } from './dto/servico/criaServico.dto';
 import { AtualizaPessoaDTO } from './dto/usuario/pessoa/atualizaPessoa.dto';
 import { CriaInstituicaoDTO } from './dto/usuario/instituicao/criaInstituicao.dto';
 import { CriaUsuarioDTO } from './dto/usuario/criaUsuario.dto';
+import { AtualizaUsuarioDTO } from './dto/usuario/atualizaUsuario.dto';
 
 @Controller('/usuario')
 export class UsuarioController {
@@ -31,9 +32,8 @@ export class UsuarioController {
   
   @UseGuards(AuthGuard)
   @Patch('/atualizar-usuario')
-  async alterar(@Req() req, @Body() novosDados: AtualizaPessoaDTO) {
-    const usuarioAtualizada = await this.usuarioService.alterarUsuario(req.user.sub, novosDados);
-      return usuarioAtualizada;
+  async alterar(@Req() req, @Body() novosDados: Partial<AtualizaUsuarioDTO>) {
+    return await this.usuarioService.alterarUsuario(req.user.sub, novosDados);
   }
 
   @UseGuards(AuthGuard)
@@ -55,8 +55,8 @@ export class UsuarioController {
   }
   
   @UseGuards(AuthGuard)
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.usuarioService.deletarUsuario(+id);
+  @Delete('/deletar')
+  async remove(@Req() req) {
+    return await this.usuarioService.deletarUsuario(req.user.sub);
   }
 }

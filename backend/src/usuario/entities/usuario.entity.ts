@@ -1,17 +1,18 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PessoaEntity } from "./pessoa.entity";
 import { InstituicaoEntity } from "./instituicao.entity";
+import { ServicoEntity } from "./servico.entity";
 
 @Entity({name:'usuario'})
 export class UsuarioEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => PessoaEntity, {nullable:true})
+    @OneToOne(() => PessoaEntity, {nullable:true, cascade:true})
     @JoinColumn()
     usuarioPessoa: PessoaEntity;
 
-    @OneToOne(() => InstituicaoEntity, {nullable:true})
+    @OneToOne(() => InstituicaoEntity, {nullable:true, cascade:true})
     @JoinColumn()
     usuarioInstituicao: InstituicaoEntity;
 
@@ -30,4 +31,6 @@ export class UsuarioEntity{
     @Column({name: 'senha', length:100, nullable:false})
     senha: string;
 
+    @OneToMany(() => ServicoEntity, servico => servico.usuario)
+    solicitacoesDeServicos: ServicoEntity[];
 }
