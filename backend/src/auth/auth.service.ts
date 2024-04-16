@@ -11,18 +11,20 @@ export class AuthService {
     constructor(private readonly usuarioService:UsuarioService, private readonly jwtService:JwtService){}
 
     async login(loginUsuario:string, senha:string){
-        let usuario:any;
+        let usuario:UsuarioEntity;
         let usuarioEspecificacaoId:number;
         let senhaValida:boolean;
         let payload:any;
 
         usuario = await this.usuarioService.buscarUsuario(loginUsuario);
+
         senhaValida = await bcrypt.compare(senha, usuario.senha);
 
         if(!usuario || !senhaValida || loginUsuario.length < 10)
             throw new BadRequestException('Login inválido')
 
         if(usuario instanceof UsuarioEntity){
+
             if(usuario.usuarioPessoa)
                 usuarioEspecificacaoId = usuario.usuarioPessoa.id;
             else

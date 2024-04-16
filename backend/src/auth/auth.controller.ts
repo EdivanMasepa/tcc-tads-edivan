@@ -7,11 +7,6 @@ export class AuthController {
   
   @Post('/login')
   async login(@Body('login') login:string, @Body('senha') senha:string ){
-    try{
       return await this.authService.login(login, senha);
-    }catch(erro){
-      throw new BadRequestException("Erro na requisição")
-    }
-    
   }
 }

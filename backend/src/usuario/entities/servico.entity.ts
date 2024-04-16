@@ -19,6 +19,6 @@ export class ServicoEntity{
     @Column({name:'status', length:30, nullable:false})
     status: string;
 
-    @ManyToOne(() =>UsuarioEntity, usuario => usuario.solicitacoesDeServicos)
+    @ManyToOne(() =>UsuarioEntity, usuario => usuario.solicitacoesDeServicos,  {cascade:true, onDelete:'CASCADE'})
     usuario: UsuarioEntity;
 }

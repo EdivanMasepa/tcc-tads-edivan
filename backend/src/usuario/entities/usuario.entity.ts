@@ -8,11 +8,11 @@ export class UsuarioEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => PessoaEntity, {nullable:true, cascade:true})
+    @OneToOne(() => PessoaEntity, pessoa => pessoa.usuario, {nullable:true,  onUpdate:'CASCADE', onDelete:'CASCADE'})
     @JoinColumn()
     usuarioPessoa: PessoaEntity;
 
-    @OneToOne(() => InstituicaoEntity, {nullable:true, cascade:true})
+    @OneToOne(() => InstituicaoEntity, instituicao => instituicao.usuario, {nullable:true, onUpdate:'CASCADE', onDelete:'CASCADE'})
     @JoinColumn()
     usuarioInstituicao: InstituicaoEntity;
 

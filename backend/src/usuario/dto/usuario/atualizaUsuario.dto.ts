@@ -1,29 +1,29 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { AtualizaPessoaDTO } from './pessoa/atualizaPessoa.dto';
 import { AtualizaInstituicaoDTO } from './instituicao/atualizaInstituicao.dto';
+import { InstituicaoEntity } from 'src/usuario/entities/instituicao.entity';
+import { PessoaEntity } from 'src/usuario/entities/pessoa.entity';
 
 export class AtualizaUsuarioDTO{
 
     @IsString()
-    @IsNotEmpty({ message: "Nome não pode ser vazia" })
     nome?: string;
 
     @IsString()
-    @IsNotEmpty({ message: "E-mail não pode ser vazio." })
     email?: string;
 
     @IsString()
-    @IsNotEmpty({ message: "Telefone não pode ser vazia." })
     telefone?: string;
 
     @IsString()
-    @IsNotEmpty({ message: "Senha não pode ser vazia." })
     senha?: string;
 
     @IsString()
-    @IsNotEmpty({ message: "Confirmação de senha não pode ser vazia." })
     confirmacaoSenha?: string;
 
     @IsString()
-    especificacoes?: Partial<AtualizaPessoaDTO | AtualizaInstituicaoDTO>
+    usuarioPessoa?: PessoaEntity;
+
+    @IsString()
+    usuarioInstituicao?:InstituicaoEntity;
 }

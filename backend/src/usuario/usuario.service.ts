@@ -8,7 +8,6 @@ import * as bcrypt from 'bcrypt';
 import { CriaServicoDto } from './dto/servico/criaServico.dto';
 import { ServicoEntity } from './entities/servico.entity';
 import { ListaServicosDTO } from './dto/servico/listaServicos.dto';
-import { AtualizaPessoaDTO } from './dto/usuario/pessoa/atualizaPessoa.dto';
 import { InstituicaoEntity } from './entities/instituicao.entity';
 import { CriaInstituicaoDTO } from './dto/usuario/instituicao/criaInstituicao.dto';
 import { ListaInstituicaoDTO } from './dto/usuario/instituicao/listaInstituicao.dto';
@@ -16,8 +15,6 @@ import { CriaUsuarioDTO } from './dto/usuario/criaUsuario.dto';
 import { UsuarioEntity } from './entities/usuario.entity';
 import { ListaUsuarioDTO } from './dto/usuario/listaUsuario.dto';
 import { AtualizaUsuarioDTO } from './dto/usuario/atualizaUsuario.dto';
-import { AtualizaInstituicaoDTO } from './dto/usuario/instituicao/atualizaInstituicao.dto';
-import { use } from 'passport';
 
 @Injectable()
 export class UsuarioService {
@@ -115,25 +112,25 @@ export class UsuarioService {
       if(opcao === 1){
         return usuarios.map((usuario) => {
           if(usuario.tipoUsuario === 'pessoa'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, new ListaPessoaDTO(usuario.usuarioPessoa.id, 
-              usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao, usuario.solicitacoesDeServicos.length))
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.solicitacoesDeServicos.length, 
+              new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
           }else if(usuario.tipoUsuario === 'instituicao'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, 
-              usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.solicitacoesDeServicos.length, 
+              new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
           }
         }) 
       }else if(opcao === 2){
         return usuarios.map((usuario) => {
           if(usuario.tipoUsuario === 'pessoa'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, new ListaPessoaDTO(usuario.usuarioPessoa.id, 
-              usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao, usuario.solicitacoesDeServicos.length))
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.solicitacoesDeServicos.length,
+              new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
           }
         }) 
       }else if(opcao === 3){
         return usuarios.map((usuario) => {
           if(usuario.tipoUsuario === 'instituicao'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, 
-              usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,usuario.solicitacoesDeServicos.length,
+               new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
           }
         }) 
       }else
@@ -149,40 +146,41 @@ export class UsuarioService {
     let usuarioPessoa:PessoaEntity;
     let usuarioInstituicao:InstituicaoEntity;
 
-    usuario = await this.usuarioRepository.findOne({where:{id: parametro}, relations:['usuarioPessoa', 'usuarioInstituicao']});
+    usuario = await this.usuarioRepository.findOne({where:{id: parametro}, relations:{usuarioPessoa:true, usuarioInstituicao:true, solicitacoesDeServicos:true}});
   
     if(!usuario){
-      usuario = await this.usuarioRepository.findOne({where:{email: parametro}, relations:['usuarioPessoa', 'usuarioInstituicao']});
+      usuario = await this.usuarioRepository.findOne({where:{email: parametro}, relations:{usuarioPessoa:true, usuarioInstituicao:true, solicitacoesDeServicos:true}});
 
       if(!usuario){
-        usuario = await this.usuarioRepository.findOne({where:{telefone: parametro}, relations:['usuarioPessoa', 'usuarioInstituicao']});
+        usuario = await this.usuarioRepository.findOne({where:{telefone: parametro}, relations:{usuarioPessoa:true, usuarioInstituicao:true,solicitacoesDeServicos:true}});
 
         if(!usuario){
-          usuarioPessoa = await this.usuarioPessoaRepository.findOne({where:{cpf: parametro}, relations:['usuario']});
+          usuarioPessoa = await this.usuarioPessoaRepository.findOne({where:{cpf: parametro}, relations:{usuario:true}});
+
           if(usuarioPessoa)
-            usuario = await this.usuarioRepository.findOne({where:{id: usuarioPessoa.idUsuario}, relations:['usuarioPessoa', 'usuarioInstituicao']});
+            usuario = await this.usuarioRepository.findOne({where:{id: usuarioPessoa.idUsuario}, relations:{usuarioPessoa:true, usuarioInstituicao:true, solicitacoesDeServicos:true}});
 
           else{
-            usuarioInstituicao = await this.usuarioInstituicaoRepository.findOne({where:{cnpj: parametro}, relations:['usuario']});
+            usuarioInstituicao = await this.usuarioInstituicaoRepository.findOne({where:{cnpj: parametro}, relations:{usuario:true}});
 
-            if(usuarioInstituicao)
-              usuario = await this.usuarioRepository.findOne({where:{id: usuarioInstituicao.idUsuario}, relations:['usuarioPessoa', 'usuarioInstituicao']});
+            if(usuarioInstituicao){
+              usuario = await this.usuarioRepository.findOne({where:{id: usuarioInstituicao.idUsuario}, relations:{usuarioPessoa:true, usuarioInstituicao:true, solicitacoesDeServicos:true}});
 
-            if(!usuario)
-              return false
-            else
-              return usuario
+              if(!usuario)
+                return false
+              else
+                return usuario
+            }
           }
-
-        }else
+        }
+        else
           return usuario
-        
-      }else
-        return usuario
-      
-    }else
-      return usuario
-    
+      }
+      else
+        return usuario     
+    }
+    else
+      return usuario        
   }
 
   async buscarUsuario(parametro:any) {  
@@ -199,92 +197,107 @@ export class UsuarioService {
     }
   }
 
-  async alterarUsuario(idUsuario: number, novosDados: Partial<AtualizaUsuarioDTO>) {
+  async alterarUsuario(idUsuario: number, novosDados: AtualizaUsuarioDTO) {
     const usuarioEncontrado = await this.buscarUsuario(idUsuario);
-    const novoObjeto: Record<string, any> = {};
 
     try{
 
       if(!usuarioEncontrado)
         throw new NotFoundException('Usuário não encontrado.');
 
+      for(let itemUsuario in novosDados){
+
+          if(novosDados[itemUsuario].length < 3){
+            return {message: `'${itemUsuario}' deve ter pelo menos 3 caracteres.`}
+          }
+      }
+
       if(usuarioEncontrado.tipoUsuario === 'pessoa'){
-        let usuarioPessoa = await this.usuarioPessoaRepository.findOneBy({id: usuarioEncontrado.usuarioPessoa.id});
 
-        for(let itemUsuario in usuarioPessoa){
-          
-          for(let itemNovo in novosDados.especificacoes){
-            
-            if(itemUsuario === itemNovo){
-              usuarioPessoa[itemUsuario] = novosDados.especificacoes[itemNovo];
-            }
+        for(let item in novosDados.usuarioPessoa){
+          if(novosDados.usuarioPessoa[item].length < 3){
+            return {message: `'${item}' deve ter pelo menos 3 caracteres.`}
           }
         }
-        const usuarioPessoaAtualizado = await this.usuarioPessoaRepository.save(usuarioPessoa);
+        let pessoa = usuarioEncontrado.usuarioPessoa;
 
-        if(!usuarioPessoaAtualizado)
-          throw new BadRequestException('Erro ao atualizar cadastro.');
+        Object.assign(pessoa, novosDados.usuarioPessoa)
+
+        await this.usuarioPessoaRepository.save(pessoa);
       }
-      else if(usuarioEncontrado.tipoUsuario === 'instituicao'){
-        let usuarioInstituicao = await this.usuarioInstituicaoRepository.findOneBy({id: usuarioEncontrado.usuarioInstituicao.id});
-
-        for(let itemUsuario in usuarioInstituicao){
-          
-          for(let itemNovo in novosDados.especificacoes){
-            
-            if(itemUsuario === itemNovo){
-              usuarioInstituicao[itemUsuario] = novosDados.especificacoes[itemNovo];
-            }
-          }
-        }
-        const usuarioInstituicaoAtualizado = await this.usuarioPessoaRepository.save(usuarioInstituicao);
-
-        if(!usuarioInstituicaoAtualizado)
-          throw new BadRequestException('Erro ao atualizar cadastro.');
-      }
-
-      for (const chave in novosDados) {
-        if (typeof novosDados[chave] !== 'object'){
-            novoObjeto[chave] = novosDados[chave];
-        }
-      }
-
-      Object.assign(usuarioEncontrado, novoObjeto);
       
-      const usuarioAtualizado = await this.usuarioRepository.save(usuarioEncontrado);
+      else if(usuarioEncontrado.tipoUsuario === 'instituicao'){
+
+        for(let item in novosDados.usuarioInstituicao){
+
+          if(novosDados.usuarioInstituicao[item].length < 3){
+            return {message: `'${item}' deve ter pelo menos 3 caracteres.`}
+          }
+        }
+        let instituicao = usuarioEncontrado.usuarioInstituicao;
+
+        Object.assign(instituicao, novosDados.usuarioInstituicao)
+
+        await this.usuarioInstituicaoRepository.save(instituicao);
+
+      //   let usuarioInstituicao = await this.usuarioInstituicaoRepository.findOneBy({id: usuarioEncontrado.usuarioInstituicao.id});
+
+      //   for(let itemUsuario in usuarioInstituicao){
           
+      //     for(let itemNovo in novosDados.especificacoes){
+            
+      //       if(itemUsuario === itemNovo){
+      //         usuarioInstituicao[itemUsuario] = novosDados.especificacoes[itemNovo];
+      //       }
+      //     }
+      //     usuarioEncontrado.usuarioInstituicao = usuarioInstituicao;
+      //   }
+      //   const usuarioInstituicaoAtualizado = await this.usuarioPessoaRepository.save(usuarioInstituicao);
+
+      //   if(!usuarioInstituicaoAtualizado)
+      //     throw new BadRequestException('Erro ao atualizar cadastro.');
+      // }
+
+      // for (const chave in novosDados) {
+      //   if (typeof novosDados[chave] !== 'object'){
+      //       novoObjeto[chave] = novosDados[chave];
+      //   }
+      }
+
+      Object.assign(usuarioEncontrado, novosDados);
+
+      const usuarioAtualizado = await this.usuarioRepository.save(usuarioEncontrado);
+
       if(!usuarioAtualizado)
         throw new BadRequestException('Erro ao atualizar cadastro.');
 
       return {message: 'Cadastro atualizado.'};
 
     }catch(erro){
-      throw erro
+      return {message: erro.sqlMessage}
     }
   }
 
   async deletarUsuario(id: number) {
     const usuarioEncontrado:UsuarioEntity = await this.buscarUsuario(id);
-    
-    if(!usuarioEncontrado)
-      throw new NotFoundException('Usuário não encontrado.')
-
     try{
-      if(await this.usuarioRepository.delete(usuarioEncontrado.id))
-        return {message:'Usuário deletado.'};
-      else{
-        return {message:'Usuário nao deletado.'};
-      }
+      if(!usuarioEncontrado)
+        throw new NotFoundException('Usuário não encontrado.')
+
+      const usuarioDeletado = await this.usuarioRepository.remove(usuarioEncontrado)
+
+      if(!usuarioDeletado)
+        throw new BadRequestException('Erro ao excluir cadastro.')
+      else
+        return{message:'Usuário excluido com sucesso.'}
 
     }catch(erro){
-      throw new BadRequestException('Erro ao deletar cadastro.');
+      throw erro;
     }
-
   }
 
   async criarServico(idUsuario: number, servico:CriaServicoDto){
     const usuarioEncontrado:UsuarioEntity = await this.buscarUsuario(idUsuario);
-    console.log(idUsuario)
     
     if(!usuarioEncontrado)
       throw new NotFoundException('Usuário não encontrado.');
@@ -306,7 +319,7 @@ export class UsuarioService {
   async listarServicos(){
     const listaServico= await this.servicoRepository.find({relations:{usuario:true}})
     const servicos = listaServico.map( 
-      (servico)=> new ListaServicosDTO(servico.id, servico.titulo, servico.descricao, servico.dataServico, servico.status, 'servico.usuario.nome'));
+      (servico)=> new ListaServicosDTO(servico.id, servico.titulo, servico.descricao, servico.dataServico, servico.status, servico.usuario.nome));
      
     return servicos;
   }
