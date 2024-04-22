@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { UsuarioEntity } from "./usuario.entity";
+import { IsArray } from "class-validator";
 
 @Entity({name:'campanha'})
 export class CampanhaEntity{
@@ -11,12 +13,6 @@ export class CampanhaEntity{
     @Column({name: 'publicoAlvo', length:50, nullable:false})
     publicoAlvo: string;
 
-    @Column({name: 'resultados', length:350, nullable:false})
-    resultado: string;
-
-    @Column({name: 'voluntarios', nullable:false})
-    voluntários: number;
-
     @Column({name: 'descricao',length:500, nullable:false})
     descricao: string;
 
@@ -25,5 +21,12 @@ export class CampanhaEntity{
 
     @Column({name: 'dataFinal', nullable:false})
     dataFinal: Date;
+
+    @ManyToOne(() =>UsuarioEntity, usuario => usuario.promocaoDeCampanhas,  {cascade:true, onDelete:'CASCADE'})
+    usuarioPromovedor: UsuarioEntity;
+    
+    @IsArray()
+    @ManyToMany(() =>UsuarioEntity, usuario => usuario.promocaoDeCampanhas,  {cascade:true, onDelete:'CASCADE'})
+    usuariosVoluntarios: UsuarioEntity[];
 
 }

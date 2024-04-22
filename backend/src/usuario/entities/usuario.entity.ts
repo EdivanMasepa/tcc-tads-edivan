@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PessoaEntity } from "./pessoa.entity";
 import { InstituicaoEntity } from "./instituicao.entity";
 import { ServicoEntity } from "./servico.entity";
+import { CampanhaEntity } from "./campanha.entity";
 
 @Entity({name:'usuario'})
 export class UsuarioEntity{
@@ -32,5 +33,14 @@ export class UsuarioEntity{
     senha: string;
 
     @OneToMany(() => ServicoEntity, servico => servico.usuario)
+    @JoinColumn()
     solicitacoesDeServicos: ServicoEntity[];
+
+    @OneToMany(() => CampanhaEntity, campanha => campanha.usuarioPromovedor)
+    @JoinColumn()
+    promocaoDeCampanhas: CampanhaEntity[];
+
+    @ManyToMany(() => CampanhaEntity, campanha => campanha.usuarioPromovedor)
+    @JoinColumn()
+    participacaoEmCampanhas: CampanhaEntity[];
 }

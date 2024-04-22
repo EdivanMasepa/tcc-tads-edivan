@@ -7,6 +7,7 @@ import { AtualizaPessoaDTO } from './dto/usuario/pessoa/atualizaPessoa.dto';
 import { CriaInstituicaoDTO } from './dto/usuario/instituicao/criaInstituicao.dto';
 import { CriaUsuarioDTO } from './dto/usuario/criaUsuario.dto';
 import { AtualizaUsuarioDTO } from './dto/usuario/atualizaUsuario.dto';
+import { AtualizaServicoDTO } from './dto/servico/atualizaServico.dto';
 
 @Controller('/usuario')
 export class UsuarioController {
@@ -26,7 +27,7 @@ export class UsuarioController {
 
   @UseGuards(AuthGuard)
   @Patch('/criar-servico')
-  async cadastrarServico(@Req() req, @Body() servico: CriaServicoDto) {
+  async cadastrarServico(@Req() req:any, @Body() servico: CriaServicoDto) {
     return await this.usuarioService.criarServico(req.user.sub, servico);
   }
   
@@ -37,7 +38,13 @@ export class UsuarioController {
   }
 
   @UseGuards(AuthGuard)
-  @Get(':opcao')
+  @Patch('/atualizar-servico/:idServico')
+  async alterarServico(@Req() req:any, @Param('idServico') idServico:number, @Body() novosDados: any) {
+    return await this.usuarioService.editarServico(req.user.sub, idServico, novosDados);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/listar-usuarios/:opcao')
   async listarUsuarios(@Param('opcao') opcao:number) {
       return await this.usuarioService.listarUsuarios(Number(opcao));
   }
@@ -49,9 +56,15 @@ export class UsuarioController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('buscar:parametro')
+  @Get('buscar-usuario/:parametro')
   async buscar(@Param('parametro') parametro: any) {
     return await this.usuarioService.buscarUsuario(parametro); 
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/buscar-servico/:parametro')
+  async buscarServico(@Param('parametro') parametro: number) {
+    return await this.usuarioService.buscarServico(parametro); 
   }
   
   @UseGuards(AuthGuard)

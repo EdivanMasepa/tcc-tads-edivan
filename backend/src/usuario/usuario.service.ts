@@ -15,6 +15,7 @@ import { CriaUsuarioDTO } from './dto/usuario/criaUsuario.dto';
 import { UsuarioEntity } from './entities/usuario.entity';
 import { ListaUsuarioDTO } from './dto/usuario/listaUsuario.dto';
 import { AtualizaUsuarioDTO } from './dto/usuario/atualizaUsuario.dto';
+import { AtualizaServicoDTO } from './dto/servico/atualizaServico.dto';
 
 @Injectable()
 export class UsuarioService {
@@ -187,11 +188,11 @@ export class UsuarioService {
     try{
       let usuarioBuscado = await this.validaBuscaUsuario(parametro)
       
-      if(usuarioBuscado)
-        return usuarioBuscado;
-      else
+      if(!usuarioBuscado)
         throw new NotFoundException('Nenhum cadastro localizado.');
-
+      
+      return usuarioBuscado;
+      
     }catch(erro){
       throw erro
     }
@@ -322,6 +323,40 @@ export class UsuarioService {
       (servico)=> new ListaServicosDTO(servico.id, servico.titulo, servico.descricao, servico.dataServico, servico.status, servico.usuario.nome));
      
     return servicos;
+  }
+
+  async buscarServico(idServico:number){
+    try{
+      let servicoEncontrado = await this.servicoRepository.findOneBy({id:idServico});
+    
+      if(!servicoEncontrado)
+        throw new NotFoundException('Nenhuma solicitação de serviço encontrada.')
+  
+      return servicoEncontrado
+
+    }catch(erro){
+      throw erro
+    }
+  }
+
+  async editarServico(idUsuario: number, idServico:number, novosDadosServico: any){
+    const usuarioEncontrado = await  this.buscarUsuario(idUsuario);
+    const servicoEncontrado = await this.buscarServico(idServico);
+
+    try{
+      if(!usuarioEncontrado)
+        throw new NotFoundException('Usuario inválido.');
+
+      const novoServico = await this.servicoRepository.update(servicoEncontrado, novosDadosServico)
+
+      if(!novoServico)
+        throw new BadRequestException('Erro ao editar serviço.')
+      
+      return {message: 'Alteração feita com sucesso.'}
+
+    }catch(erro){
+      throw erro
+    }
   }
 
   validarCPF(cpf: string){
