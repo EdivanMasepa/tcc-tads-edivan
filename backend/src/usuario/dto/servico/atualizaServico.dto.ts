@@ -12,5 +12,5 @@ export class AtualizaServicoDTO{
     status?: string;
 
     @IsDate()
-    dataServico: Date;
+    dataServico?: Date;
 }

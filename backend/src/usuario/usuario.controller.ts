@@ -39,7 +39,7 @@ export class UsuarioController {
 
   @UseGuards(AuthGuard)
   @Patch('/atualizar-servico/:idServico')
-  async alterarServico(@Req() req:any, @Param('idServico') idServico:number, @Body() novosDados: any) {
+  async alterarServico(@Req() req:any, @Param('idServico') idServico:number, @Body() novosDados: AtualizaServicoDTO) {
     return await this.usuarioService.editarServico(req.user.sub, idServico, novosDados);
   }
 
@@ -69,7 +69,13 @@ export class UsuarioController {
   
   @UseGuards(AuthGuard)
   @Delete('/deletar')
-  async remove(@Req() req) {
+  async remove(@Req() req:any) {
     return await this.usuarioService.deletarUsuario(req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('deletar-servico/:parametro')
+  async removerServico(@Req() req:any, @Param('parametro') idServico:number){
+      return await this.usuarioService.deletarServico(req.user.sub, Number(idServico))
   }
 }

@@ -328,18 +328,18 @@ export class UsuarioService {
   async buscarServico(idServico:number){
     try{
       let servicoEncontrado = await this.servicoRepository.findOneBy({id:idServico});
-    
-      if(!servicoEncontrado)
-        throw new NotFoundException('Nenhuma solicitação de serviço encontrada.')
-  
-      return servicoEncontrado
 
+      if(!servicoEncontrado)
+        throw new NotFoundException('Nenhuma solicitação de serviço encontrada.') 
+    
+      return servicoEncontrado
+      
     }catch(erro){
       throw erro
     }
   }
 
-  async editarServico(idUsuario: number, idServico:number, novosDadosServico: any){
+  async editarServico(idUsuario: number, idServico:number, novosDadosServico: AtualizaServicoDTO){
     const usuarioEncontrado = await  this.buscarUsuario(idUsuario);
     const servicoEncontrado = await this.buscarServico(idServico);
 
@@ -353,6 +353,28 @@ export class UsuarioService {
         throw new BadRequestException('Erro ao editar serviço.')
       
       return {message: 'Alteração feita com sucesso.'}
+
+    }catch(erro){
+      throw erro
+    }
+  }
+
+  async deletarServico(idUsuario:number, idServico:number){
+    const usuarioEncontrado = await this.buscarUsuario(idUsuario);
+    const servicoEncontrado = await this.buscarServico(idServico);
+    let servicoExcluido: any;
+
+    try{
+      for(let servico of usuarioEncontrado.solicitacoesDeServicos){
+
+        if(servico.id === idServico)
+          servicoExcluido = await this.servicoRepository.delete(servico)
+      }
+
+      if(servicoExcluido)
+        return {message:'Serviço excluído com sucesso.'}
+      else
+        throw new BadRequestException('Erro ao excluir serviço.')
 
     }catch(erro){
       throw erro
