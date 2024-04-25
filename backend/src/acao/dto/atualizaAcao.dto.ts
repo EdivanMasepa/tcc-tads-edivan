@@ -1,16 +1,16 @@
 import { IsDate, IsNotEmpty, IsString } from "class-validator";
 
-export class AtualizaServicoDTO{
+export class AtualizaAcaoDTO{
 
     @IsString()
     titulo?:string;
 
     @IsString()
-    descricao?:string;
-
-    @IsString()
     status?: string;
 
     @IsDate()
-    dataServico?: Date;
+    dataFinal?: Date;
+
+    @IsString()
+    descricao?:string;
 }

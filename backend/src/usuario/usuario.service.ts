@@ -5,9 +5,8 @@ import { ListaPessoaDTO } from './dto/usuario/pessoa/listaPessoa.dto';
 import { CriaPessoaDTO } from './dto/usuario/pessoa/criaPessoa.dto';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { CriaServicoDto } from './dto/servico/criaServico.dto';
-import { ServicoEntity } from './entities/servico.entity';
-import { ListaServicosDTO } from './dto/servico/listaServicos.dto';
+import { CriaAcaoDto } from '../acao/dto/criaAcao.dto';
+import { AcaoEntity } from '../acao/entities/acao.entity';
 import { InstituicaoEntity } from './entities/instituicao.entity';
 import { CriaInstituicaoDTO } from './dto/usuario/instituicao/criaInstituicao.dto';
 import { ListaInstituicaoDTO } from './dto/usuario/instituicao/listaInstituicao.dto';
@@ -15,14 +14,13 @@ import { CriaUsuarioDTO } from './dto/usuario/criaUsuario.dto';
 import { UsuarioEntity } from './entities/usuario.entity';
 import { ListaUsuarioDTO } from './dto/usuario/listaUsuario.dto';
 import { AtualizaUsuarioDTO } from './dto/usuario/atualizaUsuario.dto';
-import { AtualizaServicoDTO } from './dto/servico/atualizaServico.dto';
+import { AtualizaAcaoDTO } from '../acao/dto/atualizaAcao.dto';
 
 @Injectable()
 export class UsuarioService {
   constructor(@InjectRepository(UsuarioEntity) private readonly usuarioRepository: Repository<UsuarioEntity>,
               @InjectRepository(PessoaEntity) private readonly usuarioPessoaRepository: Repository<PessoaEntity>,
-              @InjectRepository(InstituicaoEntity) private readonly usuarioInstituicaoRepository: Repository<InstituicaoEntity>,
-              @InjectRepository(ServicoEntity) private readonly servicoRepository: Repository<ServicoEntity>){}
+              @InjectRepository(InstituicaoEntity) private readonly usuarioInstituicaoRepository: Repository<InstituicaoEntity>){}
 
   async criarUsuario(usuario: CriaUsuarioDTO, usuarioPessoa?: CriaPessoaDTO, usuarioInstituicao?: CriaInstituicaoDTO){
     const usuarioEntity= new UsuarioEntity();
@@ -102,7 +100,7 @@ export class UsuarioService {
   }
 
   async listarUsuarios(opcao: number) {
-    const usuarios = await this.usuarioRepository.find({relations: ['usuarioPessoa', 'solicitacoesDeServicos', 'usuarioInstituicao']})
+    const usuarios = await this.usuarioRepository.find()
     const usuariosPessoas = await this.usuarioPessoaRepository.find();
     const usuariosInstituicoes = await this.usuarioInstituicaoRepository.find();
 
@@ -113,24 +111,24 @@ export class UsuarioService {
       if(opcao === 1){
         return usuarios.map((usuario) => {
           if(usuario.tipoUsuario === 'pessoa'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.solicitacoesDeServicos.length, 
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.pedidosDeAjuda.length, 
               new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
           }else if(usuario.tipoUsuario === 'instituicao'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.solicitacoesDeServicos.length, 
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.pedidosDeAjuda.length, 
               new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
           }
         }) 
       }else if(opcao === 2){
         return usuarios.map((usuario) => {
           if(usuario.tipoUsuario === 'pessoa'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.solicitacoesDeServicos.length,
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.pedidosDeAjuda.length,
               new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
           }
         }) 
       }else if(opcao === 3){
         return usuarios.map((usuario) => {
           if(usuario.tipoUsuario === 'instituicao'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,usuario.solicitacoesDeServicos.length,
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,usuario.pedidosDeAjuda.length,
                new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
           }
         }) 
@@ -147,25 +145,25 @@ export class UsuarioService {
     let usuarioPessoa:PessoaEntity;
     let usuarioInstituicao:InstituicaoEntity;
 
-    usuario = await this.usuarioRepository.findOne({where:{id: parametro}, relations:{usuarioPessoa:true, usuarioInstituicao:true, solicitacoesDeServicos:true}});
+    usuario = await this.usuarioRepository.findOneBy({id: parametro});
   
     if(!usuario){
-      usuario = await this.usuarioRepository.findOne({where:{email: parametro}, relations:{usuarioPessoa:true, usuarioInstituicao:true, solicitacoesDeServicos:true}});
+      usuario = await this.usuarioRepository.findOne({where:{email: parametro}});
 
       if(!usuario){
-        usuario = await this.usuarioRepository.findOne({where:{telefone: parametro}, relations:{usuarioPessoa:true, usuarioInstituicao:true,solicitacoesDeServicos:true}});
+        usuario = await this.usuarioRepository.findOne({where:{telefone: parametro}});
 
         if(!usuario){
-          usuarioPessoa = await this.usuarioPessoaRepository.findOne({where:{cpf: parametro}, relations:{usuario:true}});
+          usuarioPessoa = await this.usuarioPessoaRepository.findOne({where:{cpf: parametro}});
 
           if(usuarioPessoa)
-            usuario = await this.usuarioRepository.findOne({where:{id: usuarioPessoa.idUsuario}, relations:{usuarioPessoa:true, usuarioInstituicao:true, solicitacoesDeServicos:true}});
+            usuario = await this.usuarioRepository.findOne({where:{id: usuarioPessoa.idUsuario}});
 
           else{
-            usuarioInstituicao = await this.usuarioInstituicaoRepository.findOne({where:{cnpj: parametro}, relations:{usuario:true}});
+            usuarioInstituicao = await this.usuarioInstituicaoRepository.findOne({where:{cnpj: parametro}});
 
             if(usuarioInstituicao){
-              usuario = await this.usuarioRepository.findOne({where:{id: usuarioInstituicao.idUsuario}, relations:{usuarioPessoa:true, usuarioInstituicao:true, solicitacoesDeServicos:true}});
+              usuario = await this.usuarioRepository.findOne({where:{id: usuarioInstituicao.idUsuario}});
 
               if(!usuario)
                 return false
@@ -294,90 +292,6 @@ export class UsuarioService {
 
     }catch(erro){
       throw erro;
-    }
-  }
-
-  async criarServico(idUsuario: number, servico:CriaServicoDto){
-    const usuarioEncontrado:UsuarioEntity = await this.buscarUsuario(idUsuario);
-    
-    if(!usuarioEncontrado)
-      throw new NotFoundException('Usuário não encontrado.');
-
-    const servicoEntity = new ServicoEntity();
-
-    servicoEntity.titulo = servico.titulo
-    servicoEntity.descricao = servico.descricao
-    servicoEntity.dataServico = servico.dataServico
-    servicoEntity.status = servico.status
-    servicoEntity.usuario = usuarioEncontrado
-    
-    await this.servicoRepository.save(servicoEntity)
-
-    return {message: 'Servico criado com sucesso.'}
-  
-  }
-
-  async listarServicos(){
-    const listaServico= await this.servicoRepository.find({relations:{usuario:true}})
-    const servicos = listaServico.map( 
-      (servico)=> new ListaServicosDTO(servico.id, servico.titulo, servico.descricao, servico.dataServico, servico.status, servico.usuario.nome));
-     
-    return servicos;
-  }
-
-  async buscarServico(idServico:number){
-    try{
-      let servicoEncontrado = await this.servicoRepository.findOneBy({id:idServico});
-
-      if(!servicoEncontrado)
-        throw new NotFoundException('Nenhuma solicitação de serviço encontrada.') 
-    
-      return servicoEncontrado
-      
-    }catch(erro){
-      throw erro
-    }
-  }
-
-  async editarServico(idUsuario: number, idServico:number, novosDadosServico: AtualizaServicoDTO){
-    const usuarioEncontrado = await  this.buscarUsuario(idUsuario);
-    const servicoEncontrado = await this.buscarServico(idServico);
-
-    try{
-      if(!usuarioEncontrado)
-        throw new NotFoundException('Usuario inválido.');
-
-      const novoServico = await this.servicoRepository.update(servicoEncontrado, novosDadosServico)
-
-      if(!novoServico)
-        throw new BadRequestException('Erro ao editar serviço.')
-      
-      return {message: 'Alteração feita com sucesso.'}
-
-    }catch(erro){
-      throw erro
-    }
-  }
-
-  async deletarServico(idUsuario:number, idServico:number){
-    const usuarioEncontrado = await this.buscarUsuario(idUsuario);
-    const servicoEncontrado = await this.buscarServico(idServico);
-    let servicoExcluido: any;
-
-    try{
-      for(let servico of usuarioEncontrado.solicitacoesDeServicos){
-
-        if(servico.id === idServico)
-          servicoExcluido = await this.servicoRepository.delete(servico)
-      }
-
-      if(servicoExcluido)
-        return {message:'Serviço excluído com sucesso.'}
-      else
-        throw new BadRequestException('Erro ao excluir serviço.')
-
-    }catch(erro){
-      throw erro
     }
   }
 

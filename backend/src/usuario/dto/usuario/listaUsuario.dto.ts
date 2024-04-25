@@ -8,7 +8,7 @@ export class ListaUsuarioDTO{
         private readonly nome:string, 
         private readonly email:string, 
         private readonly telefone:string,
-        private readonly solicitacoesDeServico:number,
+        private readonly pedidosDeAjuda:number,
         private readonly especificacao: ListaPessoaDTO | ListaInstituicaoDTO
 
     ){}

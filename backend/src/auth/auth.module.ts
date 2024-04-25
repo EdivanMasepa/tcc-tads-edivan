@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PessoaEntity } from 'src/usuario/entities/pessoa.entity';
-import { ServicoEntity } from 'src/usuario/entities/servico.entity';
+import { AcaoEntity } from 'src/acao/entities/acao.entity';
 import { InstituicaoEntity } from 'src/usuario/entities/instituicao.entity';
 import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
 
@@ -17,7 +17,7 @@ import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
     privateKey: process.env.JWT_SECRET,
     secret: process.env.JWT_SECRET,
     signOptions:{expiresIn:'50000s'}}),
-    TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, ServicoEntity, InstituicaoEntity])],
+    TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, AcaoEntity, InstituicaoEntity])],
   controllers: [AuthController],
   providers: [AuthService, UsuarioService],
 })

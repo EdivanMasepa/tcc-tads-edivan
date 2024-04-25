@@ -1,6 +1,3 @@
-import { ListaServicosDTO } from "../../servico/listaServicos.dto";
-import { ListaUsuarioDTO } from "../listaUsuario.dto";
-
 export class ListaPessoaDTO {
     constructor(
         private readonly idPessoa: number,

@@ -1,21 +1,12 @@
-import { Column, Entity, JoinColumn, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PessoaEntity } from "./pessoa.entity";
 import { InstituicaoEntity } from "./instituicao.entity";
-import { ServicoEntity } from "./servico.entity";
-import { CampanhaEntity } from "./campanha.entity";
+import { AcaoEntity } from "../../acao/entities/acao.entity";
 
 @Entity({name:'usuario'})
 export class UsuarioEntity{
     @PrimaryGeneratedColumn()
     id: number;
-
-    @OneToOne(() => PessoaEntity, pessoa => pessoa.usuario, {nullable:true,  onUpdate:'CASCADE', onDelete:'CASCADE'})
-    @JoinColumn()
-    usuarioPessoa: PessoaEntity;
-
-    @OneToOne(() => InstituicaoEntity, instituicao => instituicao.usuario, {nullable:true, onUpdate:'CASCADE', onDelete:'CASCADE'})
-    @JoinColumn()
-    usuarioInstituicao: InstituicaoEntity;
 
     @Column({name:'tipo_usuario', nullable:false})
     tipoUsuario:string;
@@ -32,15 +23,23 @@ export class UsuarioEntity{
     @Column({name: 'senha', length:100, nullable:false})
     senha: string;
 
-    @OneToMany(() => ServicoEntity, servico => servico.usuario)
+    @OneToOne(() => PessoaEntity, pessoa => pessoa.usuario, {nullable:true,  onUpdate:'CASCADE', onDelete:'CASCADE', eager: true})
     @JoinColumn()
-    solicitacoesDeServicos: ServicoEntity[];
+    usuarioPessoa: PessoaEntity;
 
-    @OneToMany(() => CampanhaEntity, campanha => campanha.usuarioPromovedor)
+    @OneToOne(() => InstituicaoEntity, instituicao => instituicao.usuario, {nullable:true, onUpdate:'CASCADE', onDelete:'CASCADE', eager: true})
     @JoinColumn()
-    promocaoDeCampanhas: CampanhaEntity[];
+    usuarioInstituicao: InstituicaoEntity;
 
-    @ManyToMany(() => CampanhaEntity, campanha => campanha.usuarioPromovedor)
+    @OneToMany(() => AcaoEntity, acao => acao.usuarioResponsavel, {eager: true})
     @JoinColumn()
-    participacaoEmCampanhas: CampanhaEntity[];
+    pedidosDeAjuda: AcaoEntity[];
+
+    @OneToMany(() => AcaoEntity, acao => acao.usuarioResponsavel, {eager: true})
+    @JoinColumn()
+    promocaoDeCampanhas: AcaoEntity[];
+
+    @ManyToMany(() => AcaoEntity, acao => acao.usuariosVoluntarios, {eager: true})
+    @JoinTable()
+    participacaoEmCampanhas: AcaoEntity[];
 }
