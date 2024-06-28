@@ -1,0 +1,67 @@
+.alturaLogin{
+  height: 60%;
+
+}
+.divInputs{
+  width: 100%;
+  height: 50%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly
+}
+.divInputLogin{
+  width: 70%;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.divInputSenha{
+  width: 70%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.h5Senha{
+  display: flex;
+  justify-content: center;
+}
+.h5Senha a{
+  font-size: 11px;
+  color: #455FA3;
+  text-decoration: underline;
+}
+.divButtonEntrar{
+  width: 100%;
+  height: 20%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+
+}
+.divButtonCadastrar{
+  position: relative;
+  top: 50px;
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+}
+.buttonCadastrar a{
+  text-decoration: none;
+  background-color: inherit;
+  color: #fff;
+}
+.labelCadastrar{
+  background-color: transparent;
+  color:#455FA3  ;
+}
+.aCadastrar{
+  background-color: inherit;
+}

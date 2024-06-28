@@ -8,6 +8,9 @@ export class PessoaEntity{
     @PrimaryGeneratedColumn()
     id:number;
 
+    @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioPessoa)
+    usuario: UsuarioEntity;
+
     @Column({name:'id_usuario', nullable:false})
     idUsuario: number;
 
@@ -23,6 +26,4 @@ export class PessoaEntity{
     @Column({name: 'situacao', length:20, nullable:false})
     situacao: string;
 
-    @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioPessoa)
-    usuario: UsuarioEntity;
 }

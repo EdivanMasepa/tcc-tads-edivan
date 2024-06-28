@@ -1,0 +1,26 @@
+.divButton{
+    width: 100%;
+  
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+  
+    background-color:inherit;
+  }
+  .button{
+    height: 35px;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5% 10%;
+  
+    border: none;
+    border-radius: 50px;
+    background-color: #455FA3;
+    color: #fff;
+  }
+  .button:focus{
+    outline: none;
+  }

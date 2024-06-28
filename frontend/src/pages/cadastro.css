@@ -1,0 +1,132 @@
+.alturaCadastroDivPrincipal{
+  height: 1050px;
+}
+.aCadastroVoltar{
+  width: 40px;
+  height: 30px;
+
+  position: absolute;
+  top: 10px;
+  left: 10px;
+
+  color: #455FA3;
+  background-color: transparent;
+  border: none;
+}
+.iconeVoltar{
+  width: 40px;
+  height: 30px;
+  background-color: transparent;
+}
+.alturaCadastroDivSecundaria{
+  margin: 50px 0px 25px 0;
+  height: 1000px;
+}
+.divImgLogo{
+  width: 100%;
+  height: 15%;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+
+  color: #000;
+}
+.divH2Cadastro{
+  width: 100%;
+  height: 10%;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+
+  color:#000;
+}
+.h2Cadastro{
+  font-weight: 350;
+  text-decoration: underline;
+  color: #455FA3;
+}
+.divDescricao{
+    width: 100%;
+    height: 13% ;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+
+}
+.hrDescricao{
+    width: 20%;
+    border-top: 1px solid white;
+    border-right: none;
+    border-bottom: none;
+    border-left: none;
+    border-color: #455FA3;
+    background-color: transparent;
+}
+.h3Descricao{
+    width: 60%;
+    line-height: 35px;
+
+    color: #fff;
+
+    font-weight: 400;
+    font-size: 12px;
+    text-align: center;
+
+    background-color: #455FA3E6;
+}
+.divTipoCadastro{
+    width: 80%;
+    height: 6%;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+
+    border: 1px solid #455FA3;
+}
+.buttonOpcaoCadastro{
+    width: 50%;
+    height: 99%;
+
+    border: none;
+    border-radius: 0px;
+
+    color: #455FA3E6;
+    background-color: #fff;
+
+}
+.buttonSelecionado{
+  z-index: 1;
+
+  color: #fff;
+  background-color: #455FA3E6;
+}
+.buttonOpcaoCadastro:focus{
+    outline: none;
+}
+.shadowLeft{
+  box-shadow: -2px 0px 5px #00000060;
+}
+.shadowRight{
+  box-shadow: 2px 0px 5px #00000060;
+}
+.divFormulario{
+  width: 70%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: space-around;
+    align-items: center;
+    margin: 20px auto;
+}
