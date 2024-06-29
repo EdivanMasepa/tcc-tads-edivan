@@ -1,10 +1,15 @@
 import './login.css'
-import "../index.css"
-import Button from '../components/button'
-import Input from '../components/input'
+import "../../index.css"
+import Button from '../../components/button/button'
+import Input from '../../components/input/input'
+import { useNavigate } from 'react-router-dom'
 
 
-function Login() {
+const Login: React.FC = () => {
+  const navigate = useNavigate();
+  const redirecionar = (pagina: string) => {
+    navigate(`/${pagina}`);
+  };
   return (
     <>
       <div className='divPrincipal'>
@@ -26,12 +31,12 @@ function Login() {
 
             <div className='divInputSenha'>
               <Input label='Senha' placeholder='Senha'/>
-              <h5 className='h5Senha'><a>Esqueci minha senha</a></h5>
+              <h5 className='h5Senha'><a href='/redefinirSenha'>Esqueci minha senha</a></h5>
             </div>
 
           </div>
 
-          <Button legenda='Entrar'/>
+          <Button legenda='Entrar' onClick={() => redirecionar('perfil')}/>
 
         </div>
 

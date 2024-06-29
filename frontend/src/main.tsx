@@ -1,23 +1,32 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import Login from './pages/login.tsx'
+import Login from './pages/login/login.tsx'
 import './index.css'
-import Cadastro from './pages/cadastro.tsx'
-
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import RedefinirSenha from './pages/redefinirSenha/redefinirSenha.tsx'
+import Cadastro from './pages/cadastro/cadastro.tsx'
+import Perfil from './pages/perfil/perfil.tsx'
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element:<Login />
+    element: <Login />
   },
   {
     path: '/login',
-    element:<Login /> 
+    element: <Login /> 
   },
   {
-    path: 'cadastro',
-    element:<Cadastro />
+    path: '/cadastro',
+    element: <Cadastro />
+  },
+  {
+    path: '/redefinirSenha',
+    element: <RedefinirSenha />
+  },
+  {
+    path: '/perfil',
+    element: <Perfil />
   }
 ])
 

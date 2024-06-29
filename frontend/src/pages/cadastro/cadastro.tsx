@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import "./cadastro.css"
-import "../index.css"
-import Input from '../components/input';
-import Button from '../components/button';
+import "../../index.css"
 import { IoArrowBack } from 'react-icons/io5';
+import Input from '../../components/input/input';
+import Button from '../../components/button/button';
 
 const Cadastro: React.FC = () => {
   const [opcao, setOpcao] = useState(true)
@@ -69,6 +69,7 @@ const Cadastro: React.FC = () => {
             <Input label='Senha' placeholder=''/>
 
             <Input label='Confirmar senha' placeholder=''/>
+
             <Button legenda='Cadastrar'/>
 
         </div>
