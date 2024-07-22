@@ -36,7 +36,7 @@ const Login: React.FC = () => {
 
           </div>
 
-          <Button legenda='Entrar' onClick={() => redirecionar('perfil')}/>
+          <Button legenda='Entrar' onClick={() => redirecionar('paginaInicial')}/>
 
         </div>
 

@@ -14,8 +14,9 @@ const Cadastro: React.FC = () => {
 
   return (
     <div className='divPrincipal alturaCadastroDivPrincipal'>
-      <a href='/login' className='aCadastroVoltar'><IoArrowBack className='iconeVoltar'/>
-      </a>
+      
+      <a href='/login' className='aCadastroVoltar'><IoArrowBack className='iconeVoltar'/></a>
+      
       <div className='divSecundaria alturaCadastroDivSecundaria'>
           
         <div className='divImgLogo'>
@@ -34,19 +35,15 @@ const Cadastro: React.FC = () => {
 
         <div className='divTipoCadastro'>
           <button 
-            type='submit' 
-            className={opcao ? 'buttonOpcaoCadastro buttonSelecionado shadowRight' : 'buttonOpcaoCadastro'}
-            onClick={alteraOpcaoCadastro}
-          >
-            PESSOA
+          type='submit' 
+          className={opcao ? 'buttonOpcaoCadastro buttonSelecionado shadowRight' : 'buttonOpcaoCadastro'}
+          onClick={alteraOpcaoCadastro}>PESSOA
           </button>
 
           <button 
-            type='submit' 
-            className={opcao ? 'buttonOpcaoCadastro' : 'buttonOpcaoCadastro buttonSelecionado shadowLeft'}
-            onClick={alteraOpcaoCadastro}
-          >
-            INSTITUIÇÃO
+          type='submit' 
+          className={opcao ? 'buttonOpcaoCadastro' : 'buttonOpcaoCadastro buttonSelecionado shadowLeft'}
+          onClick={alteraOpcaoCadastro}>INSTITUIÇÃO
           </button>
         </div>
         

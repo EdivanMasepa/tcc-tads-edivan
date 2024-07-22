@@ -1,0 +1,42 @@
+.divMenu{
+    width: 60%;
+    height: 100vh;
+
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    padding-top: 70px;
+
+    background-color: #fff;
+    z-index: 2;
+}
+.ulMenu{
+    width: 100%;
+    height: auto;
+}
+.liMenu{
+    width: 100%;
+    height: auto;
+    
+    padding:20px 30px;
+    
+    font-size: 17px;
+    font-weight: 500;
+    list-style: none;
+}
+.liMenu:active, .liMenu:hover{
+    background-color: #455fa330;
+}
+.divBackgroundMenu{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: #00000090;
+    height: 100vh;
+    width:40% ;
+    z-index: 2;
+}
+.linkMenu{
+    text-decoration: none;
+    color: #455fa3;
+}

@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import RedefinirSenha from './pages/redefinirSenha/redefinirSenha.tsx'
 import Cadastro from './pages/cadastro/cadastro.tsx'
 import Perfil from './pages/perfil/perfil.tsx'
+import PaginaInicial from './pages/paginaInicial/paginaInicial.tsx'
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
   {
     path: '/perfil',
     element: <Perfil />
+  },
+  {
+    path: '/paginaInicial',
+    element: <PaginaInicial />
   }
 ])
 
