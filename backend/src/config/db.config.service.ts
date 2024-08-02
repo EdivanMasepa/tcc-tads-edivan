@@ -9,11 +9,11 @@ export class dbConfigService implements TypeOrmOptionsFactory{
     createTypeOrmOptions(): TypeOrmModuleOptions{
         return{
             type: 'mysql',
-            host: 'localhost',
-            port: 3306,
-            username: 'root' ,
-            password: '1234',
-            database:  'db_projeto',
+            host: this.configService.get<string>("DB_HOST"),
+            port: Number(this.configService.get<string>("DB_PORT")),
+            username: this.configService.get<string>("DB_USER") ,
+            password: this.configService.get<string>("DB_PASSWORD"),
+            database:  this.configService.get<string>("DB_NAME"),
             entities: [__dirname + '/../**/*.entity{.js,.ts}'],
             synchronize: true
         }

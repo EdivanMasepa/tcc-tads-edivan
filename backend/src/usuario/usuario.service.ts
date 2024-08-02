@@ -72,6 +72,10 @@ export class UsuarioService {
       }    
       else if(usuarioInstituicao != null){
 
+        if(!this.validarCNPJ(usuarioInstituicao.cnpj))
+          throw new BadRequestException('CNPJ inválido.')
+        
+
         if(await this.validaBuscaUsuario(usuarioInstituicao.cnpj))
           throw new BadRequestException('CNPJ já cadastrado.')
 
@@ -166,7 +170,7 @@ export class UsuarioService {
               usuario = await this.usuarioRepository.findOne({where:{id: usuarioInstituicao.idUsuario}});
 
               if(!usuario)
-                return false
+                return null
               else
                 return usuario
             }
@@ -183,17 +187,14 @@ export class UsuarioService {
   }
 
   async buscarUsuario(parametro:any) {  
-    try{
+
       let usuarioBuscado = await this.validaBuscaUsuario(parametro)
-      
-      if(!usuarioBuscado)
+
+      if(!(usuarioBuscado instanceof UsuarioEntity))
         throw new NotFoundException('Nenhum cadastro localizado.');
       
       return usuarioBuscado;
       
-    }catch(erro){
-      throw erro
-    }
   }
 
   async alterarUsuario(idUsuario: number, novosDados: AtualizaUsuarioDTO) {
@@ -299,8 +300,8 @@ export class UsuarioService {
     let cpfLista = cpf.split('');
     let cpfnumero = [];
     let cpfVerifica = [];
-    let soma = 0;
-    let segundaSoma = 0;
+    let soma:number = 0;
+    let segundaSoma:number = 0;
     let primeiroDigitoVerificador: number;
     let segundoDigitoVerificador : number;
     let verifica = true;
@@ -346,5 +347,61 @@ export class UsuarioService {
     }
 
     return verifica;
+  }
+
+  validarCNPJ(cnpj: string){
+    let cnpjLista = cnpj.split('')
+    let cnpjNumero = [];
+    let cnpjVerifica = [];
+    const primeiraListaApoio = [ 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    const segundaListaApoio = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    let primeiraSoma = 0;
+    let segundaSoma = 0;
+    let primeiroDigitoVerificadorCNPJ:number;
+    let segundoDigitoVerificadorCNPJ:number;
+    let verificador:boolean = false;
+
+    for(let i = 0; i < cnpjLista.length; i++){
+      cnpjVerifica[i] = parseInt(cnpjLista[i]);
+    }
+
+    for(let i = 0; i < (cnpjLista.length - 2); i++){
+      cnpjNumero[i] = parseInt(cnpjLista[i])
+      primeiraListaApoio[i] *= cnpjNumero[i]
+      primeiraSoma += primeiraListaApoio[i]
+    }    
+
+    if(primeiraSoma % 11 < 2){
+      primeiroDigitoVerificadorCNPJ = 0
+    }else{
+      primeiroDigitoVerificadorCNPJ = 11 - (primeiraSoma % 11)
+    }
+
+    cnpjNumero.push(primeiroDigitoVerificadorCNPJ)
+
+    for(let i = 0; i < (cnpjLista.length - 1); i++){
+      segundaListaApoio[i] *= cnpjNumero[i] 
+      segundaSoma += segundaListaApoio[i]
+    }   
+
+    if(segundaSoma % 11 < 2){
+      segundoDigitoVerificadorCNPJ = 0
+    }else{
+      segundoDigitoVerificadorCNPJ = 11 - (segundaSoma % 11)
+    }
+
+    cnpjNumero.push(segundoDigitoVerificadorCNPJ)
+
+    for(let i = 0; i < cnpjNumero.length; i++){
+      
+      if(cnpjNumero[i] == cnpjVerifica[i]){
+        verificador = true
+      }
+      else{
+        verificador = false
+      }
+    }
+
+    return verificador
   }
 }
