@@ -63,4 +63,8 @@
 }
 .aCadastrar{
   background-color: inherit;
+  text-decoration: none;
+}
+.novaAltura{
+  height: 25% !important;
 }
