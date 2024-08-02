@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -16,26 +16,29 @@ export class AuthService {
         let senhaValida:boolean;
         let payload:any;
 
-        usuario = await this.usuarioService.buscarUsuario(loginUsuario);
+        try{
+            usuario = await this.usuarioService.validaBuscaUsuario(loginUsuario);
 
-        senhaValida = await bcrypt.compare(senha, usuario.senha);
+            if(!(usuario instanceof UsuarioEntity))
+                throw new UnauthorizedException('Login ou senha inválidos.')
 
-        if(!usuario || !senhaValida || loginUsuario.length < 10)
-            throw new BadRequestException('Login inválido')
+            senhaValida = await bcrypt.compare(senha, usuario.senha);
 
-        if(usuario instanceof UsuarioEntity){
+            if(!senhaValida || loginUsuario.length < 10)
+                throw new UnauthorizedException('Login ou senha inválidos')
 
             if(usuario.usuarioPessoa)
                 usuarioEspecificacaoId = usuario.usuarioPessoa.id;
             else
                 usuarioEspecificacaoId = usuario.usuarioInstituicao.id
-        }else
-            throw new NotFoundException
 
-        payload = {sub:usuario.id, email:usuario.email, especificacaoId:usuarioEspecificacaoId};
+            payload = {sub:usuario.id, email:usuario.email, especificacaoId:usuarioEspecificacaoId};
 
-        return {
-            token: this.jwtService.sign(payload)
-        };
+            return {
+                token: this.jwtService.sign(payload)
+            }
+        }catch(erro){
+            return erro
+        }
     }
 }
