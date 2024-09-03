@@ -19,13 +19,13 @@ export class AuthService {
         try{
             usuario = await this.usuarioService.validaBuscaUsuario(loginUsuario);
 
-            if(!(usuario instanceof UsuarioEntity))
+            if(loginUsuario.length < 10 || !(usuario instanceof UsuarioEntity))
                 throw new UnauthorizedException('Login ou senha inválidos.')
 
             senhaValida = await bcrypt.compare(senha, usuario.senha);
-
-            if(!senhaValida || loginUsuario.length < 10)
-                throw new UnauthorizedException('Login ou senha inválidos')
+            
+            if(!senhaValida)
+                throw new UnauthorizedException('Login ou senha inválidos.')
 
             if(usuario.usuarioPessoa)
                 usuarioEspecificacaoId = usuario.usuarioPessoa.id;
@@ -35,10 +35,11 @@ export class AuthService {
             payload = {sub:usuario.id, email:usuario.email, especificacaoId:usuarioEspecificacaoId};
 
             return {
-                token: this.jwtService.sign(payload)
+                token: this.jwtService.sign(payload),
+                ok:true
             }
         }catch(erro){
-            return erro
+            throw erro
         }
     }
 }

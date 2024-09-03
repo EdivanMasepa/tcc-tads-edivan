@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PessoaEntity } from './entities/pessoa.entity';
 import { ListaPessoaDTO } from './dto/usuario/pessoa/listaPessoa.dto';
@@ -22,19 +22,43 @@ export class UsuarioService {
               @InjectRepository(PessoaEntity) private readonly usuarioPessoaRepository: Repository<PessoaEntity>,
               @InjectRepository(InstituicaoEntity) private readonly usuarioInstituicaoRepository: Repository<InstituicaoEntity>){}
 
+  propertyIsNullValidator(object: any){
+     if(typeof object === 'object'){
+
+      for(let item in object){
+
+        if(object[item]){
+
+          if (object[item] === null || object[item] === undefined || object[item].trim?.() === "" || object[item].length < 3) 
+            throw new BadRequestException(`A propriedade '${item}' não pode ser nula, indefinida, texto vazio ou ter menos de dois caracteres.`);
+
+          else if(typeof object[item] === 'object')
+            return this.propertyIsNullValidator(object[item])
+
+        }
+        else
+          throw new BadRequestException(`${item} é invalido`)
+      }
+    }
+  }
+
   async criarUsuario(usuario: CriaUsuarioDTO, usuarioPessoa?: CriaPessoaDTO, usuarioInstituicao?: CriaInstituicaoDTO){
     const usuarioEntity= new UsuarioEntity();
     const usuarioPessoaEntity = new PessoaEntity();
     const usuarioInstituicaoEntity = new InstituicaoEntity();
 
     try{
-      const senhaHasheada = await bcrypt.hash(usuario.senha, 10);
     
-      if(await this.validaBuscaUsuario(usuario.email))
-        throw new BadRequestException('Endereço de e-mail já cadastrado.')
+      this.propertyIsNullValidator(usuario)
+
+      if(usuario.email && await this.validaBuscaUsuario(usuario.email)){
+        console.log(usuario.email)
+        throw new BadRequestException('Endereço de e-mail já cadastrado.')}
 
       if(await this.validaBuscaUsuario(usuario.telefone))
         throw new BadRequestException('Número de celular já cadastrado.')
+
+      const senhaHasheada = await bcrypt.hash(usuario.senha, 10);
 
       usuarioEntity.tipoUsuario = usuario.tipoUsuario,
       usuarioEntity.nome = usuario.nome;
@@ -43,6 +67,7 @@ export class UsuarioService {
       usuarioEntity.senha = senhaHasheada;
 
       if(usuarioPessoa != null){
+        this.propertyIsNullValidator(usuarioPessoa)
 
         if(!this.validarCPF(usuarioPessoa.cpf))
           throw new BadRequestException('CPF inválido.')
@@ -72,6 +97,8 @@ export class UsuarioService {
       }    
       else if(usuarioInstituicao != null){
 
+        this.propertyIsNullValidator(usuarioInstituicao)
+
         if(!this.validarCNPJ(usuarioInstituicao.cnpj))
           throw new BadRequestException('CNPJ inválido.')
         
@@ -99,7 +126,7 @@ export class UsuarioService {
           throw new BadRequestException('Erro ao cadastrar.')
     }      
     }catch(erro){
-      throw erro
+      throw new InternalServerErrorException('Erro interno, verifique as informações e tente novamente.')
     }
   }
 

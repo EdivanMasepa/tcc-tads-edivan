@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, BadRequestException } from '@nestjs/common';
 import { UsuarioService as UsuarioService } from './usuario.service';
 import { CriaPessoaDTO } from './dto/usuario/pessoa/criaPessoa.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -15,6 +15,7 @@ export class UsuarioController {
 
   @Post('/cadastrar')
   async cadastrarUsuario(@Body() usuarioCadastro: any){
+    
     const usuario = usuarioCadastro.usuario;
     const tipoUsuario = usuarioCadastro.tipoUsuario;
 
@@ -23,6 +24,9 @@ export class UsuarioController {
 
     else if(usuario.tipoUsuario === 'instituicao')
       return await this.usuarioService.criarUsuario(usuario,null, tipoUsuario);
+    else{
+      throw new BadRequestException('Dados inválidos, verifique e tente novamente.')
+    }
   }
   
   @UseGuards(AuthGuard)
