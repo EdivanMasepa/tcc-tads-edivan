@@ -11,7 +11,7 @@ import PaginaInicial from './pages/paginaInicial/paginaInicial.tsx'
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Login />
+    element: <Login />,
   },
   {
     path: '/login',

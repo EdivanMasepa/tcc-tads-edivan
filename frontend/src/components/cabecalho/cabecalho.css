@@ -55,6 +55,7 @@
 .buttonMenu{
     border: none;
     z-index: 3;
+    background: none;
 }
 .iconeMenu{
     width: 30px;

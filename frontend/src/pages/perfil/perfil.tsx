@@ -1,10 +1,58 @@
+import { useEffect, useState } from 'react'
 import Button from '../../components/button/button'
 import Cabecalho from '../../components/cabecalho/cabecalho'
 import Input from '../../components/input/input'
 import '../../index.css'
 import './perfil.css'
+import Cookies from "js-cookie"
+import axios from 'axios'
+import { jwtDecode, JwtPayload } from 'jwt-decode'
+
+interface dadosUsuario {
+    nome: string,
+    email:string,
+    telefone:string
+}
+
 
 const Perfil: React.FC = () => {
+
+    const [nome, setNome] = useState('');
+    const [email, setEmail] = useState('');
+    const [telefone, setTelefone] = useState('');
+    const [senha, setSenha] = useState('');
+    const [confirmarSenha, setConfirmarSenha] = useState('');
+        
+    let decodeToken: JwtPayload;
+
+    const salvar = async () => {
+        try{
+            const token = Cookies.get('token') ;
+            
+            if(token){
+                decodeToken = jwtDecode(token)
+            }
+            const response = await axios.get<dadosUsuario>(`http://localhost:3000/usuario/buscar-usuario/${decodeToken.sub}`, {
+                method: 'GET',
+                headers: {'Authorization': `Bearer ${token}`}
+            })
+            return response.data
+        }catch(erro){
+            console.log(erro)
+        }
+    }
+
+    useEffect(()=>{
+        salvar().then((response) => {
+            if(!response) return null
+            setNome(response.nome)
+            setEmail(response.email)
+            setTelefone(response.telefone)
+        })
+        
+
+    },[])
+    
     return(
         <div className='divPrincipal'>
             <Cabecalho />
@@ -15,17 +63,17 @@ const Perfil: React.FC = () => {
                 </div>
 
                 <div className='divAlterarPerfil'>
-                    <Input label='Nome' placeholder=''/>
+                    <Input value = {nome} setValue={setNome} label='Nome' placeholder='' type='text'/>
                                 
-                    <Input label='Email' placeholder=''/>
+                    <Input value = {email} setValue={setEmail} label='Email' placeholder=''  type='text'/>
 
-                    <Input label='Telefone' placeholder=''/>
+                    <Input value = {telefone} setValue={setTelefone} label='Telefone' placeholder=''  type='text'/>
 
-                    <Input label='Senha' placeholder=''/>
+                    <Input value = {senha} setValue={setSenha} label='Senha' placeholder=''  type='text'/>
                     
-                    <Input label='Confirmar senha' placeholder=''/>
+                    <Input value = {confirmarSenha} setValue={setConfirmarSenha} label='Confirmar senha' placeholder=''  type='text'/>
 
-                    <Button legenda='Salvar' />
+                    <Button legenda='Salvar' onClick={() => salvar()}/>
 
                 </div>
             </div>

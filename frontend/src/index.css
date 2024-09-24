@@ -4,8 +4,6 @@
   margin: 0;
 
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background-color: #fff;
-
 }
 .divPrincipal{
   width: 100vw;
@@ -26,6 +24,8 @@
   flex-direction: column;
 
   box-shadow: 1px 1px 2px #00000040;
+  background-color: #fff;
+
 }
 .divImgLogo{
   width: 100%;

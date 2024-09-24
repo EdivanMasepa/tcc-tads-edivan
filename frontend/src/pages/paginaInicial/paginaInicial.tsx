@@ -2,6 +2,9 @@ import { useState } from 'react';
 import Cabecalho from '../../components/cabecalho/cabecalho';
 import '../../index.css'
 import './paginaInicial.css'
+import { ToastContainer } from 'react-toastify';
+import  'react-toastify/dist/ReactToastify.css' ;
+
 
 const PaginaInicial: React.FC = () => {
 
@@ -51,6 +54,7 @@ const PaginaInicial: React.FC = () => {
                 ))}
                 
             </div>
+            <ToastContainer /> 
 
         </div>
     )

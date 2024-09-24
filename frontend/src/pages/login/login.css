@@ -19,12 +19,35 @@
   align-items: center;
 }
 .divInputSenha{
-  width: 70%;
+  width: 100%;
 
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
+}
+.divInputVerSenha{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.div1InputSenha{
+  width: 15%;
+}
+.div2InputSenha{
+  width: 70%;
+}
+.div3InputSenha{
+  width: 15%; 
+  padding-top: 8px; 
+}
+.iconeVerSenha{
+  width: 20px;
+  height: 20px;
+  color: #455FA3;
+  z-index: 3;
+  margin-left: -25px;
+
 }
 .h5Senha{
   display: flex;

@@ -4,12 +4,114 @@ import "../../index.css"
 import { IoArrowBack } from 'react-icons/io5';
 import Input from '../../components/input/input';
 import Button from '../../components/button/button';
+import { toast, ToastContainer } from 'react-toastify';
+import axios from 'axios';
+import  'react-toastify/dist/ReactToastify.css' ;
+
+enum TipoCadastro{
+  pessoa='pessoa' ,
+  instituicao='instituição'
+}
+
+interface UsuarioPessoa {
+  cpf:string;
+  dataNascimento:string;
+  genero:string;
+}
+
+interface UsuarioInstituicao {
+  cnpj: string;
+  dataFundacao:string;
+  areaAtuacao:string;
+}
+
+interface DadosCadastro{
+    usuario:{
+      tipoUsuario:TipoCadastro;
+      nome:string;
+      email:string;
+      telefone: string;
+      senha:string;
+    },
+    tipoUsuario: UsuarioPessoa | UsuarioInstituicao;
+}
 
 const Cadastro: React.FC = () => {
-  const [opcao, setOpcao] = useState(true)
+  
+  const [tipoCadastro, setTipoCadastro] = useState<TipoCadastro>(TipoCadastro.pessoa);
+  const [nome, setNome] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [telefone, setTelefone] = useState<string | null>(null);
+  const [senha, setSenha] = useState<string | null>(null);
+  const [confirmarSenha, setConfirmarSenha] = useState<string | null>(null);
+
+
+  const [cpfOuCnpj, setCpfOuCnpj] = useState<string | null>(null);
+  const [dataNascimentoOuFundacao, setDataNascimentoOuFundacao] = useState<string | null>(null);
+  const [generoOuAreaAtuacao, setGeneroOuAreaAtuacao] = useState<string | null>(null);
+  const [situacao, setSituacao] = useState<string | null>(null);
+
+
+  const listaCamposCadastro = [tipoCadastro, nome, email, telefone, senha, confirmarSenha, cpfOuCnpj, dataNascimentoOuFundacao, generoOuAreaAtuacao];
+
+  for(let campo in listaCamposCadastro){
+    if (!campo) {
+      toast.dismiss()
+      toast.error("Preencha todos os campos")
+      return
+    }
+  }
+  const dados: DadosCadastro | any = {
+    usuario:{
+      tipoUsuario: tipoCadastro,
+      nome: nome,
+      email: email,
+      telefone: telefone,
+      senha: senha
+    },
+    tipoUsuario:{
+      cpf: cpfOuCnpj,
+      dataNascimento: dataNascimentoOuFundacao,
+      genero: generoOuAreaAtuacao,
+      situacao: situacao
+    }
+  
+  }
+  
+  const cadastrar =  async (dadosCadastro: DadosCadastro) => {
+    try{
+      console.log(dadosCadastro)
+
+      const response = await axios.post('http://localhost:3000/usuario/cadastrar', dadosCadastro)
+
+      console.log(response)
+
+      toast.success('Cadastrado com sucesso.')      
+    }
+    catch(erro){
+      if (axios.isAxiosError(erro) && erro.response){
+        console.log('erro')
+
+        if(erro.response.data.message){
+          console.log(erro.response.data.message)
+          toast.dismiss()
+          toast.error(erro.response.data.message);
+        }
+        else {
+          toast.dismiss
+          toast.error('Erro ao cadastrar.')
+        }
+      } 
+      else {
+        console.log('Erro desconhecido', erro);
+      }
+    }
+  }
+
+  const [opcaoCadastro, setOpcaoCadastro] = useState(true)
 
   const alteraOpcaoCadastro = () =>{
-    setOpcao(!opcao)
+    setOpcaoCadastro(!opcaoCadastro)
   };
 
   return (
@@ -29,50 +131,58 @@ const Cadastro: React.FC = () => {
 
         <div className='divDescricao'>
           <hr className='hrDescricao hrDescricaoDireita'/>
-          <h3 className='h3Descricao'>INFORMAÇÕES PESSOAIS</h3>
+          <h3 className='h3Descricao'>INFORMAÇÕES {opcaoCadastro ? 'PESSOAIS' : 'BÁSICAS'}</h3>
           <hr className='hrDescricao hrDescricaoEsquerda'/>
+        </div>
+
+        <div className='divLegendaTipoCadastro'>
+            <p>Cadastrar:</p>
         </div>
 
         <div className='divTipoCadastro'>
           <button 
-          type='submit' 
-          className={opcao ? 'buttonOpcaoCadastro buttonSelecionado shadowRight' : 'buttonOpcaoCadastro'}
-          onClick={alteraOpcaoCadastro}>PESSOA
+          value={TipoCadastro.pessoa}
+          onChange={() =>{setTipoCadastro}}
+            type='submit' 
+            className={opcaoCadastro ? 'buttonOpcaoCadastro buttonSelecionado shadowRight' : 'buttonOpcaoCadastro'}
+            onClick={alteraOpcaoCadastro}>PESSOA
           </button>
 
           <button 
-          type='submit' 
-          className={opcao ? 'buttonOpcaoCadastro' : 'buttonOpcaoCadastro buttonSelecionado shadowLeft'}
-          onClick={alteraOpcaoCadastro}>INSTITUIÇÃO
+            value={TipoCadastro.instituicao}
+            onChange={() =>{setTipoCadastro}}
+            type='submit' 
+            className={opcaoCadastro ? 'buttonOpcaoCadastro' : 'buttonOpcaoCadastro buttonSelecionado shadowLeft'}
+            onClick={alteraOpcaoCadastro}>INSTITUIÇÃO
           </button>
         </div>
         
         <div className='divFormulario'>
 
-            <Input label='Nome completo' placeholder=''/>
+          <Input value={nome ?? ""} setValue={setNome} label='Nome completo' placeholder='Nome'  type='text'/>
 
-            <Input label='Email' placeholder=''/>
+          <Input value={email ?? ""} setValue={setEmail} label='Email' placeholder='exemplo@exemplo.com'  type='email'/>
 
-            <Input label='Telefone' placeholder=''/>
+          <Input value={telefone ?? ""} setValue={setTelefone} label='Telefone' placeholder='11 91111-1111'  type='text'/>
 
-            <Input label={opcao ? 'CPF' : 'CNPJ'} placeholder=''/>
+          <Input value={cpfOuCnpj ?? ""} setValue={setCpfOuCnpj} label={opcaoCadastro ? 'CPF' : 'CNPJ'} placeholder=''  type='text'/>
 
-            <Input label={opcao ? 'Data de nascimento': 'Data de fundação' } placeholder=''/>
+          <Input value={dataNascimentoOuFundacao ?? ""} setValue={setDataNascimentoOuFundacao} label={opcaoCadastro ? 'Data de nascimento': 'Data de fundação' } placeholder=''  type='text'/>
 
-            <Input label={opcao ? 'Gênero': 'Área de atuação' } placeholder=''/>
+          <Input value={generoOuAreaAtuacao ?? ""} setValue={setGeneroOuAreaAtuacao} label={opcaoCadastro ? 'Gênero': 'Área de atuação' } placeholder=''  type='text'/>
 
-            {opcao && <Input label='Situação' placeholder=''/>} 
+          {opcaoCadastro && <Input value={situacao ?? ""} setValue={setSituacao} label='Situação' placeholder=''  type='text'/>} 
 
-            <Input label='Senha' placeholder=''/>
+          <Input value={senha ?? ""} setValue={setSenha} label='Senha' placeholder=''  type='text'/>
 
-            <Input label='Confirmar senha' placeholder=''/>
+          <Input value={confirmarSenha ?? ""} setValue={setConfirmarSenha} label='Confirmar senha' placeholder=''  type='text'/>
 
-            <Button legenda='Cadastrar'/>
+          <Button legenda='Cadastrar' onClick={() => cadastrar(dados)}/>
 
         </div>
 
       </div>
-      
+      <ToastContainer/>
     </div>
   );
 };

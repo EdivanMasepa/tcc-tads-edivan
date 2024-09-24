@@ -4,58 +4,63 @@ import Button from '../../components/button/button'
 import Input from '../../components/input/input'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import Cookies from 'js-cookie'
+import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5'
+import { toast, ToastContainer } from 'react-toastify'
+import  'react-toastify/dist/ReactToastify.css' ;
+import axios from 'axios'
 
+interface DadosLogin {
+  login: string | null;
+  senha: string | null;
+};
 
 const Login: React.FC = () => {
-  const [login, setLogin] = useState('');
-  const [senha, setSenha] = useState('');
+  const [login, setLogin] = useState<string | null>(null);
+  const [senha, setSenha] = useState<string | null>(null);
+  const [verSenha, setVerSenha] = useState(true);
 
-  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLogin(e.target.value);
-  };
+  const mostrarSenha = ()=>{
+    setVerSenha(!verSenha)
+  }
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSenha(e.target.value);
-  };
-
-  const dadosLogin = {
-    login: login,
-    senha: senha,
-  };
   const navigate = useNavigate()
-  const logar = async () => {
+  const logar = async (dadosLogin:DadosLogin) => {
+
+    if (!login || !senha) {
+      toast.dismiss()
+      toast.error("Preencha todos os campos")
+      return
+    }
 
     try{
+      const response = await axios.post('http://localhost:3000/auth/login', dadosLogin)
+      
+      Cookies.set('token', response.data.token, {sameSite: "Strict", secure: true})
+      navigate('/paginaInicial')
+      toast.success('Sucesso')     
 
+      return response.data
 
-      console.log(dadosLogin)
-      const response = await fetch('http://localhost:3000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dadosLogin),
-      })
+    }catch(erro){
+      if (axios.isAxiosError(erro) && erro.response){
 
-      console.log(response)
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Login bem-sucedido:', data);
-        // Você pode armazenar o token ou redirecionar o usuário
-        navigate('/paginaInicial')
-      } else {
-        console.error(response.statusText);
-      }
-      } catch (error) {
-        console.error('Erro ao fazer a requisição:', error);
+        if(erro.response.data.message){
+          toast.dismiss()
+          toast.error(erro.response.data.message);
+        }
+        else {
+          toast.dismiss
+          toast.error('Erro ao fazer login.')
+        }
+  
+      } 
+      else {
+        console.log('Erro desconhecido', erro);
       }
     }
+  }
   
-  // const navigate = useNavigate();
-  // const redirecionar = (pagina: string) => {
-  //   navigate(`/${pagina}`);
-  // };
   return (
     <>
       <div className='divPrincipal'>
@@ -72,17 +77,30 @@ const Login: React.FC = () => {
           <div className='divInputs'>
 
             <div className='divInputLogin'>
-              <Input value={login} setValue={setLogin} label='Login' placeholder='E-mail, CPF ou Telefone'/>
+              <Input value={login ?? ""} setValue={setLogin} label='Login' placeholder='E-mail, CPF ou Telefone' type='text'/>
             </div>
 
+
             <div className='divInputSenha'>
-              <Input value={senha} setValue={setSenha} label='Senha' placeholder='Senha'/>
-              <h5 className='h5Senha'><a href='/redefinirSenha'>Esqueci minha senha</a></h5>
+
+              <div className='div1InputSenha'>
+                
+              </div>
+
+              <div className='div2InputSenha'>
+                <Input value={senha ?? ""} setValue={setSenha} label='Senha' placeholder='Senha' type={verSenha ? 'password' : 'text'}/>
+                <h5 className='h5Senha'><a href='/redefinirSenha'>Esqueci minha senha</a></h5>
+              </div>
+
+              <div className='div3InputSenha'>
+                <span onClick={mostrarSenha}>{verSenha ? <IoEyeOutline className='iconeVerSenha'/> : <IoEyeOffOutline className='iconeVerSenha'/>}</span>
+              </div>
+                
             </div>
 
           </div>
 
-          <Button className='novaAltura' legenda='Entrar' onClick={() => logar()}/>
+          <Button className='novaAltura' legenda='Entrar' onClick={() => logar({login, senha})}/>
 
         </div>
 
@@ -92,6 +110,7 @@ const Login: React.FC = () => {
         </div>
 
       </div>
+      <ToastContainer /> 
     </>
   )
 }
