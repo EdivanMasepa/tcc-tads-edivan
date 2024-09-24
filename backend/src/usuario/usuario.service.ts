@@ -22,7 +22,7 @@ export class UsuarioService {
               @InjectRepository(PessoaEntity) private readonly usuarioPessoaRepository: Repository<PessoaEntity>,
               @InjectRepository(InstituicaoEntity) private readonly usuarioInstituicaoRepository: Repository<InstituicaoEntity>){}
 
-  propertyIsNullValidator(object: any){
+  validaPropriedades(object: any){
      if(typeof object === 'object'){
 
       for(let item in object){
@@ -33,7 +33,7 @@ export class UsuarioService {
             throw new BadRequestException(`A propriedade '${item}' não pode ser nula, indefinida, texto vazio ou ter menos de dois caracteres.`);
 
           else if(typeof object[item] === 'object')
-            return this.propertyIsNullValidator(object[item])
+            return this.validaPropriedades(object[item])
 
         }
         else
@@ -46,13 +46,11 @@ export class UsuarioService {
     const usuarioEntity= new UsuarioEntity();
     const usuarioPessoaEntity = new PessoaEntity();
     const usuarioInstituicaoEntity = new InstituicaoEntity();
+    this.validaPropriedades(usuario)
 
     try{
-    
-      this.propertyIsNullValidator(usuario)
 
       if(usuario.email && await this.validaBuscaUsuario(usuario.email)){
-        console.log(usuario.email)
         throw new BadRequestException('Endereço de e-mail já cadastrado.')}
 
       if(await this.validaBuscaUsuario(usuario.telefone))
@@ -67,7 +65,6 @@ export class UsuarioService {
       usuarioEntity.senha = senhaHasheada;
 
       if(usuarioPessoa != null){
-        this.propertyIsNullValidator(usuarioPessoa)
 
         if(!this.validarCPF(usuarioPessoa.cpf))
           throw new BadRequestException('CPF inválido.')
@@ -97,9 +94,7 @@ export class UsuarioService {
       }    
       else if(usuarioInstituicao != null){
 
-        this.propertyIsNullValidator(usuarioInstituicao)
-
-        if(!this.validarCNPJ(usuarioInstituicao.cnpj))
+        if(!this.validarCNPJ(usuarioInstituicao.cnpj)) 
           throw new BadRequestException('CNPJ inválido.')
         
 
@@ -226,82 +221,40 @@ export class UsuarioService {
 
   async alterarUsuario(idUsuario: number, novosDados: AtualizaUsuarioDTO) {
     const usuarioEncontrado = await this.buscarUsuario(idUsuario);
+    this.validaPropriedades(novosDados);
 
-    try{
-
+    try{      
       if(!usuarioEncontrado)
         throw new NotFoundException('Usuário não encontrado.');
 
-      for(let itemUsuario in novosDados){
-
-          if(novosDados[itemUsuario].length < 3){
-            return {message: `'${itemUsuario}' deve ter pelo menos 3 caracteres.`}
-          }
-      }
-
       if(usuarioEncontrado.tipoUsuario === 'pessoa'){
-
-        for(let item in novosDados.usuarioPessoa){
-          if(novosDados.usuarioPessoa[item].length < 3){
-            return {message: `'${item}' deve ter pelo menos 3 caracteres.`}
-          }
-        }
         let pessoa = usuarioEncontrado.usuarioPessoa;
+        Object.assign(pessoa, novosDados.usuarioPessoa);
+        const usuarioPessoatualizado = await this.usuarioPessoaRepository.save(pessoa);
 
-        Object.assign(pessoa, novosDados.usuarioPessoa)
-
-        await this.usuarioPessoaRepository.save(pessoa);
+        if(!usuarioPessoatualizado)
+          throw new BadRequestException('Erro ao atualizar cadastro.');
       }
       
       else if(usuarioEncontrado.tipoUsuario === 'instituicao'){
-
-        for(let item in novosDados.usuarioInstituicao){
-
-          if(novosDados.usuarioInstituicao[item].length < 3){
-            return {message: `'${item}' deve ter pelo menos 3 caracteres.`}
-          }
-        }
         let instituicao = usuarioEncontrado.usuarioInstituicao;
-
         Object.assign(instituicao, novosDados.usuarioInstituicao)
+        const usuarioInstituicaotualizado = await this.usuarioInstituicaoRepository.save(instituicao);
 
-        await this.usuarioInstituicaoRepository.save(instituicao);
-
-      //   let usuarioInstituicao = await this.usuarioInstituicaoRepository.findOneBy({id: usuarioEncontrado.usuarioInstituicao.id});
-
-      //   for(let itemUsuario in usuarioInstituicao){
-          
-      //     for(let itemNovo in novosDados.especificacoes){
-            
-      //       if(itemUsuario === itemNovo){
-      //         usuarioInstituicao[itemUsuario] = novosDados.especificacoes[itemNovo];
-      //       }
-      //     }
-      //     usuarioEncontrado.usuarioInstituicao = usuarioInstituicao;
-      //   }
-      //   const usuarioInstituicaoAtualizado = await this.usuarioPessoaRepository.save(usuarioInstituicao);
-
-      //   if(!usuarioInstituicaoAtualizado)
-      //     throw new BadRequestException('Erro ao atualizar cadastro.');
-      // }
-
-      // for (const chave in novosDados) {
-      //   if (typeof novosDados[chave] !== 'object'){
-      //       novoObjeto[chave] = novosDados[chave];
-      //   }
+        if(!usuarioInstituicaotualizado)
+          throw new BadRequestException('Erro ao atualizar cadastro.');
       }
 
       Object.assign(usuarioEncontrado, novosDados);
-
       const usuarioAtualizado = await this.usuarioRepository.save(usuarioEncontrado);
 
       if(!usuarioAtualizado)
         throw new BadRequestException('Erro ao atualizar cadastro.');
+      else
+        return {statusCode:200, message:'Atualizado com sucesso.'}
 
-      return {message: 'Cadastro atualizado.'};
-
-    }catch(erro){
-      return {message: erro.sqlMessage}
+    }catch{
+      throw new InternalServerErrorException('Erro interno, verifique as informações e tente novamente.')
     }
   }
 

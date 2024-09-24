@@ -15,7 +15,6 @@ export class UsuarioController {
 
   @Post('/cadastrar')
   async cadastrarUsuario(@Body() usuarioCadastro: any){
-    
     const usuario = usuarioCadastro.usuario;
     const tipoUsuario = usuarioCadastro.tipoUsuario;
 
