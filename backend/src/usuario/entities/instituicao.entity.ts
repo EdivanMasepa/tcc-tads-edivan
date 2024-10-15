@@ -18,7 +18,7 @@ export class InstituicaoEntity{
     cnpj: string;
 
     @Column({name: 'data_fundacao', nullable:false})
-    dataFundacao: Date;
+    dataFundacao: string;
 
     @Column({name: 'area_atuacao', length:50, nullable:false})
     areaAtuacao: string;

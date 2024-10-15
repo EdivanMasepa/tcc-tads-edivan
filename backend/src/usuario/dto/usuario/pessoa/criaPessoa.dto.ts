@@ -13,7 +13,7 @@ export class CriaPessoaDTO extends CriaUsuarioDTO {
   
     @IsDate()
     @IsNotEmpty({ message: "Data não pode ser vazia" })
-    dataNascimento: Date;
+    dataNascimento: string;
 
     @IsString()
     @IsNotEmpty({ message: "Gênero não pode ser vazio." })

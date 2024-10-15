@@ -18,7 +18,7 @@ export class PessoaEntity{
     cpf: string;  
 
     @Column({name: 'data_nascimento', nullable:false})
-    dataNascimento: Date;
+    dataNascimento: string;
 
     @Column({name: 'genero', length:30, nullable:false})
     genero: string;

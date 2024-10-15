@@ -13,7 +13,7 @@ export class CriaInstituicaoDTO extends CriaUsuarioDTO {
     
     @IsDate()
     @IsNotEmpty({ message: "Data de fundação não pode ser vazia" })
-    dataFundacao: Date;
+    dataFundacao: string;
 
     @IsString()
     @IsNotEmpty({ message: "Propósito não pode ser vazio." })

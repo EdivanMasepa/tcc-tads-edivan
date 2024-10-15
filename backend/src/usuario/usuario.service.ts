@@ -46,83 +46,80 @@ export class UsuarioService {
     const usuarioEntity= new UsuarioEntity();
     const usuarioPessoaEntity = new PessoaEntity();
     const usuarioInstituicaoEntity = new InstituicaoEntity();
+    
     this.validaPropriedades(usuario)
 
-    try{
+    if(usuario.email && await this.validaBuscaUsuario(usuario.email)){
+      throw new BadRequestException('Endereço de e-mail já cadastrado.')}
 
-      if(usuario.email && await this.validaBuscaUsuario(usuario.email)){
-        throw new BadRequestException('Endereço de e-mail já cadastrado.')}
+    if(await this.validaBuscaUsuario(usuario.telefone))
+      throw new BadRequestException('Número de celular já cadastrado.')
 
-      if(await this.validaBuscaUsuario(usuario.telefone))
-        throw new BadRequestException('Número de celular já cadastrado.')
+    const senhaHasheada = await bcrypt.hash(usuario.senha, 10);
 
-      const senhaHasheada = await bcrypt.hash(usuario.senha, 10);
+    usuarioEntity.tipoUsuario = usuario.tipoUsuario,
+    usuarioEntity.nome = usuario.nome;
+    usuarioEntity.email = usuario.email;
+    usuarioEntity.telefone = usuario.telefone;
+    usuarioEntity.senha = senhaHasheada;
 
-      usuarioEntity.tipoUsuario = usuario.tipoUsuario,
-      usuarioEntity.nome = usuario.nome;
-      usuarioEntity.email = usuario.email;
-      usuarioEntity.telefone = usuario.telefone;
-      usuarioEntity.senha = senhaHasheada;
+    if(usuarioPessoa != null){
 
-      if(usuarioPessoa != null){
+      if(!this.validarCPF(usuarioPessoa.cpf))
+        throw new BadRequestException('CPF inválido.')
 
-        if(!this.validarCPF(usuarioPessoa.cpf))
-          throw new BadRequestException('CPF inválido.')
+      if(await this.validaBuscaUsuario(usuarioPessoa.cpf))
+        throw new BadRequestException('CPF já cadastrado.')
 
-        if(await this.validaBuscaUsuario(usuarioPessoa.cpf))
-          throw new BadRequestException('CPF já cadastrado.')
+      const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
+      const dataFormatada = this.formataData(usuarioPessoa.dataNascimento)
 
-        const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
+      usuarioPessoaEntity.idUsuario = usuarioCriado.id;
+      usuarioPessoaEntity.cpf = usuarioPessoa.cpf;
+      usuarioPessoaEntity.dataNascimento = dataFormatada;
+      usuarioPessoaEntity.genero = usuarioPessoa.genero;
+      usuarioPessoaEntity.situacao = usuarioPessoa.situacao;
 
-        usuarioPessoaEntity.idUsuario = usuarioCriado.id;
-        usuarioPessoaEntity.cpf = usuarioPessoa.cpf;
-        usuarioPessoaEntity.dataNascimento = usuarioPessoa.dataNascimento;
-        usuarioPessoaEntity.genero = usuarioPessoa.genero;
-        usuarioPessoaEntity.situacao = usuarioPessoa.situacao;
+      const usuarioPessoaCriado = await this.usuarioPessoaRepository.save(usuarioPessoaEntity);    
 
-        const usuarioPessoaCriado = await this.usuarioPessoaRepository.save(usuarioPessoaEntity);    
+      if(usuarioPessoaCriado){
+        usuarioCriado.usuarioPessoa = usuarioPessoaCriado;
 
-        if(usuarioPessoaCriado){
-          usuarioCriado.usuarioPessoa = usuarioPessoaCriado;
+        await this.usuarioRepository.save(usuarioCriado);
 
-          await this.usuarioRepository.save(usuarioCriado);
-
-          return{message: 'Usuário cadastrado com sucesso.'};
-          
-        }else
-          throw new BadRequestException('Erro ao cadastrar.')
-      }    
-      else if(usuarioInstituicao != null){
-
-        if(!this.validarCNPJ(usuarioInstituicao.cnpj)) 
-          throw new BadRequestException('CNPJ inválido.')
+        return{message: 'Usuário cadastrado com sucesso.'};
         
+      }else
+        throw new BadRequestException('Erro ao cadastrar.')
+    }    
+    else if(usuarioInstituicao != null){
 
-        if(await this.validaBuscaUsuario(usuarioInstituicao.cnpj))
-          throw new BadRequestException('CNPJ já cadastrado.')
+      if(!this.validarCNPJ(usuarioInstituicao.cnpj)) 
+        throw new BadRequestException('CNPJ inválido.')
+      
+      if(await this.validaBuscaUsuario(usuarioInstituicao.cnpj))
+        throw new BadRequestException('CNPJ já cadastrado.')
 
-        const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
+      const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
+      const dataFormatada = this.formataData(usuarioInstituicao.dataFundacao)
 
-        usuarioInstituicaoEntity.idUsuario = usuarioEntity.id;
-        usuarioInstituicaoEntity.cnpj = usuarioInstituicao.cnpj;
-        usuarioInstituicaoEntity.dataFundacao = usuarioInstituicao.dataFundacao;
-        usuarioInstituicaoEntity.areaAtuacao = usuarioInstituicao.areaAtuacao;
+      usuarioInstituicaoEntity.idUsuario = usuarioEntity.id;
+      usuarioInstituicaoEntity.cnpj = usuarioInstituicao.cnpj;
+      usuarioInstituicaoEntity.dataFundacao = dataFormatada;
+      usuarioInstituicaoEntity.areaAtuacao = usuarioInstituicao.areaAtuacao;
 
-        const usuarioInstituicaoCriado = await this.usuarioInstituicaoRepository.save(usuarioInstituicaoEntity);
+      const usuarioInstituicaoCriado = await this.usuarioInstituicaoRepository.save(usuarioInstituicaoEntity);
 
-        if(usuarioInstituicaoCriado){
-          usuarioCriado.usuarioInstituicao = usuarioInstituicaoEntity;
+      if(usuarioInstituicaoCriado){
+        usuarioCriado.usuarioInstituicao = usuarioInstituicaoEntity;
 
-          await this.usuarioRepository.save(usuarioCriado);
+        await this.usuarioRepository.save(usuarioCriado);
 
-          return{message: 'Usuário cadastrado com sucesso.'};
+        return{message: 'Usuário cadastrado com sucesso.'};
 
-        }else
-          throw new BadRequestException('Erro ao cadastrar.')
+      }else
+        throw new BadRequestException('Erro ao cadastrar.')
     }      
-    }catch(erro){
-      throw new InternalServerErrorException('Erro interno, verifique as informações e tente novamente.')
-    }
   }
 
   async listarUsuarios(opcao: number) {
@@ -182,9 +179,11 @@ export class UsuarioService {
         if(!usuario){
           usuarioPessoa = await this.usuarioPessoaRepository.findOne({where:{cpf: parametro}});
 
-          if(usuarioPessoa)
+          if(usuarioPessoa){
             usuario = await this.usuarioRepository.findOne({where:{id: usuarioPessoa.idUsuario}});
-
+            
+            return usuario
+          }
           else{
             usuarioInstituicao = await this.usuarioInstituicaoRepository.findOne({where:{cnpj: parametro}});
 
@@ -383,5 +382,18 @@ export class UsuarioService {
     }
 
     return verificador
+  }
+
+  formataData(data: string){
+    try{
+      const [dia, mes, ano] = data.split('/');
+      const novaData = new Date(Number(ano), Number(mes) - 1, Number(dia));
+      const dataFormatada = novaData.toISOString().split('T')[0];
+
+      return dataFormatada
+    }
+    catch(erro){
+      throw new BadRequestException("Verifique o formato da data.")
+    }
   }
 }
