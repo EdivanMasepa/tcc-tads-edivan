@@ -9,7 +9,7 @@ import { AtualizaAcaoDTO } from './dto/atualizaAcao.dto';
 export class AcaoController {
   constructor(private readonly acaoService: AcaoService) {}
 
-  @Patch('/criar-acao')
+  @Post('/criar-acao')
   async cadastrarAcao(@Req() req:any, @Body() acao: CriaAcaoDto) {
     return await this.acaoService.criarAcao(req.user.sub, acao);
   }
@@ -29,7 +29,12 @@ export class AcaoController {
     return await this.acaoService.buscarAcao(parametro); 
   }
 
-  @Delete('deletar-acao/:parametro')
+  @Get('/buscar-acao-por-texto/:parametro')
+  async buscarAcaoPorTexto(@Param('parametro') parametro: string) {
+    return await this.acaoService.buscaAcaoPorTexto(parametro); 
+  }
+
+  @Delete('/deletar-acao/:parametro')
   async removerAcao(@Req() req:any, @Param('parametro') idAcao:number){
       return await this.acaoService.deletarAcao(req.user.sub, Number(idAcao))
   }

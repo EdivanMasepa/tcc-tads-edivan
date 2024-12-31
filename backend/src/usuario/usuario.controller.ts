@@ -29,19 +29,19 @@ export class UsuarioController {
   }
   
   @UseGuards(AuthGuard)
-  @Patch('/atualizar-usuario')
-  async alterar(@Req() req, @Body() novosDados: Partial<AtualizaUsuarioDTO>) {
+  @Patch('/atualizar')
+  async alterar(@Req() req:any, @Body() novosDados: Partial<AtualizaUsuarioDTO>){
     return await this.usuarioService.alterarUsuario(req.user.sub, novosDados);
   }
 
   @UseGuards(AuthGuard)
-  @Get('/listar-usuarios/:opcao')
+  @Get('/listar/:opcao')
   async listarUsuarios(@Param('opcao') opcao:number) {
       return await this.usuarioService.listarUsuarios(Number(opcao));
   }
 
   @UseGuards(AuthGuard)
-  @Get('buscar-usuario/:parametro')
+  @Get('/buscar/:parametro')
   async buscar(@Param('parametro') parametro: any) {
     return await this.usuarioService.buscarUsuario(parametro); 
   }
