@@ -1,16 +1,20 @@
-import { IsDate, IsNotEmpty, IsString } from "class-validator";
+import { IsDate, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class AtualizaAcaoDTO{
 
-    @IsString()
-    titulo?:string;
-
-    @IsString()
+    @IsOptional()
+    @IsString({message:'STATUS deve ser do tipo texto.'})
     status?: string;
 
-    @IsDate()
-    dataFinal?: Date;
+    @IsOptional()
+    @IsString({message:'TITULO deve ser do tipo texto.'})
+    titulo?:string;
 
-    @IsString()
+    @IsOptional()
+    @IsString({message:'DESCRIÇÃO deve ser do tipo texto.'})
     descricao?:string;
+
+    @IsOptional()
+    @IsDate({message:'DATA FINAL deve ser do tipo texto.'})
+    dataFinal?: string;
 }

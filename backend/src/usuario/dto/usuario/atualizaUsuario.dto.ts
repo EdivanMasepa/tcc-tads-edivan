@@ -6,24 +6,24 @@ import { PessoaEntity } from 'src/usuario/entities/pessoa.entity';
 
 export class AtualizaUsuarioDTO{
     @IsOptional()
-    @IsString({message:'"Nome" deve ser do tipo texto.'})
+    @IsString({message:'NOME deve ser do tipo texto.'})
     nome?: string;
 
     @IsOptional()
-    @IsEmail({allow_display_name:false}, {message:'Email inváldo.'})
+    @IsEmail({allow_display_name:false}, {message:'EMAIL inváldo.'})
     email?: string;
 
     @IsOptional()
-    @IsString({message:'"Telefone" deve ser do tipo texto.'})
+    @IsString({message:'TELEFONE tem tipo inválido.'})
     telefone?: string;
 
     @IsOptional()
-    @IsString({message:'"senha" deve ser do tipo texto.'})
+    @IsString({message:'SENHA deve ser do tipo texto.'})
     senha?: string;
 
     @IsOptional()
-    usuarioPessoa?: PessoaEntity;
+    usuarioPessoa?: AtualizaPessoaDTO;
 
     @IsOptional()
-    usuarioInstituicao?:InstituicaoEntity;
+    usuarioInstituicao?:AtualizaInstituicaoDTO;
 }

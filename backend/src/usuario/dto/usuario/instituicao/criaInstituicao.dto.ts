@@ -3,19 +3,19 @@ import { CriaUsuarioDTO } from "../criaUsuario.dto";
 
 export class CriaInstituicaoDTO extends CriaUsuarioDTO {
 
-    @IsNumber()
-    @IsNotEmpty({ message: "id do usuário não informado." })
+    @IsNumber({allowNaN:false}, {message:"Tipo do usuário não é compativel."})
+    @IsNotEmpty({message: "Usuário não informado."})
     idUsuario: number;
 
-    @IsString()
-    @IsNotEmpty({ message: "CNPJ não pode ser vazio." })
+    @IsString({message: "CNPJ tem tipo inválido."})
+    @IsNotEmpty({message: "CNPJ não pode ser vazio."})
     cnpj: string;
     
-    @IsDate()
-    @IsNotEmpty({ message: "Data de fundação não pode ser vazia" })
+    @IsString({message:"DATA DE FUNDAÇÃO tem tipo inválido."})
+    @IsNotEmpty({message: "DATA DE FUNDAÇÃO não pode ser vazia."})
     dataFundacao: string;
 
-    @IsString()
-    @IsNotEmpty({ message: "Propósito não pode ser vazio." })
+    @IsString({message: "ÁREA DE ATUAÇÃO deve ser do tipo texto."})
+    @IsNotEmpty({message: "ÁREA DE ATUAÇÃO não pode ser vazio."})
     areaAtuacao: string;
 }

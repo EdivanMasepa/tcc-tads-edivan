@@ -5,11 +5,11 @@ export class ListaAcaoDTO{
     constructor(
         private readonly id:number,
         private readonly tipoAcao:string,
-        private readonly titulo:string,
         private readonly status: string,
-        private readonly dataInicial: Date,
-        private readonly dataFinal: Date,
+        private readonly titulo:string,
         private readonly descricao:string,
-        private readonly usuarioSolicitante: string
+        private readonly dataInicial: string,
+        private readonly dataFinal: string,
+        private readonly usuarioResponsavel: string
     ){}
 }

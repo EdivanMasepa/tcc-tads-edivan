@@ -1,10 +1,12 @@
-import { IsDate, IsNotEmpty, IsString } from "class-validator";
+import { IsDate, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class AtualizaInstituicaoDTO{
     
-    @IsDate()
-    dataFundacao?: Date;
+    @IsOptional()
+    @IsDate({message:"DATA DE FUNDAÇÃO deve ser uma data válida."})
+    dataFundacao?: string;
 
-    @IsString()
+    @IsOptional()
+    @IsString({message:"ÁREA DE ATUAÇÃO deve ser do tipo texto."})
     areaAtuacao?: string;
 }

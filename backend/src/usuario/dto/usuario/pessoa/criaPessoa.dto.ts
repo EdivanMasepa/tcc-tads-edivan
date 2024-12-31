@@ -3,23 +3,23 @@ import { CriaUsuarioDTO } from "../criaUsuario.dto";
 
 export class CriaPessoaDTO extends CriaUsuarioDTO {
 
-    @IsNumber()
-    @IsNotEmpty({ message: "id do usuário não informado." })
+    @IsNumber({allowNaN: false}, {message: "Tipo do usuário não é compativel."})
+    @IsNotEmpty({message: "Usuário não informado."})
     idUsuario: number;
   
-    @IsString()
-    @IsNotEmpty({ message: "CPF não pode ser vazio." })
+    @IsString({message: "CPF tem tipo inválido."})
+    @IsNotEmpty({ message: "CPF não pode ser vazio."})
     cpf: string;
   
-    @IsDate()
-    @IsNotEmpty({ message: "Data não pode ser vazia" })
+    @IsString({message:"DATA DE NASCIMENTO tem tipo inválido."})
+    @IsNotEmpty({ message: "DATA DE NASCIMENTO não pode ser vazia"})
     dataNascimento: string;
 
-    @IsString()
-    @IsNotEmpty({ message: "Gênero não pode ser vazio." })
+    @IsString({message:"GÊNERO deve ser do tipo texto."})
+    @IsNotEmpty({ message: "GÊNERO não pode ser vazio."})
     genero: string;
 
-    @IsString()
-    @IsNotEmpty({ message: "Situação não pode ser vazia." })
+    @IsString({message:"SITUAÇÃO deve ser do tipo texto."})
+    @IsNotEmpty({ message: "SITUAÇÃO não pode ser vazia."})
     situacao: string;
 }
