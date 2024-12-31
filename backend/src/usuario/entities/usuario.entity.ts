@@ -23,23 +23,14 @@ export class UsuarioEntity{
     @Column({name: 'senha', length:100, nullable:false})
     senha: string;
 
-    @OneToOne(() => PessoaEntity, pessoa => pessoa.usuario, {nullable:true,  onUpdate:'CASCADE', onDelete:'CASCADE', eager: true})
+    @OneToOne(() => PessoaEntity, pessoa => pessoa.usuario, {nullable:true,  eager: true, cascade:true})
     @JoinColumn()
     usuarioPessoa: PessoaEntity;
 
-    @OneToOne(() => InstituicaoEntity, instituicao => instituicao.usuario, {nullable:true, onUpdate:'CASCADE', onDelete:'CASCADE', eager: true})
+    @OneToOne(() => InstituicaoEntity, instituicao => instituicao.usuario, {nullable:true, onUpdate:'CASCADE', onDelete:'CASCADE', eager: true,  cascade:true})
     @JoinColumn()
     usuarioInstituicao: InstituicaoEntity;
 
-    @OneToMany(() => AcaoEntity, acao => acao.usuarioResponsavel, {eager: true})
-    @JoinColumn()
-    pedidosDeAjuda: AcaoEntity[];
-
-    @OneToMany(() => AcaoEntity, acao => acao.usuarioResponsavel, {eager: true})
-    @JoinColumn()
-    promocaoDeCampanhas: AcaoEntity[];
-
-    @ManyToMany(() => AcaoEntity, acao => acao.usuariosVoluntarios, {eager: true})
-    @JoinTable()
-    participacaoEmCampanhas: AcaoEntity[];
+    @OneToMany(() => AcaoEntity, acao => acao.usuario, {nullable:true, eager: true,  cascade:true})
+    acoes: AcaoEntity[];
 }
