@@ -20,24 +20,25 @@ import { AtualizaAcaoDTO } from '../acao/dto/atualizaAcao.dto';
 export class UsuarioService {
   constructor(@InjectRepository(UsuarioEntity) private readonly usuarioRepository: Repository<UsuarioEntity>,
               @InjectRepository(PessoaEntity) private readonly usuarioPessoaRepository: Repository<PessoaEntity>,
-              @InjectRepository(InstituicaoEntity) private readonly usuarioInstituicaoRepository: Repository<InstituicaoEntity>){}
+              @InjectRepository(InstituicaoEntity) private readonly usuarioInstituicaoRepository: Repository<InstituicaoEntity>,
+              @InjectRepository(AcaoEntity) private readonly acaoRepository: Repository<AcaoEntity>){}
 
   validaPropriedades(object: any){
-     if(typeof object === 'object'){
+    if(typeof object === 'object'){
 
       for(let item in object){
 
         if(object[item]){
 
-          if (object[item] === null || object[item] === undefined || object[item].trim?.() === "" || object[item].length < 3) 
-            throw new BadRequestException(`A propriedade '${item}' não pode ser nula, indefinida, texto vazio ou ter menos de dois caracteres.`);
+          if (object[item] === null || object[item] === undefined || object[item].trim?.() === '' || object[item].length < 3) 
+            throw new BadRequestException(`A propriedade '${item}' não pode ser nula, indefinida, texto vazio ou ter menos de três caracteres.`);
 
           else if(typeof object[item] === 'object')
             return this.validaPropriedades(object[item])
 
         }
         else
-          throw new BadRequestException(`${item} é invalido`)
+          throw new BadRequestException(`${item} é invalido.`)
       }
     }
   }
@@ -53,7 +54,7 @@ export class UsuarioService {
       throw new BadRequestException('Endereço de e-mail já cadastrado.')}
 
     if(await this.validaBuscaUsuario(usuario.telefone))
-      throw new BadRequestException('Número de celular já cadastrado.')
+      throw new BadRequestException('Número de telefone já cadastrado.')
 
     const senhaHasheada = await bcrypt.hash(usuario.senha, 10);
 
@@ -64,6 +65,7 @@ export class UsuarioService {
     usuarioEntity.senha = senhaHasheada;
 
     if(usuarioPessoa != null){
+      this.validaPropriedades(usuarioPessoa)
 
       if(!this.validarCPF(usuarioPessoa.cpf))
         throw new BadRequestException('CPF inválido.')
@@ -87,12 +89,13 @@ export class UsuarioService {
 
         await this.usuarioRepository.save(usuarioCriado);
 
-        return{message: 'Usuário cadastrado com sucesso.'};
+        return{statusCode: 201, message: 'Usuário cadastrado com sucesso.'};
         
       }else
         throw new BadRequestException('Erro ao cadastrar.')
     }    
     else if(usuarioInstituicao != null){
+      this.validaPropriedades(usuarioInstituicao)
 
       if(!this.validarCNPJ(usuarioInstituicao.cnpj)) 
         throw new BadRequestException('CNPJ inválido.')
@@ -115,11 +118,13 @@ export class UsuarioService {
 
         await this.usuarioRepository.save(usuarioCriado);
 
-        return{message: 'Usuário cadastrado com sucesso.'};
+        return{statusCode: 201, message: 'Usuário cadastrado com sucesso.'};
 
       }else
         throw new BadRequestException('Erro ao cadastrar.')
-    }      
+
+    }else
+        throw new BadRequestException('Tipo do usuário inválido.')      
   }
 
   async listarUsuarios(opcao: number) {
@@ -127,39 +132,38 @@ export class UsuarioService {
     const usuariosPessoas = await this.usuarioPessoaRepository.find();
     const usuariosInstituicoes = await this.usuarioInstituicaoRepository.find();
 
-    if(!usuariosPessoas || !usuariosInstituicoes)
-      throw new NotFoundException('Erro ao buscar usuários.')
+    if(usuarios.length < 0 || usuariosPessoas.length < 0 || usuariosInstituicoes.length < 0)
+      throw new BadRequestException('Não foi possível realizar a busca.')
  
     try{
       if(opcao === 1){
         return usuarios.map((usuario) => {
           if(usuario.tipoUsuario === 'pessoa'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.pedidosDeAjuda.length, 
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.acoes.length, 
               new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
           }else if(usuario.tipoUsuario === 'instituicao'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.pedidosDeAjuda.length, 
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.acoes.length, 
               new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
           }
         }) 
       }else if(opcao === 2){
         return usuarios.map((usuario) => {
           if(usuario.tipoUsuario === 'pessoa'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.pedidosDeAjuda.length,
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.acoes.length,
               new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
           }
         }) 
       }else if(opcao === 3){
         return usuarios.map((usuario) => {
           if(usuario.tipoUsuario === 'instituicao'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,usuario.pedidosDeAjuda.length,
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,usuario.acoes.length,
                new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
           }
         }) 
-      }else
-        throw new NotFoundException('Opção inválida.')
+      }
     }
-    catch(erro){
-      throw erro
+    catch{
+      throw new BadRequestException('Erro ao buscar usuários.')
     }
   }
 
@@ -167,7 +171,7 @@ export class UsuarioService {
     let usuario:UsuarioEntity;
     let usuarioPessoa:PessoaEntity;
     let usuarioInstituicao:InstituicaoEntity;
-
+    
     usuario = await this.usuarioRepository.findOneBy({id: parametro});
   
     if(!usuario){
@@ -178,10 +182,9 @@ export class UsuarioService {
 
         if(!usuario){
           usuarioPessoa = await this.usuarioPessoaRepository.findOne({where:{cpf: parametro}});
-
+          
           if(usuarioPessoa){
             usuario = await this.usuarioRepository.findOne({where:{id: usuarioPessoa.idUsuario}});
-            
             return usuario
           }
           else{
@@ -207,72 +210,67 @@ export class UsuarioService {
       return usuario        
   }
 
-  async buscarUsuario(parametro:any) {  
+  async buscarUsuario(parametro:any){
+    const usuarioBuscado = await this.validaBuscaUsuario(parametro)
 
-      let usuarioBuscado = await this.validaBuscaUsuario(parametro)
-
-      if(!(usuarioBuscado instanceof UsuarioEntity))
-        throw new NotFoundException('Nenhum cadastro localizado.');
-      
-      return usuarioBuscado;
-      
+    if(!(usuarioBuscado instanceof UsuarioEntity))
+      throw new NotFoundException('Nenhum cadastro localizado.');
+    
+    return usuarioBuscado;  
   }
 
   async alterarUsuario(idUsuario: number, novosDados: AtualizaUsuarioDTO) {
     const usuarioEncontrado = await this.buscarUsuario(idUsuario);
     this.validaPropriedades(novosDados);
 
-    try{      
-      if(!usuarioEncontrado)
-        throw new NotFoundException('Usuário não encontrado.');
+    try{ 
+      await this.usuarioRepository.update({id:usuarioEncontrado.id}, {
+        nome: novosDados.nome,
+        email: novosDados.email,
+        telefone: novosDados.telefone
+      })     
 
       if(usuarioEncontrado.tipoUsuario === 'pessoa'){
-        let pessoa = usuarioEncontrado.usuarioPessoa;
-        Object.assign(pessoa, novosDados.usuarioPessoa);
-        const usuarioPessoatualizado = await this.usuarioPessoaRepository.save(pessoa);
-
-        if(!usuarioPessoatualizado)
-          throw new BadRequestException('Erro ao atualizar cadastro.');
+        await this.usuarioPessoaRepository.update({id: usuarioEncontrado.usuarioPessoa.id}, {
+          dataNascimento: novosDados.usuarioPessoa.dataNascimento,
+          genero: novosDados.usuarioPessoa.genero,
+          situacao: novosDados.usuarioPessoa.situacao
+        })
       }
-      
       else if(usuarioEncontrado.tipoUsuario === 'instituicao'){
-        let instituicao = usuarioEncontrado.usuarioInstituicao;
-        Object.assign(instituicao, novosDados.usuarioInstituicao)
-        const usuarioInstituicaotualizado = await this.usuarioInstituicaoRepository.save(instituicao);
-
-        if(!usuarioInstituicaotualizado)
-          throw new BadRequestException('Erro ao atualizar cadastro.');
+        await this.usuarioInstituicaoRepository.update({id: usuarioEncontrado.usuarioPessoa.id}, {
+          dataFundacao: novosDados.usuarioInstituicao.dataFundacao,
+          areaAtuacao: novosDados.usuarioInstituicao.areaAtuacao
+        })
       }
+      return {statusCode:200, message:'Atualizado com sucesso.'}
 
-      Object.assign(usuarioEncontrado, novosDados);
-      const usuarioAtualizado = await this.usuarioRepository.save(usuarioEncontrado);
-
-      if(!usuarioAtualizado)
-        throw new BadRequestException('Erro ao atualizar cadastro.');
-      else
-        return {statusCode:200, message:'Atualizado com sucesso.'}
-
-    }catch{
-      throw new InternalServerErrorException('Erro interno, verifique as informações e tente novamente.')
+    }catch(e){
+      console.log(e)
+      throw new BadRequestException('Erro ao atualizar cadastro.');
     }
   }
 
-  async deletarUsuario(id: number) {
+  async deletarUsuario(id: number){
     const usuarioEncontrado:UsuarioEntity = await this.buscarUsuario(id);
+
     try{
-      if(!usuarioEncontrado)
-        throw new NotFoundException('Usuário não encontrado.')
+      if(usuarioEncontrado.acoes.length > 0){
+        for(let acao of usuarioEncontrado.acoes){
+          await this.acaoRepository.delete(acao)
+        }
+      }
+      await this.usuarioRepository.delete(usuarioEncontrado.id)
 
-      const usuarioDeletado = await this.usuarioRepository.remove(usuarioEncontrado)
+      if (usuarioEncontrado.usuarioPessoa) {
+        await this.usuarioPessoaRepository.delete({id:usuarioEncontrado.usuarioPessoa.id});
+      }
+     
+      return{statusCode:200, message:'Usuário excluido com sucesso.'}
 
-      if(!usuarioDeletado)
-        throw new BadRequestException('Erro ao excluir cadastro.')
-      else
-        return{message:'Usuário excluido com sucesso.'}
-
-    }catch(erro){
-      throw erro;
-    }
+    }catch{
+      throw new BadRequestException('Erro ao excluir cadastro.')
+    }    
   }
 
   validarCPF(cpf: string){
@@ -331,14 +329,14 @@ export class UsuarioService {
   validarCNPJ(cnpj: string){
     let cnpjLista = cnpj.split('')
     let cnpjNumero = [];
-    let cnpjVerifica = [];
-    const primeiraListaApoio = [ 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-    const segundaListaApoio = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    let cnpjVerifica = [];  
     let primeiraSoma = 0;
     let segundaSoma = 0;
     let primeiroDigitoVerificadorCNPJ:number;
     let segundoDigitoVerificadorCNPJ:number;
     let verificador:boolean = false;
+    const primeiraListaApoio = [ 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    const segundaListaApoio = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
     for(let i = 0; i < cnpjLista.length; i++){
       cnpjVerifica[i] = parseInt(cnpjLista[i]);
@@ -393,7 +391,7 @@ export class UsuarioService {
       return dataFormatada
     }
     catch(erro){
-      throw new BadRequestException("Verifique o formato da data.")
+      throw new BadRequestException('Verifique o formato da data.')
     }
   }
 }

@@ -10,92 +10,114 @@ import { ListaAcaoDTO } from './dto/listaAcao.dto';
 
 @Injectable()
 export class AcaoService {
-  constructor(@InjectRepository(AcaoEntity) private readonly acaoRepository: Repository<AcaoEntity>,
-              private readonly usuarioService: UsuarioService){}
+  constructor(
+    @InjectRepository(AcaoEntity) private readonly acaoRepository: Repository<AcaoEntity>,
+    private readonly usuarioService: UsuarioService){}
 
   async criarAcao(idUsuario: number, acao:CriaAcaoDto){
-    const usuarioEncontrado:UsuarioEntity = await this.usuarioService.buscarUsuario(idUsuario);
-    
-    if(!usuarioEncontrado)
-      throw new NotFoundException('Usuário não encontrado.');
-
-    const acaoEntity = new AcaoEntity();
-    
-    acaoEntity.tipoAcao = acao.tipoAcao;
-    acaoEntity.titulo = acao.titulo;
-    acaoEntity.status = acao.status;
-    acaoEntity.dataInicial = acao.dataInicial;
-    acaoEntity.dataFinal = acao.dataFinal;
-    acaoEntity.descricao = acao.descricao;
-    acaoEntity.usuarioResponsavel = usuarioEncontrado
-    
-    await this.acaoRepository.save(acaoEntity)
-
-    return {message: 'Sucesso ao cadastrar.'}
-  
-  }
-
-  async listarAcoes(){
-    const listaAcao= await this.acaoRepository.find({relations:{usuarioResponsavel:true}})
-    const acoes = listaAcao.map( 
-      (acao)=> new ListaAcaoDTO(acao.id, acao.titulo, acao.tipoAcao, acao.status, acao.dataInicial, acao.dataFinal, acao.descricao, acao.usuarioResponsavel.nome));
-     
-    return acoes;
-  }
-
-  async buscarAcao(idAcao:number){
     try{
-      let acaoEncontrada = await this.acaoRepository.findOneBy({id:idAcao});
-
-      if(!acaoEncontrada)
-        throw new NotFoundException('Nenhuma solicitação de serviço encontrada.') 
+      const usuarioEncontrado:UsuarioEntity = await this.usuarioService.buscarUsuario(idUsuario);
+      const acaoEntity:AcaoEntity = new AcaoEntity();
     
-      return acaoEncontrada
+      acaoEntity.tipoAcao = acao.tipoAcao;
+      acaoEntity.titulo = acao.titulo;
+      acaoEntity.status = acao.status;
+      acaoEntity.dataInicial = acao.dataInicial;
+      acaoEntity.dataFinal = acao.dataFinal;
+      acaoEntity.descricao = acao.descricao;
+      acaoEntity.usuario = usuarioEncontrado
+   
+      await this.acaoRepository.save(acaoEntity)
       
-    }catch(erro){
-      throw erro
+      return {statuscode:201, message: 'Sucesso ao cadastrar.'}
+    
+    }catch{
+      throw new BadRequestException("Erro ao criar publicação.")
     }
   }
 
+  async listarAcoes(){
+    try{
+      const listaAcao= await this.acaoRepository.find({relations:{usuario:true}})
+
+      return listaAcao.map(
+        (acao)=> new ListaAcaoDTO(
+          acao.id,
+          acao.tipoAcao,          
+          acao.status, 
+          acao.titulo, 
+          acao.descricao, 
+          acao.dataInicial, 
+          acao.dataFinal,          
+          acao.usuario.nome
+        )
+      );
+    }catch{
+      throw new BadRequestException("Erro ao buscar ações.")
+    }
+  }
+
+  async buscarAcao(idAcao:number){
+      const acaoEncontrada = await this.acaoRepository.findOneBy({id:idAcao});
+
+      if(!acaoEncontrada)
+        throw new NotFoundException('Nenhuma publicação encontrada.') 
+    
+      return acaoEncontrada
+  }
+
+  async buscaAcaoPorTexto(text: string){
+    const acao = await this.acaoRepository
+      .createQueryBuilder('acao')
+      .select(['acao.id', 'acao.titulo', 'acao.descricao'])
+      .where('lower(acao.titulo) like concat("%", lower(:text), "%")', {text})
+      .getMany()
+
+    console.log(acao)
+  }
+
   async editarAcao(idUsuario: number, idAcao:number, novosDadosAcao: AtualizaAcaoDTO){
-    const usuarioEncontrado = await  this.usuarioService.buscarUsuario(idUsuario);
-    const AcaoEncontrada = await this.buscarAcao(idAcao);
+    const usuario = await this.usuarioService.buscarUsuario(idUsuario);
+    let acaoEncontradaUsuario: AcaoEntity | null = null;
 
     try{
-      if(!usuarioEncontrado)
-        throw new NotFoundException('Usuario inválido.');
+      const acaoEncontrada = await this.buscarAcao(idAcao);
 
-      const novaAcao = await this.acaoRepository.update(AcaoEncontrada, novosDadosAcao)
+      for(let acao of usuario.acoes){
+        if(acao.id === acaoEncontrada.id)
+          acaoEncontradaUsuario = acao
+      }
 
-      if(!novaAcao)
-        throw new BadRequestException('Erro ao editar serviço.')
-      
-      return {message: 'Alteração feita com sucesso.'}
+      if(acaoEncontradaUsuario === null)  
+        throw new BadRequestException;
 
-    }catch(erro){
-      throw erro
+      await this.acaoRepository.update(acaoEncontrada, novosDadosAcao)
+
+      return {statuscode:200, message: 'Alteração feita com sucesso.'}
+
+    }catch{
+      throw new BadRequestException('Erro ao editar serviço.')
     }
   }
 
   async deletarAcao(idUsuario:number, idAcao:number){
     const usuarioEncontrado = await this.usuarioService.buscarUsuario(idUsuario);
     const acaoEncontrada = await this.buscarAcao(idAcao);
-    let acaoExcluido: any;
+
+    if(!acaoEncontrada)
+      throw new NotFoundException("Publicação não encontrada.")
 
     try{
-      for(let acao of usuarioEncontrado.pedidosDeAjuda){
+      for(let acao of usuarioEncontrado.acoes){
 
         if(acao.id === idAcao)
-          acaoExcluido = await this.acaoRepository.delete(acao)
+          await this.acaoRepository.delete(acao)
       }
 
-      if(acaoExcluido)
-        return {message:'Serviço excluído com sucesso.'}
-      else
-        throw new BadRequestException('Erro ao excluir serviço.')
+      return {statuscode:200, message:'Serviço excluído com sucesso.'}
 
-    }catch(erro){
-      throw erro
+    }catch{
+      throw new BadRequestException('Erro ao excluir serviço.')
     }
   }
 }

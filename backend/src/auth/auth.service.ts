@@ -16,30 +16,26 @@ export class AuthService {
         let senhaValida:boolean;
         let payload:any;
 
-        try{
-            usuario = await this.usuarioService.validaBuscaUsuario(loginUsuario);
+        usuario = await this.usuarioService.validaBuscaUsuario(loginUsuario);
 
-            if(loginUsuario.length < 10 || !(usuario instanceof UsuarioEntity))
-                throw new UnauthorizedException('Login ou senha inválidos.')
+        if(loginUsuario.length < 10 || !(usuario instanceof UsuarioEntity))
+            throw new UnauthorizedException('Login ou senha inválidos.')
 
-            senhaValida = await bcrypt.compare(senha, usuario.senha);
+        senhaValida = await bcrypt.compare(senha, usuario.senha);
+        
+        if(!senhaValida)
+            throw new UnauthorizedException('Login ou senha inválidos.')
+
+        if(usuario.usuarioPessoa)
+            usuarioEspecificacaoId = usuario.usuarioPessoa.id;
+        else
+            usuarioEspecificacaoId = usuario.usuarioInstituicao.id
             
-            if(!senhaValida)
-                throw new UnauthorizedException('Login ou senha inválidos.')
-
-            if(usuario.usuarioPessoa)
-                usuarioEspecificacaoId = usuario.usuarioPessoa.id;
-            else
-                usuarioEspecificacaoId = usuario.usuarioInstituicao.id
-
-            payload = {sub:usuario.id, email:usuario.email, especificacaoId:usuarioEspecificacaoId};
-
-            return {
-                token: this.jwtService.sign(payload),
-                ok:true
-            }
-        }catch(erro){
-            throw erro
+        payload = {sub:usuario.id, email:usuario.email, especificacaoId:usuarioEspecificacaoId};
+        
+        return {
+            token: this.jwtService.sign(payload),
+            ok:true
         }
     }
 }
