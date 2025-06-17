@@ -4,10 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { dbConfigService } from './config/db.config.service';
 import { UsuarioModule } from './usuario/usuario.module';
 import { AuthModule } from './auth/auth.module';
-import { AcaoModule } from './acao/acao.module';
+import { PublicacaoModule } from './publicacao/publicacao.module';
 
 @Module({
-  imports: [UsuarioModule, AuthModule, AcaoModule, ConfigModule.forRoot({
+  imports: [UsuarioModule, AuthModule, PublicacaoModule, ConfigModule.forRoot({
     isGlobal:true
   }),
   TypeOrmModule.forRootAsync({
