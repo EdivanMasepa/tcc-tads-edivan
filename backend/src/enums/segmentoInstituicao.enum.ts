@@ -1,0 +1,21 @@
+export enum SegmentoInstituicao {
+    ADMINISTRACAO_PUBLICA = 'Administração Pública',
+    AGRICULTURA = 'Agricultura',
+    ASSISTENCIA_SOCIAL = 'Assistência Social',
+    COMERCIO = 'Comércio',
+    COMUNICACAO_MIDIA = 'Comunicação e Mídia',
+    COOPERATIVISMO = 'Cooperativismo',
+    CULTURA = 'Cultura',
+    DEFESA_CIVIL = 'Defesa Civil',
+    EDUCACAO = 'Educação',
+    ESPORTE_LAZER = 'Esporte e Lazer',
+    FINANCAS = 'Finanças e Bancos',
+    INDUSTRIA = 'Indústria',
+    ORGANIZACAO_NAO_GOVERNAMENTAL = 'ONG / OSCIP',
+    ORGANIZACAO_RELIGIOSA = 'Organização Religiosa',
+    OUTROS = 'Outros',
+    SAUDE = 'Saúde',
+    SEGURANCA_PUBLICA = 'Segurança Pública',
+    TECNOLOGIA = 'Tecnologia',
+    TRANSPORTE = 'Transporte'
+}

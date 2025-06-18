@@ -5,6 +5,6 @@ export class ListaInstituicaoDTO {
         private readonly id: number,
         private readonly cnpj:string, 
         private readonly dataFundacao: string,
-        private readonly areaAtuacao:string
+        private readonly segmento:string
     ) {}
 }

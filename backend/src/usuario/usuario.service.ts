@@ -1,27 +1,25 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PessoaEntity } from './entities/pessoa.entity';
-import { ListaPessoaDTO } from './dto/usuario/pessoa/listaPessoa.dto';
-import { CriaPessoaDTO } from './dto/usuario/pessoa/criaPessoa.dto';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { CriaAcaoDto } from '../acao/dto/criaAcao.dto';
-import { AcaoEntity } from '../acao/entities/acao.entity';
 import { InstituicaoEntity } from './entities/instituicao.entity';
-import { CriaInstituicaoDTO } from './dto/usuario/instituicao/criaInstituicao.dto';
-import { ListaInstituicaoDTO } from './dto/usuario/instituicao/listaInstituicao.dto';
-import { CriaUsuarioDTO } from './dto/usuario/criaUsuario.dto';
 import { UsuarioEntity } from './entities/usuario.entity';
-import { ListaUsuarioDTO } from './dto/usuario/listaUsuario.dto';
-import { AtualizaUsuarioDTO } from './dto/usuario/atualizaUsuario.dto';
-import { AtualizaAcaoDTO } from '../acao/dto/atualizaAcao.dto';
+import { PublicacaoEntity } from '../publicacao/entities/publicacao.entity';
+import { CriaUsuarioDTO } from './dto/criaUsuario.dto';
+import { TipoUsuario } from '../enums/tipoUsuario.enum';
+import { ListaUsuarioDTO } from './dto/listaUsuario.dto';
+import { ListaPessoaDTO } from './dto/pessoa/listaPessoa.dto';
+import { ListaInstituicaoDTO } from './dto/instituicao/listaInstituicao.dto';
+import { AtualizaUsuarioDTO } from './dto/atualizaUsuario.dto';
+
 
 @Injectable()
 export class UsuarioService {
   constructor(@InjectRepository(UsuarioEntity) private readonly usuarioRepository: Repository<UsuarioEntity>,
               @InjectRepository(PessoaEntity) private readonly usuarioPessoaRepository: Repository<PessoaEntity>,
               @InjectRepository(InstituicaoEntity) private readonly usuarioInstituicaoRepository: Repository<InstituicaoEntity>,
-              @InjectRepository(AcaoEntity) private readonly acaoRepository: Repository<AcaoEntity>){}
+              @InjectRepository(PublicacaoEntity) private readonly acaoRepository: Repository<PublicacaoEntity>){}
 
   validaPropriedades(object: any){
     if(typeof object === 'object'){
@@ -43,20 +41,21 @@ export class UsuarioService {
     }
   }
 
-  async criarUsuario(usuario: CriaUsuarioDTO, usuarioPessoa?: CriaPessoaDTO, usuarioInstituicao?: CriaInstituicaoDTO){
-    const usuarioEntity= new UsuarioEntity();
-    const usuarioPessoaEntity = new PessoaEntity();
-    const usuarioInstituicaoEntity = new InstituicaoEntity();
-    
+  async criarUsuario(usuario: CriaUsuarioDTO){
+    const usuarioEntity:UsuarioEntity = new UsuarioEntity();
+       
     this.validaPropriedades(usuario)
 
-    if(usuario.email && await this.validaBuscaUsuario(usuario.email)){
+    if(await this.buscaUsuarioValido(usuario.telefone))
+      throw new BadRequestException('Número de telefone já cadastrado.')
+    
+    if(usuario.email && await this.buscaUsuarioValido(usuario.email)){
       throw new BadRequestException('Endereço de e-mail já cadastrado.')}
 
-    if(await this.validaBuscaUsuario(usuario.telefone))
-      throw new BadRequestException('Número de telefone já cadastrado.')
+    if(usuario.senha == usuario.confirmaSenha){
+      throw new BadRequestException('Senhas diferentes.')}
 
-    const senhaHasheada = await bcrypt.hash(usuario.senha, 10);
+    const senhaHasheada: string = await bcrypt.hash(usuario.senha, 10);
 
     usuarioEntity.tipoUsuario = usuario.tipoUsuario,
     usuarioEntity.nome = usuario.nome;
@@ -64,23 +63,24 @@ export class UsuarioService {
     usuarioEntity.telefone = usuario.telefone;
     usuarioEntity.senha = senhaHasheada;
 
-    if(usuarioPessoa != null){
-      this.validaPropriedades(usuarioPessoa)
+    if(usuario.pessoa != null){
+      const usuarioPessoaEntity: PessoaEntity = new PessoaEntity();
+      this.validaPropriedades(usuario.pessoa)
 
-      if(!this.validarCPF(usuarioPessoa.cpf))
-        throw new BadRequestException('CPF inválido.')
-
-      if(await this.validaBuscaUsuario(usuarioPessoa.cpf))
+      if(!this.validarCPF(usuario.pessoa.cpf))
         throw new BadRequestException('CPF já cadastrado.')
 
-      const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
-      const dataFormatada = this.formataData(usuarioPessoa.dataNascimento)
+      if(await this.buscaUsuarioValido(usuario.pessoa.cpf))
+        throw new BadRequestException('CPF já cadastrado.')
+
+      const usuarioCriado: UsuarioEntity = await this.usuarioRepository.save(usuarioEntity);
+      const dataFormatada: string = this.formataData(usuario.pessoa.dataNascimento)
 
       usuarioPessoaEntity.idUsuario = usuarioCriado.id;
-      usuarioPessoaEntity.cpf = usuarioPessoa.cpf;
+      usuarioPessoaEntity.cpf = usuario.pessoa.cpf;
       usuarioPessoaEntity.dataNascimento = dataFormatada;
-      usuarioPessoaEntity.genero = usuarioPessoa.genero;
-      usuarioPessoaEntity.situacao = usuarioPessoa.situacao;
+      usuarioPessoaEntity.genero = usuario.pessoa.genero;
+      usuarioPessoaEntity.situacao = usuario.pessoa.situacao;
 
       const usuarioPessoaCriado = await this.usuarioPessoaRepository.save(usuarioPessoaEntity);    
 
@@ -94,22 +94,23 @@ export class UsuarioService {
       }else
         throw new BadRequestException('Erro ao cadastrar.')
     }    
-    else if(usuarioInstituicao != null){
-      this.validaPropriedades(usuarioInstituicao)
+    else if(usuario.instituicao != null){
+      const usuarioInstituicaoEntity:InstituicaoEntity = new InstituicaoEntity();
+      this.validaPropriedades(usuario.instituicao)
 
-      if(!this.validarCNPJ(usuarioInstituicao.cnpj)) 
+      if(!this.validarCNPJ(usuario.instituicao.cnpj)) 
         throw new BadRequestException('CNPJ inválido.')
       
-      if(await this.validaBuscaUsuario(usuarioInstituicao.cnpj))
+      if(await this.buscaUsuarioValido(usuario.instituicao.cnpj))
         throw new BadRequestException('CNPJ já cadastrado.')
 
       const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
-      const dataFormatada = this.formataData(usuarioInstituicao.dataFundacao)
+      const dataFormatada = this.formataData(usuario.instituicao.dataFundacao)
 
       usuarioInstituicaoEntity.idUsuario = usuarioEntity.id;
-      usuarioInstituicaoEntity.cnpj = usuarioInstituicao.cnpj;
+      usuarioInstituicaoEntity.cnpj = usuario.instituicao.cnpj;
       usuarioInstituicaoEntity.dataFundacao = dataFormatada;
-      usuarioInstituicaoEntity.areaAtuacao = usuarioInstituicao.areaAtuacao;
+      usuarioInstituicaoEntity.segmento = usuario.instituicao.segmento;
 
       const usuarioInstituicaoCriado = await this.usuarioInstituicaoRepository.save(usuarioInstituicaoEntity);
 
@@ -128,36 +129,36 @@ export class UsuarioService {
   }
 
   async listarUsuarios(opcao: number) {
-    const usuarios = await this.usuarioRepository.find()
-    const usuariosPessoas = await this.usuarioPessoaRepository.find();
-    const usuariosInstituicoes = await this.usuarioInstituicaoRepository.find();
+    const usuarios: UsuarioEntity[] = await this.usuarioRepository.find()
+    const usuariosPessoas: PessoaEntity[] = await this.usuarioPessoaRepository.find();
+    const usuariosInstituicoes: InstituicaoEntity[] = await this.usuarioInstituicaoRepository.find();
 
     if(usuarios.length < 0 || usuariosPessoas.length < 0 || usuariosInstituicoes.length < 0)
-      throw new BadRequestException('Não foi possível realizar a busca.')
+      throw new NotFoundException('Nenhum registro encontrado.')
  
     try{
       if(opcao === 1){
         return usuarios.map((usuario) => {
-          if(usuario.tipoUsuario === 'pessoa'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.acoes.length, 
+          if(usuario.tipoUsuario === TipoUsuario.PESSOA){
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.publicacoes.length, 
               new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
-          }else if(usuario.tipoUsuario === 'instituicao'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.acoes.length, 
-              new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
+          }else if(usuario.tipoUsuario === TipoUsuario.INSTITUICAO){
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.publicacoes.length, 
+              new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.segmento))
           }
         }) 
       }else if(opcao === 2){
         return usuarios.map((usuario) => {
-          if(usuario.tipoUsuario === 'pessoa'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.acoes.length,
+          if(usuario.tipoUsuario === TipoUsuario.PESSOA){
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.publicacoes.length,
               new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
           }
         }) 
       }else if(opcao === 3){
         return usuarios.map((usuario) => {
-          if(usuario.tipoUsuario === 'instituicao'){
-            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,usuario.acoes.length,
-               new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.areaAtuacao))
+          if(usuario.tipoUsuario === TipoUsuario.INSTITUICAO){
+            return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,usuario.publicacoes.length,
+               new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.segmento))
           }
         }) 
       }
@@ -167,7 +168,7 @@ export class UsuarioService {
     }
   }
 
-  async validaBuscaUsuario(parametro: any){
+  async buscaUsuarioValido(parametro: any){
     let usuario:UsuarioEntity;
     let usuarioPessoa:PessoaEntity;
     let usuarioInstituicao:InstituicaoEntity;
@@ -185,7 +186,7 @@ export class UsuarioService {
           
           if(usuarioPessoa){
             usuario = await this.usuarioRepository.findOne({where:{id: usuarioPessoa.idUsuario}});
-            return usuario
+            return usuario;
           }
           else{
             usuarioInstituicao = await this.usuarioInstituicaoRepository.findOne({where:{cnpj: parametro}});
@@ -211,7 +212,7 @@ export class UsuarioService {
   }
 
   async buscarUsuario(parametro:any){
-    const usuarioBuscado = await this.validaBuscaUsuario(parametro)
+    const usuarioBuscado: UsuarioEntity = await this.buscaUsuarioValido(parametro)
 
     if(!(usuarioBuscado instanceof UsuarioEntity))
       throw new NotFoundException('Nenhum cadastro localizado.');
@@ -230,17 +231,17 @@ export class UsuarioService {
         telefone: novosDados.telefone
       })     
 
-      if(usuarioEncontrado.tipoUsuario === 'pessoa'){
+      if(usuarioEncontrado.tipoUsuario === TipoUsuario.PESSOA){
         await this.usuarioPessoaRepository.update({id: usuarioEncontrado.usuarioPessoa.id}, {
           dataNascimento: novosDados.usuarioPessoa.dataNascimento,
           genero: novosDados.usuarioPessoa.genero,
           situacao: novosDados.usuarioPessoa.situacao
         })
       }
-      else if(usuarioEncontrado.tipoUsuario === 'instituicao'){
+      else if(usuarioEncontrado.tipoUsuario === TipoUsuario.INSTITUICAO){
         await this.usuarioInstituicaoRepository.update({id: usuarioEncontrado.usuarioPessoa.id}, {
           dataFundacao: novosDados.usuarioInstituicao.dataFundacao,
-          areaAtuacao: novosDados.usuarioInstituicao.areaAtuacao
+          segmento: novosDados.usuarioInstituicao.segmento
         })
       }
       return {statusCode:200, message:'Atualizado com sucesso.'}
@@ -255,8 +256,8 @@ export class UsuarioService {
     const usuarioEncontrado:UsuarioEntity = await this.buscarUsuario(id);
 
     try{
-      if(usuarioEncontrado.acoes.length > 0){
-        for(let acao of usuarioEncontrado.acoes){
+      if(usuarioEncontrado.publicacoes.length > 0){
+        for(let acao of usuarioEncontrado.publicacoes){
           await this.acaoRepository.delete(acao)
         }
       }

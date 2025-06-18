@@ -10,16 +10,12 @@ export class AtualizaUsuarioDTO{
     nome?: string;
 
     @IsOptional()
-    @IsEmail({allow_display_name:false}, {message:'EMAIL inváldo.'})
+    @IsEmail({allow_display_name:false}, {message:'EMAIL inválido.'})
     email?: string;
 
     @IsOptional()
     @IsString({message:'TELEFONE tem tipo inválido.'})
     telefone?: string;
-
-    @IsOptional()
-    @IsString({message:'SENHA deve ser do tipo texto.'})
-    senha?: string;
 
     @IsOptional()
     usuarioPessoa?: AtualizaPessoaDTO;

@@ -16,7 +16,7 @@ export class AuthService {
         let senhaValida:boolean;
         let payload:any;
 
-        usuario = await this.usuarioService.validaBuscaUsuario(loginUsuario);
+        usuario = await this.usuarioService.buscaUsuarioValido(loginUsuario);
 
         if(loginUsuario.length < 10 || !(usuario instanceof UsuarioEntity))
             throw new UnauthorizedException('Login ou senha inválidos.')

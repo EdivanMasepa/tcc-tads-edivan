@@ -26,6 +26,6 @@ export class PublicacaoEntity{
     @Column({name: 'imagem', type: 'varchar', nullable: false})
     imagem: string;
 
-    @ManyToOne(() =>UsuarioEntity, usuario => usuario.acoes)
+    @ManyToOne(() =>UsuarioEntity, usuario => usuario.publicacoes)
     usuario: UsuarioEntity;
 }

@@ -80,7 +80,7 @@ export class PublicacaoService {
     try{
       const publicacaoEncontrada: PublicacaoEntity = await this.buscarPublicacao(idPublicacao);
 
-      for(let publicacao of usuario.acoes){
+      for(let publicacao of usuario.publicacoes){
         if(publicacao.id === publicacaoEncontrada.id)
           acaoEncontradaUsuario = publicacao
       }
@@ -105,7 +105,7 @@ export class PublicacaoService {
       throw new NotFoundException("Publicação não encontrada.")
 
     try{
-      for(let publicacao of usuarioEncontrado.acoes){
+      for(let publicacao of usuarioEncontrado.publicacoes){
 
         if(publicacao.id === idPublicacao)
           await this.publicacaoRepository.delete(publicacao)

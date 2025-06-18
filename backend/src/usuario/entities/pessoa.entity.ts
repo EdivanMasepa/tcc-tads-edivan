@@ -1,5 +1,7 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UsuarioEntity } from "./usuario.entity";
+import { GeneroPessoa } from "../../enums/generoPessoa.enum";
+import { SituacaoPessoa } from "../../enums/situacaoPessoa.enum";
 
 @Entity({name:'pessoa'})
 export class PessoaEntity{
@@ -7,20 +9,20 @@ export class PessoaEntity{
     @PrimaryGeneratedColumn()
     id:number;
 
-    @Column({name:'id_usuario', nullable:false})
+    @Column({name:'id_usuario', type: 'number', nullable:false})
     idUsuario: number;
 
-    @Column({name: 'cpf', nullable:false})
+    @Column({name: 'cpf', type: 'varchar', nullable:false})
     cpf: string;  
 
-    @Column({name: 'data_nascimento', nullable:false})
+    @Column({name: 'data_nascimento', type: 'varchar', nullable:false})
     dataNascimento: string;
 
-    @Column({name: 'genero', length:30, nullable:false})
-    genero: string;
+    @Column({name: 'genero', length:30, type: 'enum', enum: GeneroPessoa, nullable:false})
+    genero: GeneroPessoa;
 
-    @Column({name: 'situacao', length:20, nullable:false})
-    situacao: string;
+    @Column({name: 'situacao', type: 'enum', enum: SituacaoPessoa, length:20, nullable:false})
+    situacao: SituacaoPessoa;
     
     @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioPessoa)
     usuario: UsuarioEntity;

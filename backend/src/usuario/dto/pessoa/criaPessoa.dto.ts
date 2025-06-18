@@ -1,5 +1,7 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString, Min, isNotEmpty } from "class-validator";
+import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsString, Min, isNotEmpty } from "class-validator";
 import { CriaUsuarioDTO } from "../criaUsuario.dto";
+import { SituacaoPessoa } from "../../../enums/situacaoPessoa.enum";
+import { GeneroPessoa } from "../../../enums/generoPessoa.enum";
 
 export class CriaPessoaDTO extends CriaUsuarioDTO {
 
@@ -15,11 +17,11 @@ export class CriaPessoaDTO extends CriaUsuarioDTO {
     @IsNotEmpty({ message: "DATA DE NASCIMENTO não pode ser vazia"})
     dataNascimento: string;
 
-    @IsString({message:"GÊNERO deve ser do tipo texto."})
+    @IsEnum(GeneroPessoa, {message:"GÊNERO não está predefinido."})
     @IsNotEmpty({ message: "GÊNERO não pode ser vazio."})
-    genero: string;
+    genero: GeneroPessoa;
 
-    @IsString({message:"SITUAÇÃO deve ser do tipo texto."})
+    @IsEnum(SituacaoPessoa, {message:"SITUAÇÃO não está predefinida."})
     @IsNotEmpty({ message: "SITUAÇÃO não pode ser vazia."})
-    situacao: string;
+    situacao: SituacaoPessoa;
 }
