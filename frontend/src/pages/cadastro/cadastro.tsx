@@ -80,11 +80,7 @@ const Cadastro: React.FC = () => {
   
   const cadastrar =  async (dadosCadastro: DadosCadastro) => {
     try{
-      console.log(dadosCadastro)
-
       const response = await axios.post('http://localhost:3000/usuario/cadastrar', dadosCadastro)
-
-      console.log(response)
 
       toast.success('Cadastrado com sucesso.')      
     }
@@ -141,8 +137,8 @@ const Cadastro: React.FC = () => {
 
         <div className='divTipoCadastro'>
           <button 
-          value={TipoCadastro.pessoa}
-          onChange={() =>{setTipoCadastro}}
+            value={TipoCadastro.pessoa}
+            onChange={() =>{setTipoCadastro}}
             type='submit' 
             className={opcaoCadastro ? 'buttonOpcaoCadastro buttonSelecionado shadowRight' : 'buttonOpcaoCadastro'}
             onClick={alteraOpcaoCadastro}>PESSOA

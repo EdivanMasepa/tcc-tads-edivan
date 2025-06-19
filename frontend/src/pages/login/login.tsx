@@ -25,6 +25,7 @@ const Login: React.FC = () => {
   }
 
   const navigate = useNavigate()
+
   const logar = async (dadosLogin:DadosLogin) => {
 
     if (!login || !senha) {
@@ -35,17 +36,14 @@ const Login: React.FC = () => {
 
     try{
       const response = await axios.post('http://localhost:3000/auth/login', dadosLogin)
-      
       Cookies.set('token', response.data.token, {sameSite: "Strict", secure: true})
       navigate('/paginaInicial')
       toast.success('Sucesso')     
-
-      return response.data
-
+      
     }catch(erro){
       if (axios.isAxiosError(erro) && erro.response){
 
-        if(erro.response.data.message){
+        if(erro.response.data){
           toast.dismiss()
           toast.error(erro.response.data.message);
         }
@@ -53,10 +51,10 @@ const Login: React.FC = () => {
           toast.dismiss
           toast.error('Erro ao fazer login.')
         }
-  
       } 
       else {
-        console.log('Erro desconhecido', erro);
+        toast.dismiss
+          toast.error('Erro desconhecido, tente novamente.')
       }
     }
   }
