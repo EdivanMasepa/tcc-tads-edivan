@@ -21,39 +21,33 @@ export class UsuarioService {
               @InjectRepository(InstituicaoEntity) private readonly usuarioInstituicaoRepository: Repository<InstituicaoEntity>,
               @InjectRepository(PublicacaoEntity) private readonly acaoRepository: Repository<PublicacaoEntity>){}
 
-  validaPropriedades(object: any){
-    if(typeof object === 'object'){
+  validaPropriedades(param: any){
+    if (param === null || param === undefined || param.trim?.() === '' || param.length < 3) 
+            throw new BadRequestException(`A propriedade '${param}' não possui um valor válido.`);
+    
+    else if (typeof param === 'object'){
 
-      for(let item in object){
+      for (let item in param){
 
-        if(object[item]){
+        if (param[item]) return this.validaPropriedades(param[item])
 
-          if (object[item] === null || object[item] === undefined || object[item].trim?.() === '' || object[item].length < 3) 
-            throw new BadRequestException(`A propriedade '${item}' não pode ser nula, indefinida, texto vazio ou ter menos de três caracteres.`);
-
-          else if(typeof object[item] === 'object')
-            return this.validaPropriedades(object[item])
-
-        }
-        else
-          throw new BadRequestException(`${item} é invalido.`)
+        else throw new BadRequestException(`${item} é invalido.`)
       }
     }
   }
 
-  async criarUsuario(usuario: CriaUsuarioDTO){
+  async criar(usuario: CriaUsuarioDTO){
     const usuarioEntity:UsuarioEntity = new UsuarioEntity();
-       
     this.validaPropriedades(usuario)
 
     if(await this.buscaUsuarioValido(usuario.telefone))
       throw new BadRequestException('Número de telefone já cadastrado.')
     
-    if(usuario.email && await this.buscaUsuarioValido(usuario.email)){
-      throw new BadRequestException('Endereço de e-mail já cadastrado.')}
+    if(usuario.email && await this.buscaUsuarioValido(usuario.email))
+      throw new BadRequestException('E-mail já cadastrado.')
 
-    if(usuario.senha == usuario.confirmaSenha){
-      throw new BadRequestException('Senhas diferentes.')}
+    if(usuario.senha != usuario.confirmaSenha)
+      throw new BadRequestException('As senhas não conferem.')
 
     const senhaHasheada: string = await bcrypt.hash(usuario.senha, 10);
 
@@ -63,18 +57,18 @@ export class UsuarioService {
     usuarioEntity.telefone = usuario.telefone;
     usuarioEntity.senha = senhaHasheada;
 
-    if(usuario.pessoa != null){
+    if(usuario.tipoUsuario === TipoUsuario.PESSOA && usuario.pessoa != null){
       const usuarioPessoaEntity: PessoaEntity = new PessoaEntity();
       this.validaPropriedades(usuario.pessoa)
 
       if(!this.validarCPF(usuario.pessoa.cpf))
-        throw new BadRequestException('CPF já cadastrado.')
+        throw new BadRequestException('CPF inválido.')
 
       if(await this.buscaUsuarioValido(usuario.pessoa.cpf))
         throw new BadRequestException('CPF já cadastrado.')
 
       const usuarioCriado: UsuarioEntity = await this.usuarioRepository.save(usuarioEntity);
-      const dataFormatada: string = this.formataData(usuario.pessoa.dataNascimento)
+      const dataFormatada: string = this.formataData(usuario.pessoa.dataNascimento, usuario.tipoUsuario)
 
       usuarioPessoaEntity.idUsuario = usuarioCriado.id;
       usuarioPessoaEntity.cpf = usuario.pessoa.cpf;
@@ -92,9 +86,9 @@ export class UsuarioService {
         return{statusCode: 201, message: 'Usuário cadastrado com sucesso.'};
         
       }else
-        throw new BadRequestException('Erro ao cadastrar.')
+        throw new BadRequestException('Erro ao cadastrar, verifique as informações e tente novamente.')
     }    
-    else if(usuario.instituicao != null){
+    else if(usuario.tipoUsuario === TipoUsuario.INSTITUICAO && usuario.instituicao != null){
       const usuarioInstituicaoEntity:InstituicaoEntity = new InstituicaoEntity();
       this.validaPropriedades(usuario.instituicao)
 
@@ -105,7 +99,7 @@ export class UsuarioService {
         throw new BadRequestException('CNPJ já cadastrado.')
 
       const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
-      const dataFormatada = this.formataData(usuario.instituicao.dataFundacao)
+      const dataFormatada = this.formataData(usuario.instituicao.dataFundacao, usuario.tipoUsuario)
 
       usuarioInstituicaoEntity.idUsuario = usuarioEntity.id;
       usuarioInstituicaoEntity.cnpj = usuario.instituicao.cnpj;
@@ -383,6 +377,33 @@ export class UsuarioService {
     return verificador
   }
 
+  validaData(data: string, tipoUsuario: TipoUsuario){
+    const dataAtual: Date = new Date();
+    const dataMinima: Date = new Date();
+    const dataMaxima: Date = new Date();
+
+    try{
+      
+      if(tipoUsuario == TipoUsuario.PESSOA){
+        dataMinima.setFullYear(dataAtual.getFullYear() - 5);
+        dataMaxima.setFullYear(dataAtual.getFullYear() - 100)
+      }
+      
+      const [dia, mes, ano] = data.split('/');
+      const novaData = new Date(Number(ano), Number(mes) - 1, Number(dia));
+      const dataFormatada = novaData.toISOString().split('T')[0];
+      
+      if (novaData > dataMinima || novaData < dataMinima)
+        throw new BadRequestException(  )
+
+      return dataFormatada
+    }
+    catch(erro){
+      console.log(erro)
+      throw new BadRequestException('Data tem valor inválido.')
+    }
+  }
+
   formataData(data: string){
     try{
       const [dia, mes, ano] = data.split('/');
@@ -392,7 +413,8 @@ export class UsuarioService {
       return dataFormatada
     }
     catch(erro){
-      throw new BadRequestException('Verifique o formato da data.')
+      return null
     }
   }
+
 }
