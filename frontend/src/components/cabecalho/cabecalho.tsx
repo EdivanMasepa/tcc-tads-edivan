@@ -2,11 +2,15 @@ import { IoClose, IoMenu, IoSearch } from 'react-icons/io5'
 import './cabecalho.css'
 import Menu from '../menu/menu'
 import { useEffect, useRef, useState } from 'react';
+import { IoMdAddCircle } from 'react-icons/io';
+import { useNavigate } from 'react-router-dom';
 
 const Cabecalho: React.FC = () => {
     
     const [abreMenu, setAbreMenu] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate()
+
 
     const abrirMenu = () => {
         setAbreMenu(!abreMenu);
@@ -33,11 +37,17 @@ const Cabecalho: React.FC = () => {
         };
       }, [abreMenu]);
 
+    const criarPublicacao = () => {
+      navigate('/criarPublicacao')
+    }
 
     return(
         <div className="divCabecalho">
             <div className="divLogoCabecalho">
                 <a href='/paginaInicial'><h3 className='logo'>LOGO</h3></a>
+            </div>
+            <div className="divCabecalhoCriarPublicacao">
+                <button type="submit" className='buttonCriarPublicacao' onClick={criarPublicacao}><IoMdAddCircle className='iconeCriarPublicacao' /></button>
             </div>
             <div className="divCabecalhoPesquisa">
                 <button type="submit" className='buttonPesquisa'><IoSearch className='iconePesquisa' /></button>
