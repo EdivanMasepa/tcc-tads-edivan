@@ -48,10 +48,44 @@
     background-color: transparent;
 }
 .divPublicacao{
-
     padding: 10px;
     margin-top: 20px;
 
     background-color: #fff;
+    
+    display: flex;
+    flex-direction: column;
 
+}
+.divCabecalhoPublicacao{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+}
+.usuarioPublicacao{
+    font-weight: 600;
+}
+.dataPublicacao{
+    color: gray;
+}
+.divConteudoPublicacao{
+    display: flex;
+    flex-direction: column;
+
+}
+.divCabecalhoConteudoPublicacao{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+}
+.divConteudo{
+    display: flex;
+    flex-direction: column;
+
+    border:1px solid #c0c0c0;
+
+    margin-top: 10px;
+    padding: 5px;
 }

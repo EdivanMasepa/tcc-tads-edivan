@@ -1,12 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Cabecalho from '../../components/cabecalho/cabecalho';
 import '../../index.css'
 import './paginaInicial.css'
 import { ToastContainer } from 'react-toastify';
 import  'react-toastify/dist/ReactToastify.css' ;
+import Cookies from "js-cookie"
+import axios from 'axios'
+import { jwtDecode, JwtPayload } from 'jwt-decode'
 
+enum TipoPublicacao{
+    ajuda = 'Pedir ajuda' ,
+    campanha = 'Promover campanha',
+    informativa = 'informativa'
+}
+
+interface DadosPublicacao {
+    id: number
+    tipoAcao:TipoPublicacao;
+    status: string;
+    titulo:string;
+    dataInicial: string;
+    dataFinal: string;
+    descricao:string;
+    usuarioSolicitante: string;
+}
 
 const PaginaInicial: React.FC = () => {
+
+    const [acoes, setAcoes] = useState<DadosPublicacao[]>([]);
 
     const [opcao, setOpcao] = useState<number | null>(0);
 
@@ -19,6 +40,33 @@ const PaginaInicial: React.FC = () => {
         { id: 1, legenda: 'Solicitações', boxShadow: 'shadowDuplo' },
         { id: 2, legenda: 'Campanhas', boxShadow: 'shadowEsquerda' },
       ];
+
+    let decodeToken: JwtPayload;
+
+    useEffect(() => {
+
+        const listaPublicacoes = async () => {
+            try{
+                const token = Cookies.get('token') ;
+                
+                if(token){
+                    decodeToken = jwtDecode(token)
+                }
+    
+                const response = await axios.get<DadosPublicacao[]>('http://localhost:3000/acao/acoes', {
+                    method: 'GET',
+                    headers: {'Authorization': `Bearer ${token}`}
+                })
+                setAcoes(response.data); 
+                console.log(response.data[0])
+                return response.data
+            }catch(erro){
+                console.log(erro)
+            }
+        };
+
+        listaPublicacoes();
+      }, []);
     
 
     return(
@@ -37,21 +85,25 @@ const PaginaInicial: React.FC = () => {
             </div>
             <div className='divPaginaInicial'>
 
-                {[0, 1, 2, 4].map((publicacao)=>(
-                    <div key={publicacao} className='divPublicacao'>
+                {acoes.map((acao: any)=>(  
+                    <div  className='divPublicacao' key={acao.id}>
                         <div className='divCabecalhoPublicacao'>
-                            <h2>Fulando da silva</h2>
-                            <h4>24/03/2004</h4>
+                            <p className="usuarioPublicacao">{acao.usuarioSolicitante}</p>
+                            <p className="dataPublicacao">{acao.dataInicial} - {acao.dataFinal}</p>
                         </div>
                         <div className='divConteudoPublicacao'>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus quam totam reprehenderit similique. 
-                                Ut fugiat amet, dolorem voluptate nobis molestias cupiditate voluptatibus! Obcaecati ea reprehenderit 
-                                porro, expedita cumque dolore culpa!
-                            </p>
+                            <div className='divCabecalhoConteudoPublicacao'>
+                                <p>tipo: {acao.tipoAcao}</p>
+                                <p>status: {acao.status}</p>
+                            </div>
+                            <div className='divConteudo'>
+                                <p>{acao.titulo}</p>
+                                <p>{acao.descricao}</p>
+                            </div>
                         </div>
                     
                     </div>
-                ))}
+                ))} 
                 
             </div>
             <ToastContainer /> 
