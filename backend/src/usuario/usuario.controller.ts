@@ -10,7 +10,7 @@ export class UsuarioController {
 
   @Post('/cadastrar')
   async cadastrar(@Body() usuario: CriaUsuarioDTO){
-    return await this.usuarioService.criarUsuario(usuario);
+    return await this.usuarioService.criar(usuario);
   }
   
   @UseGuards(AuthGuard)

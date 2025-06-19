@@ -8,13 +8,13 @@ export class PublicacaoEntity{
     @PrimaryGeneratedColumn()
     id:number;
 
-    @Column({name:'categoria', type:'enum', enum: CategoriaPublicacao, length:20, nullable: false})
+    @Column({name:'categoria', type:'enum', enum: CategoriaPublicacao, nullable: false})
     categoria:CategoriaPublicacao;
     
-    @Column({name: 'titulo', type: 'varchar', length:50, nullable: false})
+    @Column({name: 'titulo', type: 'varchar', nullable: false})
     titulo:string;
 
-    @Column({name: 'descricao', type: 'varchar', length:500, nullable: false})
+    @Column({name: 'descricao', type: 'varchar', nullable: false})
     descricao:string;
     
     @Column({name: 'data', type: 'varchar', nullable: false})

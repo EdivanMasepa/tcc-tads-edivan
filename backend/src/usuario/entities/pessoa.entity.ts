@@ -9,7 +9,7 @@ export class PessoaEntity{
     @PrimaryGeneratedColumn()
     id:number;
 
-    @Column({name:'id_usuario', type: 'number', nullable:false})
+    @Column({name:'id_usuario', nullable:false})
     idUsuario: number;
 
     @Column({name: 'cpf', type: 'varchar', nullable:false})
@@ -18,10 +18,10 @@ export class PessoaEntity{
     @Column({name: 'data_nascimento', type: 'varchar', nullable:false})
     dataNascimento: string;
 
-    @Column({name: 'genero', length:30, type: 'enum', enum: GeneroPessoa, nullable:false})
+    @Column({name: 'genero', type: 'enum', enum: GeneroPessoa, nullable:false})
     genero: GeneroPessoa;
 
-    @Column({name: 'situacao', type: 'enum', enum: SituacaoPessoa, length:20, nullable:false})
+    @Column({name: 'situacao', type: 'enum', enum: SituacaoPessoa, nullable:false})
     situacao: SituacaoPessoa;
     
     @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioPessoa)

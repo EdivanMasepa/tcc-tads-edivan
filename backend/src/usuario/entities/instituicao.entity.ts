@@ -8,7 +8,7 @@ export class InstituicaoEntity{
     @PrimaryGeneratedColumn()
     id:number;
 
-    @Column({name:'id_usuario', type: 'number', nullable:false})
+    @Column({name:'id_usuario', nullable:false})
     idUsuario: number;
 
     @Column({name: 'cnpj', type: 'varchar', nullable:false})
@@ -17,7 +17,7 @@ export class InstituicaoEntity{
     @Column({name: 'data_fundacao', type: 'varchar', nullable:false})
     dataFundacao: string;
 
-    @Column({name: 'segmento', type: 'enum', enum: SegmentoInstituicao, length:50, nullable:false})
+    @Column({name: 'segmento', type: 'enum', enum: SegmentoInstituicao, nullable:false})
     segmento: SegmentoInstituicao;
 
     @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioInstituicao)

@@ -2,7 +2,7 @@ import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsString, Min, isNotEmpty } from 
 import { CriaUsuarioDTO } from "../criaUsuario.dto";
 import { SegmentoInstituicao } from "../../../enums/segmentoInstituicao.enum";
 
-export class CriaInstituicaoDTO extends CriaUsuarioDTO {
+export class CriaInstituicaoDTO {
 
     @IsNumber({allowNaN:false}, {message:"Tipo do usuário não é compativel."})
     @IsNotEmpty({message: "Usuário não informado."})

@@ -12,16 +12,16 @@ export class UsuarioEntity{
     @Column({name:'tipo_usuario', type: 'enum', enum: TipoUsuario, nullable:false})
     tipoUsuario:TipoUsuario;
     
-    @Column({name: 'nome', type: 'varchar', length:50, nullable:false})
+    @Column({name: 'nome', type: 'varchar', nullable:false})
     nome: string;
 
-    @Column({name: 'email', type: 'varchar', length:50, nullable:false})
+    @Column({name: 'email', type: 'varchar', nullable:false})
     email: string;
 
-    @Column({name: 'telefone', type: 'varchar', length:16, nullable:true})
+    @Column({name: 'telefone', type: 'varchar', nullable:true})
     telefone: string;
 
-    @Column({name: 'senha', type: 'varchar', length:100, nullable:false})
+    @Column({name: 'senha', type: 'varchar', nullable:false})
     senha: string;
 
     @OneToOne(() => PessoaEntity, pessoa => pessoa.usuario, {nullable:true,  eager: true, cascade:true})

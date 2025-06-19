@@ -3,7 +3,7 @@ import { CriaUsuarioDTO } from "../criaUsuario.dto";
 import { SituacaoPessoa } from "../../../enums/situacaoPessoa.enum";
 import { GeneroPessoa } from "../../../enums/generoPessoa.enum";
 
-export class CriaPessoaDTO extends CriaUsuarioDTO {
+export class CriaPessoaDTO {
 
     @IsNumber({allowNaN: false}, {message: "Tipo do usuário não é compativel."})
     @IsNotEmpty({message: "Usuário não informado."})
