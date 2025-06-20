@@ -7,7 +7,8 @@ export class ListaPublicacaoDTO{
         private readonly categoria:string,
         private readonly titulo:string,
         private readonly descricao:string,
-        private readonly data: string,
+        private readonly data: Date,
+        private readonly aprovada: boolean,
         private readonly nomeUsuarioResponsavel: string
     ){}
 }

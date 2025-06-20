@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UsuarioEntity } from "../../usuario/entities/usuario.entity";
-import { CategoriaPublicacao } from "../../enums/categoriaPublicacao.enum";
+import { CategoriaPublicacao } from "../enum/categoriaPublicacao.enum";
+import { DenunciaEntity } from "../../denuncia/entities/denuncia.entity";
 
 @Entity({name:'acao'})
 export class PublicacaoEntity{
@@ -17,15 +18,23 @@ export class PublicacaoEntity{
     @Column({name: 'descricao', type: 'varchar', nullable: false})
     descricao:string;
     
-    @Column({name: 'data', type: 'varchar', nullable: false})
-    data: string;
+    @Column({name: 'data', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: false })
+    data: Date;
 
     @Column({name: 'aprovada', type: 'boolean', nullable: false})
-    aprovada: string;
+    aprovada: boolean;
 
     @Column({name: 'imagem', type: 'varchar', nullable: false})
     imagem: string;
 
-    @ManyToOne(() =>UsuarioEntity, usuario => usuario.publicacoes)
-    usuario: UsuarioEntity;
+    @ManyToOne(() =>UsuarioEntity, usuarioResponsavel => usuarioResponsavel.publicacoes)
+    @JoinColumn({name:'id_usuario_responsavel'})
+    usuarioResponsavel: UsuarioEntity;
+
+    @ManyToOne(() =>UsuarioEntity, usuarioModerador => usuarioModerador.publicacoes)
+    @JoinColumn({name:'id_usuario_moderador'})
+    usuarioModerador: UsuarioEntity;
+
+    @OneToMany(() => DenunciaEntity, denuncias => denuncias.publicacao)
+    denuncias: DenunciaEntity[];
 }

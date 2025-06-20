@@ -8,9 +8,10 @@ import { InstituicaoEntity } from 'src/usuario/entities/instituicao.entity';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { JwtService } from '@nestjs/jwt';
 import { PublicacaoEntity } from './entities/publicacao.entity';
+import { DenunciaEntity } from '../denuncia/entities/denuncia.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, PublicacaoEntity, InstituicaoEntity])],
+  imports:[TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, PublicacaoEntity, InstituicaoEntity, DenunciaEntity])],
   controllers: [PublicacaoController],
   providers: [PublicacaoService, UsuarioService, JwtService],
 })

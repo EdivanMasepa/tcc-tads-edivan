@@ -1,8 +1,8 @@
 import { IsDate, IsNotEmpty, IsString,  } from "class-validator";
 import { UsuarioEntity } from "src/usuario/entities/usuario.entity";
-import { CategoriaPublicacao } from "../../enums/categoriaPublicacao.enum";
+import { CategoriaPublicacao } from "../enum/categoriaPublicacao.enum";
 
-export class CriaPublicacaoDto {
+export class CriaPublicacaoDTO {
         
     @IsString({message:"TIPO DA AÇÃO deve ser do tipo texto."})
     @IsNotEmpty({ message: "TIPO DA AÇÃO não pode ser vazio." })
@@ -16,9 +16,9 @@ export class CriaPublicacaoDto {
     @IsNotEmpty({ message: "DESCRIÇÃO não pode ser vazia." })
     descricao: string;
 
-    @IsDate({message:"DATA deve ser do tipo texto."})
+    @IsDate({message:"DATA deve ser do tipo DATA."})
     @IsNotEmpty({ message: "DATA não pode ser vazia" })
-    data: string;
+    data: Date;
 
     @IsNotEmpty({ message: "Usuário não reconhecido." })
     usuarioResponsavel: UsuarioEntity;

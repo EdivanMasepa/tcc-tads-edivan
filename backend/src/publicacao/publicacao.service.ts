@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CriaPublicacaoDto } from './dto/criaPublicacao.dto';
+import { CriaPublicacaoDTO } from './dto/criaPublicacao.dto';
 import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
 import { PublicacaoEntity } from './entities/publicacao.entity';
 import { AtualizaPublicacaoDTO } from './dto/atualizaPublicacao.dto';
@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { ListaPublicacaoDTO } from './dto/listaPublicacao.dto';
+import { AvaliarPublicacaoDTO } from './dto/avaliarPublicaca.dto';
 
 @Injectable()
 export class PublicacaoService {
@@ -14,16 +15,16 @@ export class PublicacaoService {
     @InjectRepository(PublicacaoEntity) private readonly publicacaoRepository: Repository<PublicacaoEntity>,
     private readonly usuarioService: UsuarioService){}
 
-  async criarPublicacao(idUsuario: number, publicacao:CriaPublicacaoDto){
+  async criarPublicacao(idUsuario: number, publicacao:CriaPublicacaoDTO){
     try{
-      const usuarioEncontrado:UsuarioEntity = await this.usuarioService.buscarUsuario(idUsuario);
+      const usuarioEncontrado:UsuarioEntity = await this.usuarioService.buscar(idUsuario);
       const publicacaoEntity:PublicacaoEntity = new PublicacaoEntity();
     
       publicacaoEntity.categoria = publicacao.categoria;
       publicacaoEntity.titulo = publicacao.titulo;
       publicacaoEntity.descricao = publicacao.descricao;
       publicacaoEntity.data = publicacao.data;
-      publicacaoEntity.usuario = usuarioEncontrado
+      publicacaoEntity.usuarioResponsavel = usuarioEncontrado
    
       await this.publicacaoRepository.save(publicacaoEntity)
       
@@ -34,9 +35,9 @@ export class PublicacaoService {
     }
   }
 
-  async listarPublicacoes(){
+  async listarPublicacoes(aprovada: boolean | null){
     try{
-      const listaAcao:PublicacaoEntity[] = await this.publicacaoRepository.find({relations:{usuario:true}})
+      const listaAcao:PublicacaoEntity[] = await this.publicacaoRepository.find({where:{aprovada:aprovada}, relations:{usuarioResponsavel:true}})
 
       return listaAcao.map(
         (publicacao)=> new ListaPublicacaoDTO(
@@ -44,8 +45,9 @@ export class PublicacaoService {
           publicacao.categoria,          
           publicacao.titulo, 
           publicacao.descricao, 
-          publicacao.data,          
-          publicacao.usuario.nome
+          publicacao.data,    
+          publicacao.aprovada,      
+          publicacao.usuarioResponsavel.nome
         )
       );
     }catch{
@@ -62,7 +64,7 @@ export class PublicacaoService {
       return publicacaoEncontrada;
   }
 
-  async buscaAcaoPorTexto(text: string){
+  async buscapublicacaoPorTexto(text: string){
     const publicacao: PublicacaoEntity[] = await this.publicacaoRepository
       .createQueryBuilder('publicacao')
       .select(['publicacao.id', 'publicacao.titulo', 'publicacao.descricao'])
@@ -74,18 +76,18 @@ export class PublicacaoService {
   }
 
   async editarPublicacao(idUsuario: number, idPublicacao:number, novosDadosPublicacao: AtualizaPublicacaoDTO){
-    const usuario: UsuarioEntity = await this.usuarioService.buscarUsuario(idUsuario);
-    let acaoEncontradaUsuario: PublicacaoEntity | null = null;
+    const usuario: UsuarioEntity = await this.usuarioService.buscar(idUsuario);
+    let publicacaoEncontradaUsuario: PublicacaoEntity | null = null;
 
     try{
       const publicacaoEncontrada: PublicacaoEntity = await this.buscarPublicacao(idPublicacao);
 
       for(let publicacao of usuario.publicacoes){
         if(publicacao.id === publicacaoEncontrada.id)
-          acaoEncontradaUsuario = publicacao
+          publicacaoEncontradaUsuario = publicacao
       }
 
-      if(acaoEncontradaUsuario === null)  
+      if(publicacaoEncontradaUsuario === null)  
         throw new NotFoundException('Nenhuma publicação encontrada.');
 
       await this.publicacaoRepository.update(publicacaoEncontrada, novosDadosPublicacao)
@@ -97,8 +99,30 @@ export class PublicacaoService {
     }
   }
 
-  async deletarAcao(idUsuario:number, idPublicacao:number){
-    const usuarioEncontrado: UsuarioEntity = await this.usuarioService.buscarUsuario(idUsuario);
+  async avaliarPublicacao(aprovada: AvaliarPublicacaoDTO, idUsuario: number){
+    const publicacao: PublicacaoEntity = await this.buscarPublicacao(aprovada.idPublicacao);
+
+    if(!publicacao)
+      throw new NotFoundException('Publicação não encontrada.')
+
+    try{
+      const usuario:UsuarioEntity = await this.usuarioService.buscar(idUsuario) 
+
+      if(usuario.moderador === true){
+        publicacao.aprovada = aprovada.aprovada;
+        publicacao.usuarioModerador = usuario;
+      }
+      await this.publicacaoRepository.save(publicacao)
+
+      return {statuscode:200, message: 'Alteração feita com sucesso.'}
+
+    }catch(erro){
+      throw new BadRequestException('Erro ao atualizar publicacao.')
+    }
+  }
+
+  async deletaPublicacao(idUsuario:number, idPublicacao:number){
+    const usuarioEncontrado: UsuarioEntity = await this.usuarioService.buscar(idUsuario);
     const publicacaoEncontrada: PublicacaoEntity = await this.buscarPublicacao(idPublicacao);
 
     if(!publicacaoEncontrada)
