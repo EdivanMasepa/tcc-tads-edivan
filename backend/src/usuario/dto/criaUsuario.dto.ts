@@ -1,7 +1,7 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, ValidateNested } from "class-validator";
 import { CriaPessoaDTO } from "./pessoa/criaPessoa.dto";
 import { CriaInstituicaoDTO } from "./instituicao/criaInstituicao.dto";
-import { TipoUsuario } from "../../enums/tipoUsuario.enum";
+import { TipoUsuario } from "../enum/tipoUsuario.enum";
 import { Type } from "class-transformer";
 
 export class CriaUsuarioDTO{

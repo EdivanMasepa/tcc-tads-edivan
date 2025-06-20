@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class AlterarSenhaDto{
+export class AlteraSenhaDTO{
 
     @IsNotEmpty()
     @IsString({message:'SENHA ANTIGA deve ser do tipo texto.'})

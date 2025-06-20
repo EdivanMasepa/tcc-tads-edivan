@@ -7,7 +7,7 @@ import { InstituicaoEntity } from './entities/instituicao.entity';
 import { UsuarioEntity } from './entities/usuario.entity';
 import { PublicacaoEntity } from '../publicacao/entities/publicacao.entity';
 import { CriaUsuarioDTO } from './dto/criaUsuario.dto';
-import { TipoUsuario } from '../enums/tipoUsuario.enum';
+import { TipoUsuario } from './enum/tipoUsuario.enum';
 import { ListaUsuarioDTO } from './dto/listaUsuario.dto';
 import { ListaPessoaDTO } from './dto/pessoa/listaPessoa.dto';
 import { ListaInstituicaoDTO } from './dto/instituicao/listaInstituicao.dto';
@@ -21,29 +21,14 @@ export class UsuarioService {
               @InjectRepository(InstituicaoEntity) private readonly usuarioInstituicaoRepository: Repository<InstituicaoEntity>,
               @InjectRepository(PublicacaoEntity) private readonly acaoRepository: Repository<PublicacaoEntity>){}
 
-  validaPropriedades(param: any){
-    if (param === null || param === undefined || param.trim?.() === '' || param.length < 3) 
-            throw new BadRequestException(`A propriedade '${param}' não possui um valor válido.`);
-    
-    else if (typeof param === 'object'){
-
-      for (let item in param){
-
-        if (param[item]) return this.validaPropriedades(param[item])
-
-        else throw new BadRequestException(`${item} é invalido.`)
-      }
-    }
-  }
-
   async criar(usuario: CriaUsuarioDTO){
     const usuarioEntity:UsuarioEntity = new UsuarioEntity();
     this.validaPropriedades(usuario)
 
-    if(await this.buscaUsuarioValido(usuario.telefone))
+    if(await this.buscarEValidar(usuario.telefone))
       throw new BadRequestException('Número de telefone já cadastrado.')
     
-    if(usuario.email && await this.buscaUsuarioValido(usuario.email))
+    if(usuario.email && await this.buscarEValidar(usuario.email))
       throw new BadRequestException('E-mail já cadastrado.')
 
     if(usuario.senha != usuario.confirmaSenha)
@@ -64,15 +49,15 @@ export class UsuarioService {
       if(!this.validarCPF(usuario.pessoa.cpf))
         throw new BadRequestException('CPF inválido.')
 
-      if(await this.buscaUsuarioValido(usuario.pessoa.cpf))
+      if(await this.buscarEValidar(usuario.pessoa.cpf))
         throw new BadRequestException('CPF já cadastrado.')
 
       const usuarioCriado: UsuarioEntity = await this.usuarioRepository.save(usuarioEntity);
-      const dataFormatada: string = this.formataData(usuario.pessoa.dataNascimento, usuario.tipoUsuario)
+      //const dataFormatada: string = this.formataData(usuario.pessoa.dataNascimento, usuario.tipoUsuario)
 
       usuarioPessoaEntity.idUsuario = usuarioCriado.id;
       usuarioPessoaEntity.cpf = usuario.pessoa.cpf;
-      usuarioPessoaEntity.dataNascimento = dataFormatada;
+      usuarioPessoaEntity.dataNascimento = usuario.pessoa.dataNascimento;
       usuarioPessoaEntity.genero = usuario.pessoa.genero;
       usuarioPessoaEntity.situacao = usuario.pessoa.situacao;
 
@@ -95,15 +80,15 @@ export class UsuarioService {
       if(!this.validarCNPJ(usuario.instituicao.cnpj)) 
         throw new BadRequestException('CNPJ inválido.')
       
-      if(await this.buscaUsuarioValido(usuario.instituicao.cnpj))
+      if(await this.buscarEValidar(usuario.instituicao.cnpj))
         throw new BadRequestException('CNPJ já cadastrado.')
 
       const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
-      const dataFormatada = this.formataData(usuario.instituicao.dataFundacao, usuario.tipoUsuario)
+      //const dataFormatada = this.formataData(usuario.instituicao.dataFundacao, usuario.tipoUsuario)
 
       usuarioInstituicaoEntity.idUsuario = usuarioEntity.id;
       usuarioInstituicaoEntity.cnpj = usuario.instituicao.cnpj;
-      usuarioInstituicaoEntity.dataFundacao = dataFormatada;
+      usuarioInstituicaoEntity.dataFundacao = usuario.instituicao.dataFundacao;
       usuarioInstituicaoEntity.segmento = usuario.instituicao.segmento;
 
       const usuarioInstituicaoCriado = await this.usuarioInstituicaoRepository.save(usuarioInstituicaoEntity);
@@ -122,7 +107,7 @@ export class UsuarioService {
         throw new BadRequestException('Tipo do usuário inválido.')      
   }
 
-  async listarUsuarios(opcao: number) {
+  async listar(opcao: number) {
     const usuarios: UsuarioEntity[] = await this.usuarioRepository.find()
     const usuariosPessoas: PessoaEntity[] = await this.usuarioPessoaRepository.find();
     const usuariosInstituicoes: InstituicaoEntity[] = await this.usuarioInstituicaoRepository.find();
@@ -162,7 +147,7 @@ export class UsuarioService {
     }
   }
 
-  async buscaUsuarioValido(parametro: any){
+  async buscarEValidar(parametro: any){
     let usuario:UsuarioEntity;
     let usuarioPessoa:PessoaEntity;
     let usuarioInstituicao:InstituicaoEntity;
@@ -205,8 +190,8 @@ export class UsuarioService {
       return usuario        
   }
 
-  async buscarUsuario(parametro:any){
-    const usuarioBuscado: UsuarioEntity = await this.buscaUsuarioValido(parametro)
+  async buscar(parametro:any){
+    const usuarioBuscado: UsuarioEntity = await this.buscarEValidar(parametro)
 
     if(!(usuarioBuscado instanceof UsuarioEntity))
       throw new NotFoundException('Nenhum cadastro localizado.');
@@ -214,8 +199,8 @@ export class UsuarioService {
     return usuarioBuscado;  
   }
 
-  async alterarUsuario(idUsuario: number, novosDados: AtualizaUsuarioDTO) {
-    const usuarioEncontrado = await this.buscarUsuario(idUsuario);
+  async alterar(idUsuario: number, novosDados: AtualizaUsuarioDTO) {
+    const usuarioEncontrado = await this.buscar(idUsuario);
     this.validaPropriedades(novosDados);
 
     try{ 
@@ -246,8 +231,8 @@ export class UsuarioService {
     }
   }
 
-  async deletarUsuario(id: number){
-    const usuarioEncontrado:UsuarioEntity = await this.buscarUsuario(id);
+  async deletar(id: number){
+    const usuarioEncontrado:UsuarioEntity = await this.buscar(id);
 
     try{
       if(usuarioEncontrado.publicacoes.length > 0){
@@ -268,6 +253,21 @@ export class UsuarioService {
     }    
   }
 
+  validaPropriedades(param: any){
+    if (param === null || param === undefined || param.trim?.() === '' || param.length < 3) 
+      throw new BadRequestException(`A propriedade '${param}' não possui um valor válido.`);
+    
+    else if (typeof param === 'object'){
+
+      for (let item in param){
+
+        if (param[item]) return this.validaPropriedades(param[item])
+
+        else throw new BadRequestException(`${item} é invalido.`)
+      }
+    }
+  }
+  
   validarCPF(cpf: string){
     let cpfLista = cpf.split('');
     let cpfnumero = [];
@@ -377,44 +377,44 @@ export class UsuarioService {
     return verificador
   }
 
-  validaData(data: string, tipoUsuario: TipoUsuario){
-    const dataAtual: Date = new Date();
-    const dataMinima: Date = new Date();
-    const dataMaxima: Date = new Date();
+  // validaData(data: string, tipoUsuario: TipoUsuario){
+  //   const dataAtual: Date = new Date();
+  //   const dataMinima: Date = new Date();
+  //   const dataMaxima: Date = new Date();
 
-    try{
+  //   try{
       
-      if(tipoUsuario == TipoUsuario.PESSOA){
-        dataMinima.setFullYear(dataAtual.getFullYear() - 5);
-        dataMaxima.setFullYear(dataAtual.getFullYear() - 100)
-      }
+  //     if(tipoUsuario == TipoUsuario.PESSOA){
+  //       dataMinima.setFullYear(dataAtual.getFullYear() - 5);
+  //       dataMaxima.setFullYear(dataAtual.getFullYear() - 100)
+  //     }
       
-      const [dia, mes, ano] = data.split('/');
-      const novaData = new Date(Number(ano), Number(mes) - 1, Number(dia));
-      const dataFormatada = novaData.toISOString().split('T')[0];
+  //     const [dia, mes, ano] = data.split('/');
+  //     const novaData = new Date(Number(ano), Number(mes) - 1, Number(dia));
+  //     const dataFormatada = novaData.toISOString().split('T')[0];
       
-      if (novaData > dataMinima || novaData < dataMinima)
-        throw new BadRequestException(  )
+  //     if (novaData > dataMinima || novaData < dataMinima)
+  //       throw new BadRequestException(  )
 
-      return dataFormatada
-    }
-    catch(erro){
-      console.log(erro)
-      throw new BadRequestException('Data tem valor inválido.')
-    }
-  }
+  //     return dataFormatada
+  //   }
+  //   catch(erro){
+  //     console.log(erro)
+  //     throw new BadRequestException('Data tem valor inválido.')
+  //   }
+  // }
 
-  formataData(data: string){
-    try{
-      const [dia, mes, ano] = data.split('/');
-      const novaData = new Date(Number(ano), Number(mes) - 1, Number(dia));
-      const dataFormatada = novaData.toISOString().split('T')[0];
+  // formataData(data: string){
+  //   try{
+  //     const [dia, mes, ano] = data.split('/');
+  //     const novaData = new Date(Number(ano), Number(mes) - 1, Number(dia));
+  //     const dataFormatada = novaData.toISOString().split('T')[0];
 
-      return dataFormatada
-    }
-    catch(erro){
-      return null
-    }
-  }
+  //     return dataFormatada
+  //   }
+  //   catch(erro){
+  //     return null
+  //   }
+  // }
 
 }

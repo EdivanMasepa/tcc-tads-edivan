@@ -1,6 +1,6 @@
-import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsString, Min, isNotEmpty } from "class-validator";
+import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsString, MaxDate, Min, MinDate, isNotEmpty } from "class-validator";
 import { CriaUsuarioDTO } from "../criaUsuario.dto";
-import { SegmentoInstituicao } from "../../../enums/segmentoInstituicao.enum";
+import { SegmentoInstituicao } from "../../enum/segmentoInstituicao.enum";
 
 export class CriaInstituicaoDTO {
 
@@ -12,9 +12,10 @@ export class CriaInstituicaoDTO {
     @IsNotEmpty({message: "CNPJ não pode ser vazio."})
     cnpj: string;
     
-    @IsString({message:"DATA DE FUNDAÇÃO tem tipo inválido."})
+    @IsDate({message:"DATA DE FUNDAÇÃO tem tipo inválido."})
+    @MaxDate(new Date())
     @IsNotEmpty({message: "DATA DE FUNDAÇÃO não pode ser vazia."})
-    dataFundacao: string;
+    dataFundacao: Date;
 
     @IsEnum(SegmentoInstituicao, {message:"SEGMENTO não está predefinido."})
     @IsNotEmpty({message: "SEGMENTO não pode ser vazio."})

@@ -1,7 +1,7 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UsuarioEntity } from "./usuario.entity";
-import { GeneroPessoa } from "../../enums/generoPessoa.enum";
-import { SituacaoPessoa } from "../../enums/situacaoPessoa.enum";
+import { GeneroPessoa } from "../enum/generoPessoa.enum";
+import { SituacaoPessoa } from "../enum/situacaoPessoa.enum";
 
 @Entity({name:'pessoa'})
 export class PessoaEntity{
@@ -15,8 +15,8 @@ export class PessoaEntity{
     @Column({name: 'cpf', type: 'varchar', nullable:false})
     cpf: string;  
 
-    @Column({name: 'data_nascimento', type: 'varchar', nullable:false})
-    dataNascimento: string;
+    @Column({name: 'data_nascimento', type: 'timestamp', nullable:false})
+    dataNascimento: Date;
 
     @Column({name: 'genero', type: 'enum', enum: GeneroPessoa, nullable:false})
     genero: GeneroPessoa;
@@ -25,5 +25,6 @@ export class PessoaEntity{
     situacao: SituacaoPessoa;
     
     @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioPessoa)
+    @JoinColumn({name:'id_usuario'})
     usuario: UsuarioEntity;
 }

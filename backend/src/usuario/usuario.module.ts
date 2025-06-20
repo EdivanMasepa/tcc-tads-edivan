@@ -7,9 +7,10 @@ import { JwtService } from '@nestjs/jwt';
 import { InstituicaoEntity } from './entities/instituicao.entity';
 import { UsuarioEntity } from './entities/usuario.entity';
 import { PublicacaoEntity } from '../publicacao/entities/publicacao.entity';
+import { DenunciaModule } from '../denuncia/denuncia.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, PublicacaoEntity, InstituicaoEntity])],
+  imports:[TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, PublicacaoEntity, InstituicaoEntity, DenunciaModule])],
   controllers: [UsuarioController],
   providers: [UsuarioService, JwtService],
 })

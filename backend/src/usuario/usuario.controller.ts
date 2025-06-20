@@ -16,24 +16,24 @@ export class UsuarioController {
   @UseGuards(AuthGuard)
   @Patch('/atualizar')
   async alterar(@Req() req:any, @Body() novosDados: Partial<AtualizaUsuarioDTO>){
-    return await this.usuarioService.alterarUsuario(req.user.sub, novosDados);
+    return await this.usuarioService.alterar(req.user.sub, novosDados);
   }
 
   @UseGuards(AuthGuard)
   @Get('/listar/:opcao')
   async listar(@Param('opcao') opcao:number) {
-      return await this.usuarioService.listarUsuarios(Number(opcao));
+      return await this.usuarioService.listar(Number(opcao));
   }
 
   @UseGuards(AuthGuard)
   @Get('/buscar/:parametro')
   async buscar(@Param('parametro') parametro: any) {
-    return await this.usuarioService.buscarUsuario(parametro); 
+    return await this.usuarioService.buscar(parametro); 
   }
 
   @UseGuards(AuthGuard)
   @Delete('/deletar')
   async deletar(@Req() req:any) {
-    return await this.usuarioService.deletarUsuario(req.user.sub);
+    return await this.usuarioService.deletar(req.user.sub);
   }
 }

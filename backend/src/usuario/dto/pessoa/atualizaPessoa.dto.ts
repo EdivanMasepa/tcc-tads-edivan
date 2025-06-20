@@ -1,6 +1,6 @@
 import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { GeneroPessoa } from '../../../enums/generoPessoa.enum';
-import { SituacaoPessoa } from '../../../enums/situacaoPessoa.enum';
+import { GeneroPessoa } from '../../enum/generoPessoa.enum';
+import { SituacaoPessoa } from '../../enum/situacaoPessoa.enum';
 
 export class AtualizaPessoaDTO{
 

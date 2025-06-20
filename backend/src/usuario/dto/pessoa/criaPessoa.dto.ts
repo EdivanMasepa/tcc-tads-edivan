@@ -1,7 +1,7 @@
-import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsString, Min, isNotEmpty } from "class-validator";
+import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsString, MaxDate, Min, MinDate, isNotEmpty } from "class-validator";
 import { CriaUsuarioDTO } from "../criaUsuario.dto";
-import { SituacaoPessoa } from "../../../enums/situacaoPessoa.enum";
-import { GeneroPessoa } from "../../../enums/generoPessoa.enum";
+import { SituacaoPessoa } from "../../enum/situacaoPessoa.enum";
+import { GeneroPessoa } from "../../enum/generoPessoa.enum";
 
 export class CriaPessoaDTO {
 
@@ -13,9 +13,11 @@ export class CriaPessoaDTO {
     @IsNotEmpty({ message: "CPF não pode ser vazio."})
     cpf: string;
   
-    @IsString({message:"DATA DE NASCIMENTO tem tipo inválido."})
-    @IsNotEmpty({ message: "DATA DE NASCIMENTO não pode ser vazia"})
-    dataNascimento: string;
+    @IsDate({message:"DATA DE NASCIMENTO tem tipo inválido."})
+    @IsNotEmpty({message: "DATA DE NASCIMENTO não pode ser vazia"})
+    @MinDate(new Date('1925-01-01'), { message: 'DATA muito antiga, verifique.' })
+    @MaxDate(new Date('2020-01-01'), { message: 'DATA muito recente, verifique.' })
+    dataNascimento: Date;
 
     @IsEnum(GeneroPessoa, {message:"GÊNERO não está predefinido."})
     @IsNotEmpty({ message: "GÊNERO não pode ser vazio."})

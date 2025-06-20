@@ -1,11 +1,12 @@
-import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { SegmentoInstituicao } from "../../../enums/segmentoInstituicao.enum";
+import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString, MaxDate } from "class-validator";
+import { SegmentoInstituicao } from "../../enum/segmentoInstituicao.enum";
 
 export class AtualizaInstituicaoDTO{
-    
+
+    @IsDate({message:"DATA DE FUNDAÇÃO tem tipo inválido."})
+    @MaxDate(new Date())
     @IsOptional()
-    @IsDate({message:"DATA DE FUNDAÇÃO deve ser uma data válida."})
-    dataFundacao?: string;
+    dataFundacao: Date;
 
     @IsOptional()
     @IsEnum(SegmentoInstituicao, {message:"SEGMENTO não está predefinido."})
