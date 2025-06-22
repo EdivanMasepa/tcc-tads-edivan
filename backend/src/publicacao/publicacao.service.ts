@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { ListaPublicacaoDTO } from './dto/listaPublicacao.dto';
-import { AvaliarPublicacaoDTO } from './dto/avaliarPublicaca.dto';
+import { AvaliaPublicacaoDTO } from './dto/avaliaPublicacao.dto';
 
 @Injectable()
 export class PublicacaoService {
@@ -15,7 +15,7 @@ export class PublicacaoService {
     @InjectRepository(PublicacaoEntity) private readonly publicacaoRepository: Repository<PublicacaoEntity>,
     private readonly usuarioService: UsuarioService){}
 
-  async criarPublicacao(idUsuario: number, publicacao:CriaPublicacaoDTO){
+  async criar(idUsuario: number, publicacao:CriaPublicacaoDTO){
     try{
       const usuarioEncontrado:UsuarioEntity = await this.usuarioService.buscar(idUsuario);
       const publicacaoEntity:PublicacaoEntity = new PublicacaoEntity();
@@ -35,7 +35,7 @@ export class PublicacaoService {
     }
   }
 
-  async listarPublicacoes(aprovada: boolean | null){
+  async listar(aprovada: boolean | null){
     try{
       const listaAcao:PublicacaoEntity[] = await this.publicacaoRepository.find({where:{aprovada:aprovada}, relations:{usuarioResponsavel:true}})
 
@@ -55,7 +55,7 @@ export class PublicacaoService {
     }
   }
 
-  async buscarPublicacao(id:number){
+  async buscar(id:number){
       const publicacaoEncontrada: PublicacaoEntity = await this.publicacaoRepository.findOneBy({id:id});
 
       if(!publicacaoEncontrada)
@@ -64,7 +64,7 @@ export class PublicacaoService {
       return publicacaoEncontrada;
   }
 
-  async buscapublicacaoPorTexto(text: string){
+  async buscarPorTexto(text: string){
     const publicacao: PublicacaoEntity[] = await this.publicacaoRepository
       .createQueryBuilder('publicacao')
       .select(['publicacao.id', 'publicacao.titulo', 'publicacao.descricao'])
@@ -75,12 +75,12 @@ export class PublicacaoService {
     return publicacao;
   }
 
-  async editarPublicacao(idUsuario: number, idPublicacao:number, novosDadosPublicacao: AtualizaPublicacaoDTO){
+  async editar(idUsuario: number, idPublicacao:number, novosDadosPublicacao: AtualizaPublicacaoDTO){
     const usuario: UsuarioEntity = await this.usuarioService.buscar(idUsuario);
     let publicacaoEncontradaUsuario: PublicacaoEntity | null = null;
 
     try{
-      const publicacaoEncontrada: PublicacaoEntity = await this.buscarPublicacao(idPublicacao);
+      const publicacaoEncontrada: PublicacaoEntity = await this.buscar(idPublicacao);
 
       for(let publicacao of usuario.publicacoes){
         if(publicacao.id === publicacaoEncontrada.id)
@@ -99,8 +99,8 @@ export class PublicacaoService {
     }
   }
 
-  async avaliarPublicacao(aprovada: AvaliarPublicacaoDTO, idUsuario: number){
-    const publicacao: PublicacaoEntity = await this.buscarPublicacao(aprovada.idPublicacao);
+  async avaliar(aprovada: AvaliaPublicacaoDTO, idUsuario: number){
+    const publicacao: PublicacaoEntity = await this.buscar(aprovada.idPublicacao);
 
     if(!publicacao)
       throw new NotFoundException('Publicação não encontrada.')
@@ -121,9 +121,9 @@ export class PublicacaoService {
     }
   }
 
-  async deletaPublicacao(idUsuario:number, idPublicacao:number){
+  async deletar(idUsuario:number, idPublicacao:number){
     const usuarioEncontrado: UsuarioEntity = await this.usuarioService.buscar(idUsuario);
-    const publicacaoEncontrada: PublicacaoEntity = await this.buscarPublicacao(idPublicacao);
+    const publicacaoEncontrada: PublicacaoEntity = await this.buscar(idPublicacao);
 
     if(!publicacaoEncontrada)
       throw new NotFoundException("Publicação não encontrada.")
