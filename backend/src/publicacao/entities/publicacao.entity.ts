@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UsuarioEntity } from "../../usuario/entities/usuario.entity";
 import { CategoriaPublicacaoEnum } from "../enum/categoriaPublicacao.enum";
 import { DenunciaEntity } from "../../denuncia/entities/denuncia.entity";

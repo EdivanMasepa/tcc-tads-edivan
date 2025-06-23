@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import Button from '../../components/button/button'
-import Cabecalho from '../../components/cabecalho/cabecalho'
-import Input from '../../components/input/input'
+import Button from '../../componentes/botao/botao'
+import Cabecalho from '../../componentes/cabecalho/cabecalho'
+import Input from '../../componentes/input/input'
 import '../../index.css'
 import './perfil.css'
 import Cookies from "js-cookie"

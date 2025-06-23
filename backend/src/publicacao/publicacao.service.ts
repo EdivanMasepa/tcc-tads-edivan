@@ -12,8 +12,10 @@ import { AvaliaPublicacaoDTO } from './dto/avaliaPublicacao.dto';
 @Injectable()
 export class PublicacaoService {
   constructor(
-    @InjectRepository(PublicacaoEntity) private readonly publicacaoRepository: Repository<PublicacaoEntity>,
-    private readonly usuarioService: UsuarioService){}
+    @InjectRepository(PublicacaoEntity) 
+    private readonly publicacaoRepository: Repository<PublicacaoEntity>,
+    private readonly usuarioService: UsuarioService
+  ){}
 
   async criar(idUsuario: number, publicacao:CriaPublicacaoDTO){
     try{

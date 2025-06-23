@@ -7,7 +7,9 @@ import { AtualizaPublicacaoDTO } from './dto/atualizaPublicacao.dto';
 @UseGuards(AuthGuard)
 @Controller('publicacao')
 export class PublicacaoController {
-  constructor(private readonly publicacaoService: PublicacaoService) {}
+  constructor(
+    private readonly publicacaoService: PublicacaoService
+  ) {}
 
   @Post('cadastrar')
   async cadastrar(@Req() req:any, @Body() publicacao: CriaPublicacaoDTO) {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Button from '../../components/button/button';
-import Input from '../../components/input/input';
+import Button from '../../componentes/botao/botao';
+import Input from '../../componentes/input/input';
 import '../../index.css'
 import './redefinirSenha.css'
 import { IoArrowBack } from 'react-icons/io5';

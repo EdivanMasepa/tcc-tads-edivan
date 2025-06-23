@@ -1,9 +1,9 @@
 import { ChangeEvent, useState } from "react";
 import "./criarPublicacao.css"
 import '../../index.css'
-import Input from "../../components/input/input";
-import Button from "../../components/button/button";
-import SelectDemo from "../../components/select/select-radix";
+import Input from "../../componentes/input/input";
+import Button from "../../componentes/botao/botao";
+import SelectDemo from "../../componentes/select/select-radix";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie"
 import axios from 'axios'

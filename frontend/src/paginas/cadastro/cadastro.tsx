@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import "./cadastro.css"
 import "../../index.css"
 import { IoArrowBack } from 'react-icons/io5';
-import Input from '../../components/input/input';
-import Button from '../../components/button/button';
+import Input from '../../componentes/input/input';
+import Button from '../../componentes/botao/botao';
 import { toast, ToastContainer } from 'react-toastify';
 import axios from 'axios';
 import  'react-toastify/dist/ReactToastify.css' ;

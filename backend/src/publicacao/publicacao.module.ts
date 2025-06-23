@@ -11,7 +11,13 @@ import { PublicacaoEntity } from './entities/publicacao.entity';
 import { DenunciaEntity } from '../denuncia/entities/denuncia.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, PublicacaoEntity, InstituicaoEntity, DenunciaEntity])],
+  imports:[TypeOrmModule.forFeature([
+    UsuarioEntity, 
+    PessoaEntity, 
+    PublicacaoEntity, 
+    InstituicaoEntity, 
+    DenunciaEntity
+  ])],
   controllers: [PublicacaoController],
   providers: [PublicacaoService, UsuarioService, JwtService],
 })

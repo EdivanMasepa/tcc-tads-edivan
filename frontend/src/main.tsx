@@ -1,14 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import Login from './pages/login/login.tsx'
+import Login from './paginas/login/login.tsx'
 import './index.css'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
-import RedefinirSenha from './pages/redefinirSenha/redefinirSenha.tsx'
-import Cadastro from './pages/cadastro/cadastro.tsx'
-import Perfil from './pages/perfil/perfil.tsx'
-import PaginaInicial from './pages/paginaInicial/paginaInicial.tsx'
+import RedefinirSenha from './paginas/redefinirSenha/redefinirSenha.tsx'
+import Cadastro from './paginas/cadastro/cadastro.tsx'
+import Perfil from './paginas/perfil/perfil.tsx'
+import PaginaInicial from './paginas/paginaInicial/paginaInicial.tsx'
 import Cookies from 'js-cookie'
-import CriarPublicacao from './pages/criarPublicacao/criarPublicacao.tsx'
+import CriarPublicacao from './paginas/criarPublicacao/criarPublicacao.tsx'
 
 const createProtectRoute = (Page: JSX.Element) => {
   setTimeout(() => {

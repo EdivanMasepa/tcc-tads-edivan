@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Cabecalho from '../../components/cabecalho/cabecalho';
+import Cabecalho from '../../componentes/cabecalho/cabecalho';
 import '../../index.css'
 import './paginaInicial.css'
 import { ToastContainer } from 'react-toastify';

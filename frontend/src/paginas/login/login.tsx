@@ -1,7 +1,7 @@
 import './login.css'
 import "../../index.css"
-import Button from '../../components/button/button'
-import Input from '../../components/input/input'
+import Button from '../../componentes/botao/botao'
+import Input from '../../componentes/input/input'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import Cookies from 'js-cookie'
