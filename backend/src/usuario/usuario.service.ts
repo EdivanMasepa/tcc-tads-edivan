@@ -7,7 +7,7 @@ import { InstituicaoEntity } from './entities/instituicao.entity';
 import { UsuarioEntity } from './entities/usuario.entity';
 import { PublicacaoEntity } from '../publicacao/entities/publicacao.entity';
 import { CriaUsuarioDTO } from './dto/criaUsuario.dto';
-import { TipoUsuario } from './enum/tipoUsuario.enum';
+import { TipoUsuarioEnum } from './enum/tipoUsuario.enum';
 import { ListaUsuarioDTO } from './dto/listaUsuario.dto';
 import { ListaPessoaDTO } from './dto/pessoa/listaPessoa.dto';
 import { ListaInstituicaoDTO } from './dto/instituicao/listaInstituicao.dto';
@@ -42,7 +42,7 @@ export class UsuarioService {
     usuarioEntity.telefone = usuario.telefone;
     usuarioEntity.senha = senhaHasheada;
 
-    if(usuario.tipoUsuario === TipoUsuario.PESSOA && usuario.pessoa != null){
+    if(usuario.tipoUsuario === TipoUsuarioEnum.PESSOA && usuario.pessoa != null){
       const usuarioPessoaEntity: PessoaEntity = new PessoaEntity();
       this.validaPropriedades(usuario.pessoa)
 
@@ -73,7 +73,7 @@ export class UsuarioService {
       }else
         throw new BadRequestException('Erro ao cadastrar, verifique as informações e tente novamente.')
     }    
-    else if(usuario.tipoUsuario === TipoUsuario.INSTITUICAO && usuario.instituicao != null){
+    else if(usuario.tipoUsuario === TipoUsuarioEnum.INSTITUICAO && usuario.instituicao != null){
       const usuarioInstituicaoEntity:InstituicaoEntity = new InstituicaoEntity();
       this.validaPropriedades(usuario.instituicao)
 
@@ -118,24 +118,24 @@ export class UsuarioService {
     try{
       if(opcao === 1){
         return usuarios.map((usuario) => {
-          if(usuario.tipoUsuario === TipoUsuario.PESSOA){
+          if(usuario.tipoUsuario === TipoUsuarioEnum.PESSOA){
             return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.publicacoes.length, 
               new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
-          }else if(usuario.tipoUsuario === TipoUsuario.INSTITUICAO){
+          }else if(usuario.tipoUsuario === TipoUsuarioEnum.INSTITUICAO){
             return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.publicacoes.length, 
               new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.segmento))
           }
         }) 
       }else if(opcao === 2){
         return usuarios.map((usuario) => {
-          if(usuario.tipoUsuario === TipoUsuario.PESSOA){
+          if(usuario.tipoUsuario === TipoUsuarioEnum.PESSOA){
             return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.publicacoes.length,
               new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
           }
         }) 
       }else if(opcao === 3){
         return usuarios.map((usuario) => {
-          if(usuario.tipoUsuario === TipoUsuario.INSTITUICAO){
+          if(usuario.tipoUsuario === TipoUsuarioEnum.INSTITUICAO){
             return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,usuario.publicacoes.length,
                new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.segmento))
           }
@@ -210,14 +210,14 @@ export class UsuarioService {
         telefone: novosDados.telefone
       })     
 
-      if(usuarioEncontrado.tipoUsuario === TipoUsuario.PESSOA){
+      if(usuarioEncontrado.tipoUsuario === TipoUsuarioEnum.PESSOA){
         await this.usuarioPessoaRepository.update({id: usuarioEncontrado.usuarioPessoa.id}, {
           dataNascimento: novosDados.usuarioPessoa.dataNascimento,
           genero: novosDados.usuarioPessoa.genero,
           situacao: novosDados.usuarioPessoa.situacao
         })
       }
-      else if(usuarioEncontrado.tipoUsuario === TipoUsuario.INSTITUICAO){
+      else if(usuarioEncontrado.tipoUsuario === TipoUsuarioEnum.INSTITUICAO){
         await this.usuarioInstituicaoRepository.update({id: usuarioEncontrado.usuarioPessoa.id}, {
           dataFundacao: novosDados.usuarioInstituicao.dataFundacao,
           segmento: novosDados.usuarioInstituicao.segmento

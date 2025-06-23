@@ -1,6 +1,6 @@
 import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { GeneroPessoa } from '../../enum/generoPessoa.enum';
-import { SituacaoPessoa } from '../../enum/situacaoPessoa.enum';
+import { GeneroPessoaEnum } from '../../enum/generoPessoa.enum';
+import { SituacaoPessoaEnum } from '../../enum/situacaoPessoa.enum';
 
 export class AtualizaPessoaDTO{
 
@@ -13,10 +13,10 @@ export class AtualizaPessoaDTO{
     dataNascimento?: string;
 
     @IsOptional()
-    @IsEnum(GeneroPessoa, {message:"GÊNERO não está predefinido."})
-    genero?: GeneroPessoa;
+    @IsEnum(GeneroPessoaEnum, {message:"GÊNERO não está predefinido."})
+    genero?: GeneroPessoaEnum;
 
     @IsOptional()
-    @IsEnum(SituacaoPessoa, {message:"SITUAÇÃO não está predefinida."})
-    situacao?: SituacaoPessoa;
+    @IsEnum(SituacaoPessoaEnum, {message:"SITUAÇÃO não está predefinida."})
+    situacao?: SituacaoPessoaEnum;
 }

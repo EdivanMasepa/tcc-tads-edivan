@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UsuarioEntity } from "../../usuario/entities/usuario.entity";
-import { CategoriaPublicacao } from "../enum/categoriaPublicacao.enum";
+import { CategoriaPublicacaoEnum } from "../enum/categoriaPublicacao.enum";
 import { DenunciaEntity } from "../../denuncia/entities/denuncia.entity";
 
 @Entity({name:'acao'})
@@ -9,8 +9,8 @@ export class PublicacaoEntity{
     @PrimaryGeneratedColumn()
     id:number;
 
-    @Column({name:'categoria', type:'enum', enum: CategoriaPublicacao, nullable: false})
-    categoria:CategoriaPublicacao;
+    @Column({name:'categoria', type:'enum', enum: CategoriaPublicacaoEnum, nullable: false})
+    categoria:CategoriaPublicacaoEnum;
     
     @Column({name: 'titulo', type: 'varchar', nullable: false})
     titulo:string;

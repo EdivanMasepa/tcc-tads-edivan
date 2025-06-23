@@ -1,4 +1,4 @@
-export enum SegmentoInstituicao {
+export enum SegmentoInstituicaoEnum {
     ADMINISTRACAO_PUBLICA = 'Administração Pública',
     AGRICULTURA = 'Agricultura',
     ASSISTENCIA_SOCIAL = 'Assistência Social',

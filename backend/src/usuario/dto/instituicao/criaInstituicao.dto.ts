@@ -1,6 +1,6 @@
 import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsString, MaxDate, Min, MinDate, isNotEmpty } from "class-validator";
 import { CriaUsuarioDTO } from "../criaUsuario.dto";
-import { SegmentoInstituicao } from "../../enum/segmentoInstituicao.enum";
+import { SegmentoInstituicaoEnum } from "../../enum/segmentoInstituicao.enum";
 
 export class CriaInstituicaoDTO {
 
@@ -17,8 +17,8 @@ export class CriaInstituicaoDTO {
     @IsNotEmpty({message: "DATA DE FUNDAÇÃO não pode ser vazia."})
     dataFundacao: Date;
 
-    @IsEnum(SegmentoInstituicao, {message:"SEGMENTO não está predefinido."})
+    @IsEnum(SegmentoInstituicaoEnum, {message:"SEGMENTO não está predefinido."})
     @IsNotEmpty({message: "SEGMENTO não pode ser vazio."})
-    segmento?: SegmentoInstituicao
+    segmento?: SegmentoInstituicaoEnum
 
 }

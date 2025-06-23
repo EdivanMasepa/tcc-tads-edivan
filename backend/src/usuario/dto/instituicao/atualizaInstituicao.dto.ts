@@ -1,5 +1,5 @@
 import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString, MaxDate } from "class-validator";
-import { SegmentoInstituicao } from "../../enum/segmentoInstituicao.enum";
+import { SegmentoInstituicaoEnum } from "../../enum/segmentoInstituicao.enum";
 
 export class AtualizaInstituicaoDTO{
 
@@ -9,6 +9,6 @@ export class AtualizaInstituicaoDTO{
     dataFundacao: Date;
 
     @IsOptional()
-    @IsEnum(SegmentoInstituicao, {message:"SEGMENTO não está predefinido."})
-    segmento?: SegmentoInstituicao;
+    @IsEnum(SegmentoInstituicaoEnum, {message:"SEGMENTO não está predefinido."})
+    segmento?: SegmentoInstituicaoEnum;
 }

@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UsuarioEntity } from "./usuario.entity";
-import { GeneroPessoa } from "../enum/generoPessoa.enum";
-import { SituacaoPessoa } from "../enum/situacaoPessoa.enum";
+import { GeneroPessoaEnum } from "../enum/generoPessoa.enum";
+import { SituacaoPessoaEnum } from "../enum/situacaoPessoa.enum";
 
 @Entity({name:'pessoa'})
 export class PessoaEntity{
@@ -18,11 +18,11 @@ export class PessoaEntity{
     @Column({name: 'data_nascimento', type: 'timestamp', nullable:false})
     dataNascimento: Date;
 
-    @Column({name: 'genero', type: 'enum', enum: GeneroPessoa, nullable:false})
-    genero: GeneroPessoa;
+    @Column({name: 'genero', type: 'enum', enum: GeneroPessoaEnum, nullable:false})
+    genero: GeneroPessoaEnum;
 
-    @Column({name: 'situacao', type: 'enum', enum: SituacaoPessoa, nullable:false})
-    situacao: SituacaoPessoa;
+    @Column({name: 'situacao', type: 'enum', enum: SituacaoPessoaEnum, nullable:false})
+    situacao: SituacaoPessoaEnum;
     
     @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioPessoa)
     @JoinColumn({name:'id_usuario'})

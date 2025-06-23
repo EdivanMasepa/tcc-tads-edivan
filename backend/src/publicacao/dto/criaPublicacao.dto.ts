@@ -1,12 +1,12 @@
 import { IsDate, IsNotEmpty, IsString,  } from "class-validator";
 import { UsuarioEntity } from "src/usuario/entities/usuario.entity";
-import { CategoriaPublicacao } from "../enum/categoriaPublicacao.enum";
+import { CategoriaPublicacaoEnum } from "../enum/categoriaPublicacao.enum";
 
 export class CriaPublicacaoDTO {
         
     @IsString({message:"TIPO DA AÇÃO deve ser do tipo texto."})
     @IsNotEmpty({ message: "TIPO DA AÇÃO não pode ser vazio." })
-    categoria: CategoriaPublicacao;
+    categoria: CategoriaPublicacaoEnum;
     
     @IsString({message:"TÍTULO deve ser do tipo texto."})
     @IsNotEmpty({ message: "TÍTULO não pode ser vazio." })

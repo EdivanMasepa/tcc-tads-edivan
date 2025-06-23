@@ -1,6 +1,3 @@
-import { UsuarioEntity } from "src/usuario/entities/usuario.entity";
-import { PessoaEntity } from "../../usuario/entities/pessoa.entity";
-
 export class ListaPublicacaoDTO{
     constructor(
         private readonly id:number,

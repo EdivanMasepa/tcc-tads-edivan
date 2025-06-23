@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PessoaEntity } from "./pessoa.entity";
 import { InstituicaoEntity } from "./instituicao.entity";
-import { TipoUsuario } from "../enum/tipoUsuario.enum";
+import { TipoUsuarioEnum } from "../enum/tipoUsuario.enum";
 import { PublicacaoEntity } from "../../publicacao/entities/publicacao.entity";
 import { DenunciaEntity } from "../../denuncia/entities/denuncia.entity";
 
@@ -10,8 +10,8 @@ export class UsuarioEntity{
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({name:'tipo_usuario', type: 'enum', enum: TipoUsuario, nullable:false})
-    tipoUsuario:TipoUsuario;
+    @Column({name:'tipo_usuario', type: 'enum', enum: TipoUsuarioEnum, nullable:false})
+    tipoUsuario:TipoUsuarioEnum;
     
     @Column({name: 'nome', type: 'varchar', nullable:false})
     nome: string;
