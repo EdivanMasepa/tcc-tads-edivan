@@ -7,6 +7,7 @@ import './perfil.css'
 import Cookies from "js-cookie"
 import axios from 'axios'
 import { jwtDecode, JwtPayload } from 'jwt-decode'
+import { api } from '../../api'
 
 interface dadosUsuario {
     nome: string,
@@ -27,15 +28,8 @@ const Perfil: React.FC = () => {
 
     const salvar = async () => {
         try{
-            const token = Cookies.get('token') ;
             
-            if(token){
-                decodeToken = jwtDecode(token)
-            }
-            const response = await axios.get<dadosUsuario>(`http://localhost:3000/usuario/buscar-usuario/${decodeToken.sub}`, {
-                method: 'GET',
-                headers: {'Authorization': `Bearer ${token}`}
-            })
+            const response = await api.get<dadosUsuario>(`/usuario/buscar/1`)
             return response.data
         }catch(erro){
             console.log(erro)

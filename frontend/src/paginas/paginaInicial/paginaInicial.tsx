@@ -5,29 +5,21 @@ import './paginaInicial.css'
 import { ToastContainer } from 'react-toastify';
 import  'react-toastify/dist/ReactToastify.css' ;
 import Cookies from "js-cookie"
-import axios from 'axios'
+import axios, { AxiosError, isAxiosError } from 'axios'
 import { jwtDecode, JwtPayload } from 'jwt-decode'
+import { api } from '../../api';
 
-enum TipoPublicacao{
+enum CategoriaPublicacao{
     ajuda = 'Pedir ajuda' ,
     campanha = 'Promover campanha',
     informativa = 'informativa'
 }
 
-interface DadosPublicacao {
-    id: number
-    tipoAcao:TipoPublicacao;
-    status: string;
-    titulo:string;
-    dataInicial: string;
-    dataFinal: string;
-    descricao:string;
-    usuarioSolicitante: string;
-}
+
 
 const PaginaInicial: React.FC = () => {
 
-    const [acoes, setAcoes] = useState<DadosPublicacao[]>([]);
+    
 
     const [opcao, setOpcao] = useState<number | null>(0);
 
@@ -40,35 +32,35 @@ const PaginaInicial: React.FC = () => {
         { id: 1, legenda: 'Solicitações', boxShadow: 'shadowDuplo' },
         { id: 2, legenda: 'Campanhas', boxShadow: 'shadowEsquerda' },
       ];
+      const value = true
+      
+    interface DadosPublicacao {
+        id: number
+        categoria:CategoriaPublicacao;
+        titulo:string;
+        descricao: string;
+        data: string;
+        aprovada: boolean,
+        usuarioSolicitante: string;
+    }
 
-    let decodeToken: JwtPayload;
+    const [publicacoes, setPublicacoes] = useState<DadosPublicacao[]>([]);
 
     useEffect(() => {
+        const listarPublicacoes = async ():Promise<DadosPublicacao[]> => {
+            try{                
+                const {data} = await api.get<DadosPublicacao[]>(`/publicacao/listar?aprovada=${value}`);
 
-        const listaPublicacoes = async () => {
-            try{
-                const token = Cookies.get('token') ;
-                
-                if(token){
-                    decodeToken = jwtDecode(token)
-                }
-    
-                const response = await axios.get<DadosPublicacao[]>('http://localhost:3000/acao/acoes', {
-                    method: 'GET',
-                    headers: {'Authorization': `Bearer ${token}`}
-                })
-                setAcoes(response.data); 
-                console.log(response.data[0])
-                return response.data
-            }catch(erro){
-                console.log(erro)
+                setPublicacoes(data); 
+                return data;
+
+            }catch(erro:unknown){
+                throw new Error(isAxiosError(erro) ? erro.message : 'Falha ao buscar publicações.');
             }
         };
-
-        listaPublicacoes();
+        listarPublicacoes();
       }, []);
     
-
     return(
         <div className='divPrincipal alturaPaginaInicialDivPrincipal'>
             <Cabecalho />
@@ -85,7 +77,7 @@ const PaginaInicial: React.FC = () => {
             </div>
             <div className='divPaginaInicial'>
 
-                {acoes.map((acao: any)=>(  
+                {publicacoes.map((acao: any)=>(  
                     <div  className='divPublicacao' key={acao.id}>
                         <div className='divCabecalhoPublicacao'>
                             <p className="usuarioPublicacao">{acao.usuarioSolicitante}</p>

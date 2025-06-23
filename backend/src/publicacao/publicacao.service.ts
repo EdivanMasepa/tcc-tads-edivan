@@ -53,7 +53,7 @@ export class PublicacaoService {
         )
       );
     }catch{
-      throw new BadRequestException("Erro ao buscar ações.")
+      throw new BadRequestException('Erro ao buscar ações.')
     }
   }
 

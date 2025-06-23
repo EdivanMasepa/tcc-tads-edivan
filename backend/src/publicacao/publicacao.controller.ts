@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query, ParseBoolPipe } from '@nestjs/common';
 import { PublicacaoService } from './publicacao.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CriaPublicacaoDTO } from './dto/criaPublicacao.dto';
@@ -21,8 +21,8 @@ export class PublicacaoController {
     return await this.publicacaoService.editar(req.user.sub, id, novosDados);
   }
 
-  @Get('listar/:aprovada')
-  async listar(@Param('aprovada') aprovada: boolean,) {
+  @Get('listar')
+  async listar(@Query('aprovada', ParseBoolPipe) aprovada: boolean,) {
       return await this.publicacaoService.listar(aprovada);
   }
 

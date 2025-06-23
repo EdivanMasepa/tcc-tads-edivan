@@ -7,6 +7,7 @@ import Button from '../../componentes/botao/botao';
 import { toast, ToastContainer } from 'react-toastify';
 import axios from 'axios';
 import  'react-toastify/dist/ReactToastify.css' ;
+import { RetornoRequisicao } from '../../types/retornoRequisicao';
 
 enum TipoCadastro{
   pessoa='pessoa' ,
@@ -37,22 +38,18 @@ interface DadosCadastro{
 }
 
 const Cadastro: React.FC = () => {
-  
   const [tipoCadastro, setTipoCadastro] = useState<TipoCadastro>(TipoCadastro.pessoa);
   const [nome, setNome] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [telefone, setTelefone] = useState<string | null>(null);
   const [senha, setSenha] = useState<string | null>(null);
   const [confirmarSenha, setConfirmarSenha] = useState<string | null>(null);
-
-
   const [cpfOuCnpj, setCpfOuCnpj] = useState<string | null>(null);
   const [dataNascimentoOuFundacao, setDataNascimentoOuFundacao] = useState<string | null>(null);
   const [generoOuAreaAtuacao, setGeneroOuAreaAtuacao] = useState<string | null>(null);
   const [situacao, setSituacao] = useState<string | null>(null);
-
-
   const listaCamposCadastro = [tipoCadastro, nome, email, telefone, senha, confirmarSenha, cpfOuCnpj, dataNascimentoOuFundacao, generoOuAreaAtuacao];
+  const [opcaoCadastro, setOpcaoCadastro] = useState(true);
 
   for(let campo in listaCamposCadastro){
     if (!campo) {
@@ -61,6 +58,7 @@ const Cadastro: React.FC = () => {
       return
     }
   }
+  
   const dados: DadosCadastro | any = {
     usuario:{
       tipoUsuario: tipoCadastro,
@@ -75,14 +73,13 @@ const Cadastro: React.FC = () => {
       genero: generoOuAreaAtuacao,
       situacao: situacao
     }
-  
   }
   
   const cadastrar =  async (dadosCadastro: DadosCadastro) => {
     try{
-      const response = await axios.post('http://localhost:3000/usuario/cadastrar', dadosCadastro)
+      const response = await axios.post<RetornoRequisicao>('http://localhost:3000/usuario/cadastrar', dadosCadastro)
 
-      toast.success('Cadastrado com sucesso.')      
+      toast.success(response.data.message)      
     }
     catch(erro){
       if (axios.isAxiosError(erro) && erro.response){
@@ -103,8 +100,6 @@ const Cadastro: React.FC = () => {
       }
     }
   }
-
-  const [opcaoCadastro, setOpcaoCadastro] = useState(true)
 
   const alteraOpcaoCadastro = () =>{
     setOpcaoCadastro(!opcaoCadastro)
