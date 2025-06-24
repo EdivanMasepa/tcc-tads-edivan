@@ -8,77 +8,120 @@ import { toast, ToastContainer } from 'react-toastify';
 import axios from 'axios';
 import  'react-toastify/dist/ReactToastify.css' ;
 import { RetornoRequisicao } from '../../types/retornoRequisicao';
+import { api } from '../../api';
 
-enum TipoCadastro{
-  pessoa='pessoa' ,
-  instituicao='instituição'
+enum TipoCadastroEnum{
+  PESSOA='Pessoa' ,
+  INSTITUICAO='Instituição'
+}
+
+enum SegmentoInstituicaoEnum {
+    ADMINISTRACAO_PUBLICA = 'Administração Pública',
+    AGRICULTURA = 'Agricultura',
+    ASSISTENCIA_SOCIAL = 'Assistência Social',
+    COMERCIO = 'Comércio',
+    COMUNICACAO_MIDIA = 'Comunicação e Mídia',
+    COOPERATIVISMO = 'Cooperativismo',
+    CULTURA = 'Cultura',
+    DEFESA_CIVIL = 'Defesa Civil',
+    EDUCACAO = 'Educação',
+    ESPORTE_LAZER = 'Esporte e Lazer',
+    FINANCAS = 'Finanças e Bancos',
+    INDUSTRIA = 'Indústria',
+    ORGANIZACAO_NAO_GOVERNAMENTAL = 'ONG / OSCIP',
+    ORGANIZACAO_RELIGIOSA = 'Organização Religiosa',
+    OUTROS = 'Outros',
+    SAUDE = 'Saúde',
+    SEGURANCA_PUBLICA = 'Segurança Pública',
+    TECNOLOGIA = 'Tecnologia',
+    TRANSPORTE = 'Transporte'
+}
+
+enum GeneroPessoaEnum{
+  MASCULINO= 'Masculino',
+  FEMININO = 'Feminino'
 }
 
 interface UsuarioPessoa {
   cpf:string;
   dataNascimento:string;
-  genero:string;
+  genero:GeneroPessoaEnum;
+  situacao: string;
 }
 
 interface UsuarioInstituicao {
   cnpj: string;
   dataFundacao:string;
-  areaAtuacao:string;
+  segmento:SegmentoInstituicaoEnum;
 }
 
 interface DadosCadastro{
-    usuario:{
-      tipoUsuario:TipoCadastro;
+      tipoUsuario:TipoCadastroEnum;
       nome:string;
       email:string;
       telefone: string;
       senha:string;
-    },
-    tipoUsuario: UsuarioPessoa | UsuarioInstituicao;
+      confirmaSenha:string;
+      usuario: UsuarioPessoa | UsuarioInstituicao;
 }
 
 const Cadastro: React.FC = () => {
-  const [tipoCadastro, setTipoCadastro] = useState<TipoCadastro>(TipoCadastro.pessoa);
+  const [tipoCadastro, setTipoCadastro] = useState<TipoCadastroEnum>(TipoCadastroEnum.PESSOA);
   const [nome, setNome] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [telefone, setTelefone] = useState<string | null>(null);
   const [senha, setSenha] = useState<string | null>(null);
-  const [confirmarSenha, setConfirmarSenha] = useState<string | null>(null);
+  const [confirmaSenha, setConfirmarSenha] = useState<string | null>(null);
   const [cpfOuCnpj, setCpfOuCnpj] = useState<string | null>(null);
   const [dataNascimentoOuFundacao, setDataNascimentoOuFundacao] = useState<string | null>(null);
-  const [generoOuAreaAtuacao, setGeneroOuAreaAtuacao] = useState<string | null>(null);
+  const [generoOuSegmento, setGeneroOuSegmento] = useState<string | null>(null);
   const [situacao, setSituacao] = useState<string | null>(null);
-  const listaCamposCadastro = [tipoCadastro, nome, email, telefone, senha, confirmarSenha, cpfOuCnpj, dataNascimentoOuFundacao, generoOuAreaAtuacao];
+  const listaCamposCadastro = [tipoCadastro, nome, email, telefone, senha, confirmaSenha, cpfOuCnpj, dataNascimentoOuFundacao, generoOuSegmento];
   const [opcaoCadastro, setOpcaoCadastro] = useState(true);
-
-  for(let campo in listaCamposCadastro){
-    if (!campo) {
-      toast.dismiss()
-      toast.error("Preencha todos os campos")
-      return
-    }
-  }
+  const alteraOpcaoCadastro = () =>{
+    setOpcaoCadastro(!opcaoCadastro)
+  };
   
+  
+  
+  const dadosPessoa: UsuarioPessoa | any = {
+      cpf: cpfOuCnpj,
+      dataNascimento: dataNascimentoOuFundacao,
+      genero: generoOuSegmento,
+      situacao: situacao
+  }
+
+  const dadosInstituicao: UsuarioInstituicao | any = {
+      cnpj: cpfOuCnpj,
+      dataFundacao: dataNascimentoOuFundacao,
+      segmento: generoOuSegmento,
+      situacao: situacao
+  }
+
   const dados: DadosCadastro | any = {
-    usuario:{
       tipoUsuario: tipoCadastro,
       nome: nome,
       email: email,
       telefone: telefone,
-      senha: senha
-    },
-    tipoUsuario:{
-      cpf: cpfOuCnpj,
-      dataNascimento: dataNascimentoOuFundacao,
-      genero: generoOuAreaAtuacao,
-      situacao: situacao
-    }
+      senha: senha,
+      confirmaSenha: confirmaSenha,
+      pessoa: dadosPessoa
   }
   
   const cadastrar =  async (dadosCadastro: DadosCadastro) => {
-    try{
-      const response = await axios.post<RetornoRequisicao>('http://localhost:3000/usuario/cadastrar', dadosCadastro)
+          console.log(dados)
 
+    for(let campo in listaCamposCadastro){
+      console.log(campo)
+      if (!campo || campo == null || campo.trim() == '') {
+        console.log('oi')
+        toast.dismiss()
+        toast.error("Preencha todos os campos")
+      }
+    }
+    try{
+      const response = await api.post<RetornoRequisicao>('/usuario/cadastrar', dadosCadastro)
+      toast.dismiss()
       toast.success(response.data.message)      
     }
     catch(erro){
@@ -87,11 +130,9 @@ const Cadastro: React.FC = () => {
 
         if(erro.response.data.message){
           console.log(erro.response.data.message)
-          toast.dismiss()
           toast.error(erro.response.data.message);
         }
         else {
-          toast.dismiss
           toast.error('Erro ao cadastrar.')
         }
       } 
@@ -100,11 +141,6 @@ const Cadastro: React.FC = () => {
       }
     }
   }
-
-  const alteraOpcaoCadastro = () =>{
-    setOpcaoCadastro(!opcaoCadastro)
-  };
-
   return (
     <>
       <div className='divPrincipal alturaCadastroDivPrincipal'>
@@ -133,7 +169,7 @@ const Cadastro: React.FC = () => {
 
           <div className='divTipoCadastro'>
             <button 
-              value={TipoCadastro.pessoa}
+              value={TipoCadastroEnum.PESSOA}
               onChange={() =>{setTipoCadastro}}
               type='submit' 
               className={opcaoCadastro ? 'buttonOpcaoCadastro buttonSelecionado shadowRight' : 'buttonOpcaoCadastro'}
@@ -141,7 +177,7 @@ const Cadastro: React.FC = () => {
             </button>
 
             <button 
-              value={TipoCadastro.instituicao}
+              value={TipoCadastroEnum.INSTITUICAO}
               onChange={() =>{setTipoCadastro}}
               type='submit' 
               className={opcaoCadastro ? 'buttonOpcaoCadastro' : 'buttonOpcaoCadastro buttonSelecionado shadowLeft'}
@@ -161,21 +197,22 @@ const Cadastro: React.FC = () => {
 
               <Input value={dataNascimentoOuFundacao ?? ""} setValue={setDataNascimentoOuFundacao} label={opcaoCadastro ? 'Data de nascimento': 'Data de fundação' } placeholder='01/01/0001'  type='text'/>
 
-              <Input value={generoOuAreaAtuacao ?? ""} setValue={setGeneroOuAreaAtuacao} label={opcaoCadastro ? 'Gênero': 'Área de atuação' } placeholder=''  type='text'/>
+              <Input value={generoOuSegmento ?? ""} setValue={setGeneroOuSegmento} label={opcaoCadastro ? 'Gênero': 'Área de atuação' } placeholder=''  type='text'/>
 
               {opcaoCadastro && <Input value={situacao ?? ""} setValue={setSituacao} label='Situação' placeholder=''  type='text'/>} 
 
               <Input value={senha ?? ""} setValue={setSenha} label='Senha' placeholder='••••••••'  type='text'/>
 
-              <Input value={confirmarSenha ?? ""} setValue={setConfirmarSenha} label='Confirmar senha' placeholder='••••••••'  type='text'/>
+              <Input value={confirmaSenha ?? ""} setValue={setConfirmarSenha} label='Confirmar senha' placeholder='••••••••'  type='text'/>
 
               <Button legenda='Cadastrar' onClick={() => cadastrar(dados)}/>
             </div>
           </div>
 
         </div>
-        <ToastContainer/>
+    
       </div>
+          <ToastContainer/>
     </>
   );
 };

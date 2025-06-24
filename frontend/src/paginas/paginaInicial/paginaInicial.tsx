@@ -4,9 +4,8 @@ import '../../index.css'
 import './paginaInicial.css'
 import { ToastContainer } from 'react-toastify';
 import  'react-toastify/dist/ReactToastify.css' ;
-import Cookies from "js-cookie"
-import axios, { AxiosError, isAxiosError } from 'axios'
-import { jwtDecode, JwtPayload } from 'jwt-decode'
+import { isAxiosError } from 'axios'
+
 import { api } from '../../api';
 
 enum CategoriaPublicacao{
@@ -15,42 +14,31 @@ enum CategoriaPublicacao{
     informativa = 'informativa'
 }
 
-
+interface DadosPublicacao {
+    id: number
+    categoria:CategoriaPublicacao;
+    titulo:string;
+    descricao: string;
+    data: string;
+    aprovada: boolean,
+    usuarioSolicitante: string;
+}
 
 const PaginaInicial: React.FC = () => {
-
-    
-
     const [opcao, setOpcao] = useState<number | null>(0);
-
-    const alteraOpcaoPaginaInicial = (buttonSelecionado: number) => {
-        setOpcao(buttonSelecionado)
-    };
-
+    const alteraOpcaoPaginaInicial = (buttonSelecionado: number) => {setOpcao(buttonSelecionado)};
     const buttons = [
         { id: 0, legenda: 'Tudo', boxShadow: 'shadowDireita' },
         { id: 1, legenda: 'Solicitações', boxShadow: 'shadowDuplo' },
         { id: 2, legenda: 'Campanhas', boxShadow: 'shadowEsquerda' },
-      ];
-      const value = true
-      
-    interface DadosPublicacao {
-        id: number
-        categoria:CategoriaPublicacao;
-        titulo:string;
-        descricao: string;
-        data: string;
-        aprovada: boolean,
-        usuarioSolicitante: string;
-    }
-
+    ];
+    const value = true
     const [publicacoes, setPublicacoes] = useState<DadosPublicacao[]>([]);
 
     useEffect(() => {
         const listarPublicacoes = async ():Promise<DadosPublicacao[]> => {
             try{                
                 const {data} = await api.get<DadosPublicacao[]>(`/publicacao/listar?aprovada=${value}`);
-
                 setPublicacoes(data); 
                 return data;
 
