@@ -6,12 +6,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-  
-    background-color:inherit;
   }
   .button{
-    height: 35px;
-    
+    height: 40px;
+    width: 100%;
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,9 +18,10 @@
   
     border: none;
     border-radius: 50px;
-    background-color: #455FA3;
-    color: #fff;
+    background-color: var(--cor-primaria);
+    color:  var(--cor-secundaria);
+    font-weight: 500;
   }
   .button:focus{
-    outline: none;
+    outline: none;  
   }

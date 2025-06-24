@@ -1,4 +1,4 @@
-import './button.css'
+import './botao.css'
 
 export default function Button(props:any){
     return(
