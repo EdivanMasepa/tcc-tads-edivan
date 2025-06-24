@@ -32,16 +32,18 @@ const RedefinirSenha: React.FC = () => {
                             Informe abaixo por onde você prefere recebero código de verificação.
                         </p>
                     </div>}
-                    <div className='divEnviarCodigo'>
-                        {!envio && <Input label='Digite o E-mail ou Telefone'></Input>}
+                    <div className={envio ? 'divEnviarCodigo' : 'divEnviarCodigo defineSenha'}>
+                        {!envio && <Input label='Digite o e-mail ou telefone' placeholder='Digite aqui'></Input>}
 
-                        {envio && <Input label='Código de verificação' placeholder=''/>}
-                        {envio && <Input label='Senha' placeholder=''/>}
-                        {envio && <Input label='Confirmar senha' placeholder=''/>}
+                        {envio && <Input label='Código de verificação' placeholder='000000'/>}
+                        {envio && <Input label='Senha' placeholder='•••••••'/>}
+                        {envio && <Input label='Confirmar senha' placeholder='••••••••'/>}
 
-                        {!envio && <Button legenda='Enviar código' onClick={enviaCodigoVerificacao}></Button>}
-
-                        {envio && <Button legenda='Alterar senha'></Button>}
+                        <div>
+                            {!envio && <Button legenda='Enviar código' onClick={enviaCodigoVerificacao}></Button>}
+                            {envio && <Button legenda='Alterar senha'></Button>}
+                        </div>
+                        
 
                     </div>
                     {envio && <a className='aCodigo' onClick={enviaCodigoVerificacao}>Não recebi o código</a>}
