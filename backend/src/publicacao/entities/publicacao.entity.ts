@@ -3,7 +3,7 @@ import { UsuarioEntity } from "../../usuario/entities/usuario.entity";
 import { CategoriaPublicacaoEnum } from "../enum/categoriaPublicacao.enum";
 import { DenunciaEntity } from "../../denuncia/entities/denuncia.entity";
 
-@Entity({name:'acao'})
+@Entity({name:'publicacao'})
 export class PublicacaoEntity{
 
     @PrimaryGeneratedColumn()

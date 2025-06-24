@@ -23,8 +23,8 @@ export class UsuarioService {
 
   async criar(usuario: CriaUsuarioDTO){
     const usuarioEntity:UsuarioEntity = new UsuarioEntity();
-    this.validaPropriedades(usuario)
-
+    //this.validaPropriedades(usuario)
+    //console.log(usuario)
     if(await this.buscarEValidar(usuario.telefone))
       throw new BadRequestException('Número de telefone já cadastrado.')
     
@@ -42,11 +42,11 @@ export class UsuarioService {
     usuarioEntity.telefone = usuario.telefone;
     usuarioEntity.senha = senhaHasheada;
 
-    if(usuario.tipoUsuario === TipoUsuarioEnum.PESSOA && usuario.pessoa != null){
+    if(usuario.tipoUsuario == TipoUsuarioEnum.PESSOA ){
       const usuarioPessoaEntity: PessoaEntity = new PessoaEntity();
-      this.validaPropriedades(usuario.pessoa)
-
-      if(!this.validarCPF(usuario.pessoa.cpf))
+      //this.validaPropriedades(usuario.pessoa)
+      console.log(usuario)
+      if(!this.validarCPF(usuario.pessoa?.cpf))
         throw new BadRequestException('CPF inválido.')
 
       if(await this.buscarEValidar(usuario.pessoa.cpf))

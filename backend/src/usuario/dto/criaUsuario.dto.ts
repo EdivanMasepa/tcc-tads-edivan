@@ -6,7 +6,7 @@ import { Type } from "class-transformer";
 
 export class CriaUsuarioDTO{
     
-    @IsEnum({message: 'Tipo do usuário não está predefinido.'})
+   // @IsEnum({message: 'Tipo do usuário não está predefinido.'})
     @IsNotEmpty({message: 'Tipo do usuário não informado.'})
     tipoUsuario:TipoUsuarioEnum;
     
@@ -31,8 +31,8 @@ export class CriaUsuarioDTO{
     @IsNotEmpty({message: 'CONFIRMAÇÃO DE SENHA não pode ser vazia.'})
     confirmaSenha: string;
 
-    @ValidateNested()
-    @Type(() => CriaPessoaDTO)
+    @ValidateNested() 
+    @Type(() => Object)
     @IsOptional()
     pessoa?: CriaPessoaDTO;
 
