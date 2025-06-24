@@ -88,7 +88,7 @@ const PaginaInicial: React.FC = () => {
                                 <p>tipo: {acao.tipoAcao}</p>
                                 <p>status: {acao.status}</p>
                             </div>
-                            <div className='divConteudo'>
+                            <div className='divConteudo1'>
                                 <p>{acao.titulo}</p>
                                 <p>{acao.descricao}</p>
                             </div>
