@@ -106,75 +106,77 @@ const Cadastro: React.FC = () => {
   };
 
   return (
-    <div className='divPrincipal alturaCadastroDivPrincipal'>
-      
-      <a href='/login' className='aCadastroVoltar'><IoArrowBack className='iconeVoltar'/></a>
-      
-      <div className='divSecundaria alturaCadastroDivSecundaria'>
-          
-        <div className='divImgLogo'>
-          <h3 className='logo'>LOGO</h3>
-        </div>
-
-        <div className='divH2Titulo'>
-          <h2 className='h2Titulo'>CADASTRO</h2>
-        </div>
-
-        <div className='divDescricao'>
-          <hr className='hrDescricao hrDescricaoDireita'/>
-          <h3 className='h3Descricao'>INFORMAÇÕES {opcaoCadastro ? 'PESSOAIS' : 'BÁSICAS'}</h3>
-          <hr className='hrDescricao hrDescricaoEsquerda'/>
-        </div>
-
-        <div className='divLegendaTipoCadastro'>
-            <p>Cadastrar:</p>
-        </div>
-
-        <div className='divTipoCadastro'>
-          <button 
-            value={TipoCadastro.pessoa}
-            onChange={() =>{setTipoCadastro}}
-            type='submit' 
-            className={opcaoCadastro ? 'buttonOpcaoCadastro buttonSelecionado shadowRight' : 'buttonOpcaoCadastro'}
-            onClick={alteraOpcaoCadastro}>PESSOA
-          </button>
-
-          <button 
-            value={TipoCadastro.instituicao}
-            onChange={() =>{setTipoCadastro}}
-            type='submit' 
-            className={opcaoCadastro ? 'buttonOpcaoCadastro' : 'buttonOpcaoCadastro buttonSelecionado shadowLeft'}
-            onClick={alteraOpcaoCadastro}>INSTITUIÇÃO
-          </button>
-        </div>
+    <>
+      <div className='divPrincipal alturaCadastroDivPrincipal'>
         
-        <div className='divFormulario'>
+        <a href='/login' className='aCadastroVoltar'><IoArrowBack className='iconeVoltar'/></a>
+        
+        <div className='divSecundaria alturaCadastroDivSecundaria'>
+            
+          <div className='divImgLogo divImgLogoAltura'>
+            <h3 className='logo'>LOGO</h3>
+          </div>
 
-          <Input value={nome ?? ""} setValue={setNome} label='Nome completo' placeholder='Nome'  type='text'/>
+          <div className='divH2Titulo divH2TituloAltura'>
+            <h2 className='h2Titulo'>CADASTRO</h2>
+          </div>
 
-          <Input value={email ?? ""} setValue={setEmail} label='Email' placeholder='exemplo@exemplo.com'  type='email'/>
+          <div className='divDescricao'>
+            <hr className='hrDescricao hrDescricaoDireita'/>
+            <h3 className='h3Descricao'>INFORMAÇÕES {opcaoCadastro ? 'PESSOAIS' : 'BÁSICAS'}</h3>
+            <hr className='hrDescricao hrDescricaoEsquerda'/>
+          </div>
 
-          <Input value={telefone ?? ""} setValue={setTelefone} label='Telefone' placeholder='11 91111-1111'  type='text'/>
+          <div className='divLegendaTipoCadastro'>
+              <p>Cadastrar:</p>
+          </div>
 
-          <Input value={cpfOuCnpj ?? ""} setValue={setCpfOuCnpj} label={opcaoCadastro ? 'CPF' : 'CNPJ'} placeholder=''  type='text'/>
+          <div className='divTipoCadastro'>
+            <button 
+              value={TipoCadastro.pessoa}
+              onChange={() =>{setTipoCadastro}}
+              type='submit' 
+              className={opcaoCadastro ? 'buttonOpcaoCadastro buttonSelecionado shadowRight' : 'buttonOpcaoCadastro'}
+              onClick={alteraOpcaoCadastro}>PESSOA
+            </button>
 
-          <Input value={dataNascimentoOuFundacao ?? ""} setValue={setDataNascimentoOuFundacao} label={opcaoCadastro ? 'Data de nascimento': 'Data de fundação' } placeholder=''  type='text'/>
+            <button 
+              value={TipoCadastro.instituicao}
+              onChange={() =>{setTipoCadastro}}
+              type='submit' 
+              className={opcaoCadastro ? 'buttonOpcaoCadastro' : 'buttonOpcaoCadastro buttonSelecionado shadowLeft'}
+              onClick={alteraOpcaoCadastro}>INSTITUIÇÃO
+            </button>
+          </div>
+          
+          <div className='divFormulario'>
+            <div className='divConteudoFormulario'>
+              <Input value={nome ?? ""} setValue={setNome} label='Nome completo' placeholder='Nome'  type='text'/>
 
-          <Input value={generoOuAreaAtuacao ?? ""} setValue={setGeneroOuAreaAtuacao} label={opcaoCadastro ? 'Gênero': 'Área de atuação' } placeholder=''  type='text'/>
+              <Input value={email ?? ""} setValue={setEmail} label='Email' placeholder='exemplo@email.com'  type='email'/>
 
-          {opcaoCadastro && <Input value={situacao ?? ""} setValue={setSituacao} label='Situação' placeholder=''  type='text'/>} 
+              <Input value={telefone ?? ""} setValue={setTelefone} label='Telefone' placeholder='(11) 91111-1111'  type='text'/>
 
-          <Input value={senha ?? ""} setValue={setSenha} label='Senha' placeholder=''  type='text'/>
+              <Input value={cpfOuCnpj ?? ""} setValue={setCpfOuCnpj} label={opcaoCadastro ? 'CPF' : 'CNPJ'} placeholder={opcaoCadastro ? '123.456.789-10' : '12.345.687/0001-23'}  type='text'/>
 
-          <Input value={confirmarSenha ?? ""} setValue={setConfirmarSenha} label='Confirmar senha' placeholder=''  type='text'/>
+              <Input value={dataNascimentoOuFundacao ?? ""} setValue={setDataNascimentoOuFundacao} label={opcaoCadastro ? 'Data de nascimento': 'Data de fundação' } placeholder='01/01/0001'  type='text'/>
 
-          <Button legenda='Cadastrar' onClick={() => cadastrar(dados)}/>
+              <Input value={generoOuAreaAtuacao ?? ""} setValue={setGeneroOuAreaAtuacao} label={opcaoCadastro ? 'Gênero': 'Área de atuação' } placeholder=''  type='text'/>
+
+              {opcaoCadastro && <Input value={situacao ?? ""} setValue={setSituacao} label='Situação' placeholder=''  type='text'/>} 
+
+              <Input value={senha ?? ""} setValue={setSenha} label='Senha' placeholder='••••••••'  type='text'/>
+
+              <Input value={confirmarSenha ?? ""} setValue={setConfirmarSenha} label='Confirmar senha' placeholder='••••••••'  type='text'/>
+
+              <Button legenda='Cadastrar' onClick={() => cadastrar(dados)}/>
+            </div>
+          </div>
 
         </div>
-
+        <ToastContainer/>
       </div>
-      <ToastContainer/>
-    </div>
+    </>
   );
 };
 
