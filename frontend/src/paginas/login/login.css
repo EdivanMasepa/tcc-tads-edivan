@@ -1,14 +1,15 @@
 .alturaLogin{
   height: 60%;
+  justify-content: space-between;
 }
 .divInputs{
   width: 100%;
-  height: 50%;
+  height: 35%;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-evenly
+  justify-content: space-between;
 }
 .divInputLogin{
   width: 70%;
@@ -19,54 +20,49 @@
   align-items: center;
 }
 .divInputSenha{
-  width: 100%;
+  width: 70%;
 
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
 }
-.divInputVerSenha{
-  display: flex;
-  flex-direction: row;
+.div2InputSenha{
   width: 100%;
 }
-.div1InputSenha{
-  width: 15%;
-}
-.div2InputSenha{
-  width: 70%;
-}
 .div3InputSenha{
-  width: 15%; 
+  width: 0; 
   padding-top: 8px; 
 }
 .iconeVerSenha{
   width: 20px;
   height: 20px;
-  color: #455FA3;
-  z-index: 3;
-  margin-left: -25px;
 
+  color: var(--cor-primaria);
+  z-index: 1;
+  margin-left: -25px;
 }
 .h5Senha{
+  margin-top: 5px;
   display: flex;
   justify-content: center;
 }
 .h5Senha a{
   font-size: 11px;
-  color: #455FA3;
+  color: var(--cor-primaria);
   text-decoration: underline;
 }
-.divButtonEntrar{
+.divEntrar{
   width: 100%;
-  height: 20%;
+  height: 25%;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: start;
-
+  justify-content: center;
+}
+.divButtonEntrar{
+  width: 40%;
 }
 .divButtonCadastrar{
   position: relative;
@@ -82,7 +78,7 @@
 }
 .labelCadastrar{
   background-color: transparent;
-  color:#455FA3  ;
+  color:var(--cor-primaria)  ;
 }
 .aCadastrar{
   background-color: inherit;

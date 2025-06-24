@@ -16,7 +16,7 @@ export class CriaPublicacaoDTO {
     @IsNotEmpty({ message: "DESCRIÇÃO não pode ser vazia." })
     descricao: string;
 
-    @IsDate({message:"DATA deve ser do tipo DATA."})
+    @IsDate({message:"DATA deve ser uma data válida."})
     @IsNotEmpty({ message: "DATA não pode ser vazia" })
     data: Date;
 
