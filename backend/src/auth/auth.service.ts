@@ -1,27 +1,26 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
-import { PessoaEntity } from 'src/usuario/entities/pessoa.entity';
-import { InstituicaoEntity } from 'src/usuario/entities/instituicao.entity';
+import { LoginDTO } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
     constructor(private readonly usuarioService:UsuarioService, private readonly jwtService:JwtService){}
 
-    async login(loginUsuario:string, senha:string){
+    async login(dadosLogin:LoginDTO){
         let usuario:UsuarioEntity;
         let usuarioEspecificacaoId:number;
         let senhaValida:boolean;
         let payload:any;
 
-        usuario = await this.usuarioService.buscarEValidar(loginUsuario);
+        usuario = await this.usuarioService.buscarEValidar(dadosLogin.login);
 
-        if(loginUsuario.length < 5 || !(usuario instanceof UsuarioEntity))
+        if(dadosLogin.login.length < 5 || !(usuario instanceof UsuarioEntity))
             throw new UnauthorizedException('Login ou senha inválidos.')
 
-        senhaValida = await bcrypt.compare(senha, usuario.senha);
+        senhaValida = await bcrypt.compare(dadosLogin.senha, usuario.senha);
         
         if(!senhaValida)
             throw new UnauthorizedException('Login ou senha inválidos.')

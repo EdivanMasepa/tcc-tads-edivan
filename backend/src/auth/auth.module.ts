@@ -12,12 +12,13 @@ import { InstituicaoEntity } from 'src/usuario/entities/instituicao.entity';
 import { UsuarioEntity } from 'src/usuario/entities/usuario.entity';
 import { PublicacaoEntity } from '../publicacao/entities/publicacao.entity';
 import { DenunciaEntity } from '../denuncia/entities/denuncia.entity';
+import { PublicacaoModule } from '../publicacao/publicacao.module';
 
 @Module({
-  imports:[PassportModule, UsuarioModule, ConfigModule.forRoot(), JwtModule.register({
+  imports:[PassportModule, UsuarioModule, PublicacaoModule, ConfigModule.forRoot(), JwtModule.register({
     privateKey: process.env.JWT_SECRET,
     secret: process.env.JWT_SECRET,
-    signOptions:{expiresIn:'50000s'}}),
+    signOptions:{expiresIn:'25000s'}}),
     TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, PublicacaoEntity, InstituicaoEntity, DenunciaEntity])],
   controllers: [AuthController],
   providers: [AuthService, UsuarioService],
