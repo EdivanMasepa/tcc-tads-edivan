@@ -1,8 +1,8 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { AtualizaPessoaDTO } from './pessoa/atualizaPessoa.dto';
 import { AtualizaInstituicaoDTO } from './instituicao/atualizaInstituicao.dto';
-import { InstituicaoEntity } from 'src/usuario/entities/instituicao.entity';
-import { PessoaEntity } from 'src/usuario/entities/pessoa.entity';
+import { Type } from 'class-transformer';
+
 
 export class AtualizaUsuarioDTO{
     @IsOptional()
@@ -17,9 +17,13 @@ export class AtualizaUsuarioDTO{
     @IsString({message:'TELEFONE tem tipo inválido.'})
     telefone?: string;
 
+    @ValidateNested() 
+    @Type(() => Object)
     @IsOptional()
-    usuarioPessoa?: AtualizaPessoaDTO;
+    pessoa?: AtualizaPessoaDTO;
 
+    @ValidateNested()
+    @Type(() => Object)
     @IsOptional()
-    usuarioInstituicao?:AtualizaInstituicaoDTO;
+    instituicao?: AtualizaInstituicaoDTO;
 }

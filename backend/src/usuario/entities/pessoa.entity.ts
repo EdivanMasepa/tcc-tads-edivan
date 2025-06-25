@@ -24,7 +24,7 @@ export class PessoaEntity{
     @Column({name: 'situacao', type: 'enum', enum: SituacaoPessoaEnum, nullable:false})
     situacao: SituacaoPessoaEnum;
     
-    @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioPessoa)
+    @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioPessoa, {nullable:false})
     @JoinColumn({name:'id_usuario'})
     usuario: UsuarioEntity;
 }

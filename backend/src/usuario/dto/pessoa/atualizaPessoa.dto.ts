@@ -1,15 +1,13 @@
-import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxDate, MinDate } from 'class-validator';
 import { GeneroPessoaEnum } from '../../enum/generoPessoa.enum';
 import { SituacaoPessoaEnum } from '../../enum/situacaoPessoa.enum';
 
 export class AtualizaPessoaDTO{
 
-    @IsOptional()
-    @IsNumber({allowNaN:false}, {message: "Erro no usuário."})
-    idUsuario?: number;
-
-    @IsOptional()
-    @IsDate({message:"DATA DE NASCIMENTO deve ser uma data válida."})
+    @IsOptional()  
+    @IsDate({message:"DATA DE NASCIMENTO tem tipo inválido."})    
+    @MinDate(new Date('1925-01-01'), { message: 'DATA muito antiga, verifique.' })
+    @MaxDate(new Date('2020-01-01'), { message: 'DATA muito recente, verifique.' })
     dataNascimento?: string;
 
     @IsOptional()
