@@ -7,11 +7,14 @@ import { JwtService } from '@nestjs/jwt';
 import { InstituicaoEntity } from './entities/instituicao.entity';
 import { UsuarioEntity } from './entities/usuario.entity';
 import { PublicacaoEntity } from '../publicacao/entities/publicacao.entity';
-import { DenunciaModule } from '../denuncia/denuncia.module';
+import { DenunciaEntity } from '../denuncia/entities/denuncia.entity';
+import { PublicacaoModule } from '../publicacao/publicacao.module';
+import { PublicacaoService } from '../publicacao/publicacao.service';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, PublicacaoEntity, InstituicaoEntity, DenunciaModule])],
+  imports:[TypeOrmModule.forFeature([UsuarioEntity, PessoaEntity, PublicacaoEntity, InstituicaoEntity, DenunciaEntity]), forwardRef(() => PublicacaoModule)],
   controllers: [UsuarioController],
   providers: [UsuarioService, JwtService],
+  exports: [UsuarioService]
 })
 export class UsuarioModule {}
