@@ -16,10 +16,6 @@ export class CriaPublicacaoDTO {
     @IsNotEmpty({ message: "DESCRIÇÃO não pode ser vazia." })
     descricao: string;
 
-    @IsDate({message:"DATA deve ser uma data válida."})
-    @IsNotEmpty({ message: "DATA não pode ser vazia" })
-    data: Date;
-
     @IsNotEmpty({ message: "Usuário não reconhecido." })
     usuarioResponsavel: UsuarioEntity;
 }

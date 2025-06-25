@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query, ParseBoolPipe } from '@nestjs/common';
 import { PublicacaoService } from './publicacao.service';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { CriaPublicacaoDTO } from './dto/criaPublicacao.dto';
 import { AtualizaPublicacaoDTO } from './dto/atualizaPublicacao.dto';
+import { AvaliaPublicacaoDTO } from './dto/avaliaPublicacao.dto';
 
 @UseGuards(AuthGuard)
 @Controller('publicacao')
@@ -19,6 +20,11 @@ export class PublicacaoController {
   @Patch('alterar/:id')
   async alterar(@Req() req:any, @Param('id') id:number, @Body() novosDados: AtualizaPublicacaoDTO) {
     return await this.publicacaoService.editar(req.user.sub, id, novosDados);
+  }
+
+  @Patch('avaliar')
+  async avaliar(@Req() req:any, @Param('id') id:number, @Body() avaliacao: AvaliaPublicacaoDTO) {
+    return await this.publicacaoService.avaliar(avaliacao, req.user.sub);
   }
 
   @Get('listar')
