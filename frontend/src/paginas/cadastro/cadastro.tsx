@@ -112,7 +112,6 @@ const Cadastro: React.FC = () => {
           console.log(dados)
 
     for(let campo in listaCamposCadastro){
-      console.log(campo)
       if (!campo || campo == null || campo.trim() == '') {
         console.log('oi')
         toast.dismiss()

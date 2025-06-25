@@ -8,32 +8,31 @@ import { isAxiosError } from 'axios'
 
 import { api } from '../../api';
 
-enum CategoriaPublicacao{
-    ajuda = 'Pedir ajuda' ,
-    campanha = 'Promover campanha',
-    informativa = 'informativa'
+enum CategoriaPublicacaoEnum {
+    PEDIDO_AJUDA = 'Pedido de ajuda',
+    INFORMACAO_PUBLICA = ' Informação pública',
+    ACAO_SOLIDARIA = 'Ação solidária'
 }
 
 interface DadosPublicacao {
     id: number
-    categoria:CategoriaPublicacao;
+    categoria:CategoriaPublicacaoEnum;
     titulo:string;
     descricao: string;
     data: string;
-    aprovada: boolean,
-    usuarioSolicitante: string;
+    usuarioResponsavel: string;
 }
 
 const PaginaInicial: React.FC = () => {
     const [opcao, setOpcao] = useState<number | null>(0);
     const alteraOpcaoPaginaInicial = (buttonSelecionado: number) => {setOpcao(buttonSelecionado)};
+    const [publicacoes, setPublicacoes] = useState<DadosPublicacao[]>([]);
+    const value = true
     const buttons = [
         { id: 0, legenda: 'Tudo', boxShadow: 'shadowDireita' },
         { id: 1, legenda: 'Solicitações', boxShadow: 'shadowDuplo' },
         { id: 2, legenda: 'Campanhas', boxShadow: 'shadowEsquerda' },
     ];
-    const value = true
-    const [publicacoes, setPublicacoes] = useState<DadosPublicacao[]>([]);
 
     useEffect(() => {
         const listarPublicacoes = async ():Promise<DadosPublicacao[]> => {

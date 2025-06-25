@@ -14,7 +14,7 @@ export class InstituicaoEntity{
     @Column({name: 'cnpj', type: 'varchar', nullable:false})
     cnpj: string;
 
-    @Column({name: 'data_fundacao', type: 'date', nullable:false})
+    @Column({name: 'data_fundacao', type: 'timestamp', nullable:false})
     dataFundacao: Date;
 
     @Column({name: 'segmento', type: 'enum', enum: SegmentoInstituicaoEnum, nullable:false})
