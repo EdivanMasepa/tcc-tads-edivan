@@ -1,45 +1,90 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CriaDenunciaDTO } from './dto/criaDenuncia.dto';
 import { ListaDenunciasDTO } from './dto/listaDenuncias.dto';
 import { UsuarioEntity } from '../usuario/entities/usuario.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DenunciaEntity } from './entities/denuncia.entity';
 import { UsuarioService } from '../usuario/usuario.service';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
+import { BuscaDenunciaDTO } from './dto/buscaDenuncia.dto';
+import { PublicacaoEntity } from '../publicacao/entities/publicacao.entity';
+import { PublicacaoService } from '../publicacao/publicacao.service';
 
 @Injectable()
 export class DenunciaService {
   constructor(
-    @InjectRepository(DenunciaEntity) private readonly denunciaRepository: Repository<DenunciaEntity>,
-    private readonly usuarioService: UsuarioService
+    @InjectRepository(DenunciaEntity) 
+    private readonly denunciaRepository: Repository<DenunciaEntity>,
+    private readonly usuarioService: UsuarioService,
+    private readonly publicacaoService: PublicacaoService
   ){}
   
   async criar(denuncia: CriaDenunciaDTO) {
-    const usuarioRemetente: UsuarioEntity = await this.usuarioService.buscar(denuncia.idUsuarioRemetente)
-    const usuarioDenunciado: UsuarioEntity = await this.usuarioService.buscar(denuncia.idUsuarioDenunciado)
+    try{
+      const usuarioRemetente: UsuarioEntity = await this.usuarioService.buscar(denuncia.idUsuarioRemetente);
+      const usuarioDenunciado: UsuarioEntity = await this.usuarioService.buscar(denuncia.idUsuarioDenunciado);
+      const publicacao: PublicacaoEntity = await this.publicacaoService.buscar(denuncia.idPublicacao);
+      const novaDenuncia: DenunciaEntity =  new DenunciaEntity();
 
-    let publicacao: UsuarioEntity 
-    denuncia.idPublicacao ? publicacao = await this.usuarioService.buscar(denuncia.idPublicacao) : null
+      if(!usuarioRemetente || !usuarioDenunciado)
+        throw new NotFoundException('Usuário reconhecer usuário.')
 
-    if(!usuarioRemetente || !usuarioDenunciado)
-      throw new NotFoundException('Usuário não encontrado.')
+      novaDenuncia.descricao = denuncia.descricao;
+      novaDenuncia.publicacao = publicacao;
+      novaDenuncia.usuarioDenunciado = usuarioDenunciado;
+      novaDenuncia.usuarioRemetente = usuarioRemetente;
 
-    return 'This action adds a new denuncia';
+      await this.denunciaRepository.save(denuncia);
+
+      return {statusCode: 200, message:'Denúncia feita com sucesso.'};
+
+    }catch(erro){
+
+      if(erro instanceof NotFoundException)
+        throw erro;
+
+      throw new BadRequestException('Erro ao criar denúncia.')
+    }
   }
 
   async listar() {
-    return `This action returns all denuncia`;
+    try{
+      const denuncias: DenunciaEntity[] = await this.denunciaRepository.find({relations:{usuarioDenunciado: true, usuarioRemetente: true}, order:{data: 'DESC'}})
+      return denuncias.map( 
+        (denuncia) => new ListaDenunciasDTO(
+          denuncia.id, denuncia.descricao, denuncia.data, denuncia.publicacao.titulo, denuncia.usuarioDenunciado.nome, denuncia.usuarioRemetente.nome 
+        ))
+    }catch{
+      throw new BadRequestException('Falha ao buscar denuncias.')
+    }
   }
 
-  async buscar(id: number) {
-    return `This action returns a #${id} denuncia`;
-  }
+  async buscar(parametro: BuscaDenunciaDTO){
+    try{
+      const usuarioRemetente: UsuarioEntity = await this.usuarioService.buscar(parametro.idUsuarioRemetente);
+      const usuarioDenunciado: UsuarioEntity = await this.usuarioService.buscar(parametro.idUsuarioDenunciado);
+      const publicacao: PublicacaoEntity | null = await this.publicacaoService.buscar(parametro.idPublicacao);
+      
+      if (!usuarioRemetente || !usuarioDenunciado) {
+        throw new NotFoundException('Usuário não encontrado.');
+      }
 
-  async alterar(id: number, updateDenunciaDto: ListaDenunciasDTO) {
-    return `This action updates a #${id} denuncia`;
-  }
+      const denuncias: DenunciaEntity[] = await this.denunciaRepository.find({
+        where: [{id:parametro.id},{publicacao:publicacao},{usuarioDenunciado:usuarioDenunciado},{usuarioRemetente:usuarioRemetente},{data: Between(parametro.dataInicio, parametro.dataFim)}],
+        relations: {usuarioDenunciado: true, usuarioRemetente: true},
+        order: {usuarioDenunciado: 'DESC'}
+      });
+      
+      return denuncias.map((denuncia) => new ListaDenunciasDTO(
+          denuncia.id, denuncia.descricao, denuncia.data, denuncia.publicacao.titulo, denuncia.usuarioDenunciado.nome, denuncia.usuarioRemetente.nome 
+        ))
 
-  async deletar(id: number) {
-    return `This action removes a #${id} denuncia`;
+    }catch(erro){
+
+      if(erro instanceof NotFoundException)
+        throw erro;
+
+      throw new InternalServerErrorException('Falha ao buscar denuncia. Tente novamente');
+    }
   }
 }

@@ -6,12 +6,6 @@ export class CriaDenunciaDTO {
     @IsNotEmpty({message: 'DESCRIÇÃO não pode ser vazia.'})
     descricao: string;
 
-    @IsDate()
-    @MinDate(new Date(), {message: 'DATA deve ser a data atual'})
-    @MaxDate(new Date(), {message: 'DATA deve ser a data atual'})
-    @IsNotEmpty()
-    data: Date;
-
     @IsNumber({allowNaN:false}, {message: 'Usuário remetente não relacionado.'})
     @IsNotEmpty({message: 'Usuário remetente não relacionado.'})
     idUsuarioRemetente: number;

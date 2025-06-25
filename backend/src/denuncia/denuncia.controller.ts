@@ -1,34 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { DenunciaService } from './denuncia.service';
 import { CriaDenunciaDTO } from './dto/criaDenuncia.dto';
-import { ListaDenunciasDTO } from './dto/listaDenuncias.dto';
+import { AuthGuard } from '../auth/guard/auth.guard';
+import { BuscaDenunciaDTO } from './dto/buscaDenuncia.dto';
 
+@UseGuards(AuthGuard)
 @Controller('denuncia')
 export class DenunciaController {
   constructor(private readonly denunciaService: DenunciaService) {}
 
-  @Post('cadastrar')
-  async cadastrar(@Body() createDenunciaDto: CriaDenunciaDTO) {
-    return this.denunciaService.criar(createDenunciaDto);
+  @Post('criar')
+  async cadastrar(@Body() dadosDenuncia: CriaDenunciaDTO) {
+    return this.denunciaService.criar(dadosDenuncia);
   }
-
-  @Patch('alterar/:id')
-  async alterar(@Param('id') id: string, @Body() updateDenunciaDto: ListaDenunciasDTO) {
-    return this.denunciaService.alterar(+id, updateDenunciaDto);
-  }
-
   @Get('listar')
   async listar() {
     return this.denunciaService.listar();
   }
 
-  @Get('buscar/:id')
-  async buscar(@Param('id') id: string) {
-    return this.denunciaService.buscar(+id);
+  @Get('buscar')
+  async buscar(@Body('params') params: BuscaDenunciaDTO) {
+    return this.denunciaService.buscar(params);
   }
 
-  @Delete('deletar/:id')
-  async deletar(@Param('id') id: string) {
-    return this.denunciaService.deletar(+id);
-  }
 }
