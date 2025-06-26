@@ -4,21 +4,32 @@ import Menu from '../menu/menu'
 import { useEffect, useRef, useState } from 'react';
 import { IoMdAddCircle, IoMdAddCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
-import perfil from '../../../public/perfil.png'
+import CriarPublicacao from '../criarPublicacao/criarPublicacao';
 
 const Cabecalho: React.FC = () => {
     
   const [abreMenu, setAbreMenu] = useState(false);
-  const [criaPublicacao, setCriaPublicacao] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
-  const criarPublicacao = () => {navigate('/criarPublicacao')};
   const abrirMenu = () => {setAbreMenu(!abreMenu)}
+
+  const [abreCriarPublicacao, setCriarPublicacao] = useState(false);
+  const criarPublicacaoRef = useRef<HTMLDivElement>(null);
+  const abrirCriarPublicacao = () => {setCriarPublicacao(!abreMenu)};
+
+  const navigate = useNavigate();
+  const pesquisar = () => {navigate('/pesquisa')};
   const fecharMenu = () => {setAbreMenu(false)};
+  const fecharCriarPublicacao = () => {setAbreMenu(false)};
 
   const cliqueFora = (event: MouseEvent) => {
     if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
       fecharMenu();
+    }
+  };
+
+  const cancelarCriarPublicacao = (event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      fecharCriarPublicacao();
     }
   };
 
@@ -31,6 +42,7 @@ const Cabecalho: React.FC = () => {
     return () => {
       document.removeEventListener('mousedown', cliqueFora);
     };
+
   }, [abreMenu]);
 
   return(
@@ -40,20 +52,23 @@ const Cabecalho: React.FC = () => {
           </div>
 
           <div className="divCabecalhoCriarPublicacao">
-              <button type="submit" className='buttonCriarPublicacao' onClick={criarPublicacao}>
-                {abreMenu ? <IoMdAddCircle className='iconeCriarPublicacao' /> : <IoMdAddCircleOutline className='iconeCriarPublicacao' /> }
+              <button type="submit" className='buttonCriarPublicacao' onClick={abrirCriarPublicacao}>
+                {abreCriarPublicacao ? <IoMdAddCircle className='iconeCriarPublicacao' /> : <IoMdAddCircleOutline className='iconeCriarPublicacao' /> }
               </button>
           </div>
 
           <div className="divCabecalhoPesquisa">
-              <button type="submit" className='buttonPesquisa'><IoSearch className='iconePesquisa' /></button>
+              <button type="submit" className='buttonPesquisa' onClick={pesquisar} ><IoSearch className='iconePesquisa' />
+              </button>
           </div>
 
           <div className="divCabecalhoMenu">
-            <img src={perfil} alt="menu" className='imgMenu'/>
-            {/* <button className='buttonMenu' onClick={abrirMenu}>{abreMenu ? <IoClose className='iconeMenu'/> : <IoMenu className='iconeMenu'/>}</button> */}
+            <button className='buttonMenu' onClick={abrirMenu}>                
+                {abreMenu ? <IoClose className='iconeMenu'/> : <img src='./perfil.png' alt="menu" className='imgMenu'/>}
+            </button> 
           </div>
           {abreMenu && <Menu ref={menuRef} />}  
+          {abreCriarPublicacao && <CriarPublicacao ref={criarPublicacaoRef}/>}
       </div>
   )
 }
