@@ -28,13 +28,13 @@ export class UsuarioEntity{
     @Column({name: 'moderador', type: 'boolean', default: false})
     moderador: boolean;
 
-    @OneToOne(() => PessoaEntity, pessoa => pessoa.usuario, {nullable:true, onUpdate:'CASCADE', onDelete:'CASCADE', eager: true,  cascade:true})
+    @OneToOne(() => PessoaEntity, pessoa => pessoa.usuario, {nullable:true, eager: true})
     usuarioPessoa: PessoaEntity;
 
-    @OneToOne(() => InstituicaoEntity, instituicao => instituicao.usuario, {nullable:true, onUpdate:'CASCADE', onDelete:'CASCADE', eager: true,  cascade:true})
+    @OneToOne(() => InstituicaoEntity, instituicao => instituicao.usuario, {nullable:true, eager: true})
     usuarioInstituicao: InstituicaoEntity;
 
-    @OneToMany(() => PublicacaoEntity, publicacao => publicacao.usuarioResponsavel, {nullable:true, onDelete:'CASCADE', eager: true})
+    @OneToMany(() => PublicacaoEntity, publicacao => publicacao.usuarioResponsavel, {nullable:true, eager: true})
     publicacoes: PublicacaoEntity[];
 
     @OneToMany(() => DenunciaEntity, denunciasFeitas => denunciasFeitas.usuarioRemetente, {nullable:true})

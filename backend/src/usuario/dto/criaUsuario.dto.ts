@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, ValidateNested } from "class-validator";
+import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, MinLength, ValidateNested } from "class-validator";
 import { CriaPessoaDTO } from "./pessoa/criaPessoa.dto";
 import { CriaInstituicaoDTO } from "./instituicao/criaInstituicao.dto";
 import { TipoUsuarioEnum } from "../enum/tipoUsuario.enum";
@@ -12,6 +12,7 @@ export class CriaUsuarioDTO{
     
     @IsString({message: 'NOME deve ser do tipo texto.'})
     @IsNotEmpty({message: 'NOME não pode ser vazio.'})
+    @MinLength(5, {message:'NOME deve ter no mínimo 5 caracteres'})
     nome: string;
 
     @IsEmail({allow_display_name: false }, { message: 'EMAIL inválido.'})
@@ -33,12 +34,10 @@ export class CriaUsuarioDTO{
 
     @ValidateNested() 
     @Type(() => Object)
-    @IsOptional()
     pessoa?: CriaPessoaDTO;
 
     @ValidateNested()
     @Type(() => CriaInstituicaoDTO)
-    @IsOptional()
     instituicao?: CriaInstituicaoDTO;
     
 }

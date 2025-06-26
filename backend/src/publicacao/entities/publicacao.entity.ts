@@ -27,7 +27,7 @@ export class PublicacaoEntity{
     @Column({name: 'imagem', type: 'varchar', nullable: false})
     imagem: string;
 
-    @ManyToOne(() =>UsuarioEntity, usuarioResponsavel => usuarioResponsavel.publicacoes)
+    @ManyToOne(() =>UsuarioEntity, usuarioResponsavel => usuarioResponsavel.publicacoes, {onDelete:'CASCADE'})
     @JoinColumn({name:'id_usuario_responsavel'})
     usuarioResponsavel: UsuarioEntity;
 

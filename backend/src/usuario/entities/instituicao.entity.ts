@@ -20,7 +20,7 @@ export class InstituicaoEntity{
     @Column({name: 'segmento', type: 'enum', enum: SegmentoInstituicaoEnum, nullable:false})
     segmento: SegmentoInstituicaoEnum;
 
-    @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioInstituicao, {nullable:false})
+    @OneToOne(() => UsuarioEntity, usuario => usuario.usuarioInstituicao, {nullable:false, onUpdate:'CASCADE', onDelete:'CASCADE', cascade:true})
     @JoinColumn({name:'id_usuario'})
     usuario: UsuarioEntity;
 }
