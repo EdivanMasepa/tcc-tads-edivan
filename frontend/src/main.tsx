@@ -7,17 +7,8 @@ import RedefinirSenha from './paginas/redefinirSenha/redefinirSenha.tsx'
 import Cadastro from './paginas/cadastro/cadastro.tsx'
 import Perfil from './paginas/perfil/perfil.tsx'
 import PaginaInicial from './paginas/paginaInicial/paginaInicial.tsx'
-import Cookies from 'js-cookie'
-import CriarPublicacao from './paginas/criarPublicacao/criarPublicacao.tsx'
-
-const createProtectRoute = (Page: JSX.Element) => {
-  setTimeout(() => {
-    const token = Cookies.get("token")
-    if (!token) return <Navigate to={"/login"} />
-  }, 1000); 
-  
-  return Page
-}
+import RotaProtegida from './componentes/rotaProtegida.tsx'
+import Pesquisa from './paginas/pesquisa/pesquisa.tsx'
 
 const router = createBrowserRouter([
   {
@@ -38,15 +29,15 @@ const router = createBrowserRouter([
   },
   {
     path: '/perfil',
-    element: createProtectRoute(<Perfil />)
+    element: <RotaProtegida><Perfil /></RotaProtegida> 
   },
   {
     path: '/paginaInicial',
-    element: createProtectRoute(<PaginaInicial />)
+    element: <RotaProtegida><PaginaInicial /></RotaProtegida>
   },
   {
-    path: '/criarPublicacao',
-    element: createProtectRoute(<CriarPublicacao />)
+    path: '/pesquisa',
+    element: <RotaProtegida><Pesquisa /></RotaProtegida>
   }
 ])
 

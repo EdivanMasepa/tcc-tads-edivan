@@ -9,10 +9,14 @@ import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5'
 import { toast, ToastContainer } from 'react-toastify'
 import  'react-toastify/dist/ReactToastify.css' ;
 import axios from 'axios'
+import { api } from '../../api'
 
 interface DadosLogin {
-  login: string | null;
-  senha: string | null;
+  dadosLogin:{
+    login: string | null;
+    senha: string | null;
+  }
+  
 };
 
 const Login: React.FC = () => {
@@ -21,35 +25,32 @@ const Login: React.FC = () => {
   const [verSenha, setVerSenha] = useState(true);
   const navigate: NavigateFunction = useNavigate();
   const mostrarSenha = () => {setVerSenha(!verSenha)}
-
-  const logar = async (dadosLogin:DadosLogin) => {
-    if (!login || !senha) {
+  
+  const logar = async () => {
+    if (!login?.trim() || !senha?.trim()) {
       toast.dismiss();
-      toast.error("Preencha todos os campos");
+      toast.error('Preencha todos os campos');
       return;
     }
+    const dadosLogin = {
+      dadosLogin: { login, senha }
+    };
 
     try{
-      const response = await axios.post('http://localhost:3000/auth/login', dadosLogin)
-      Cookies.set('token', response.data.token, {sameSite: "Strict", secure: true})
-      navigate('/paginaInicial')
-      //toast.success('Sucesso.')     
+      const {data} = await api.post('/auth/login', dadosLogin)
+      
+      Cookies.set('token', data.token, {sameSite: "Strict", secure: true})
+      
+      navigate('/paginaInicial')  
       
     }catch(erro){
-      if (axios.isAxiosError(erro) && erro.response){
-        if(erro.response.data){
-          toast.dismiss()
-          toast.error(erro.response.data.message);
-        }
-        else {
-          toast.dismiss
-          toast.error('Erro ao fazer login.')
-        }
-      } 
-      else {
-        toast.dismiss
-          toast.error('Erro desconhecido, tente novamente.')
-      }
+      toast.dismiss();
+
+      const mensagem = axios.isAxiosError(erro) && erro.response?.data?.message
+      ? erro.response.data.message
+      : "Erro ao fazer login. Tente novamente.";
+
+      toast.error(mensagem);
     }
   }
   
@@ -86,7 +87,7 @@ const Login: React.FC = () => {
 
           <div className='divEntrar'>
             <div className='divButtonEntrar'>
-              <Button legenda='Entrar' onClick={() => logar({login, senha})}/>
+              <Button legenda='Entrar' onClick={logar}/>
             </div>
           </div>
   
