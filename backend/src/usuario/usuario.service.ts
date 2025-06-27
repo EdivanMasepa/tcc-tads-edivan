@@ -13,6 +13,7 @@ import { ListaInstituicaoDTO } from './dto/instituicao/listaInstituicao.dto';
 import { AtualizaUsuarioDTO } from './dto/atualizaUsuario.dto';
 import { AlteraSenhaDTO } from './dto/alteraSenha.dto';
 import { PublicacaoService } from '../publicacao/publicacao.service';
+import { instanceToPlain } from 'class-transformer';
 
 
 @Injectable()
@@ -113,8 +114,8 @@ export class UsuarioService {
 
       if(erro instanceof BadRequestException)
         throw erro;
-      
-      throw new InternalServerErrorException('Erro interno. Tente novamente.')
+      console.log(erro)
+      throw new InternalServerErrorException('Erro interno. Verifique as informações e tente novamente.')
     } 
   }
 
@@ -243,36 +244,32 @@ export class UsuarioService {
 
   async alterar(idUsuario: number, novosDados: AtualizaUsuarioDTO) {
     this.validaPropriedades(novosDados);
-
     try{ 
       const usuarioEncontrado = await this.buscar(idUsuario);
 
       if(!usuarioEncontrado)
         throw new NotFoundException('Erro ao relacionar usuário.');
+      
+      if(novosDados.nome || novosDados.email || novosDados.telefone)
+        await this.usuarioRepository.update({id:usuarioEncontrado.id}, {
+          nome: novosDados.nome,
+          email: novosDados.email,
+          telefone: novosDados.telefone
+        })     
 
-      Object.assign(usuarioEncontrado, novosDados)
-
-      // await this.usuarioRepository.update({id:usuarioEncontrado.id}, {
-      //   nome: novosDados.nome,
-      //   email: novosDados.email,
-      //   telefone: novosDados.telefone
-      // })     
-
-      // if(usuarioEncontrado.tipoUsuario === TipoUsuarioEnum.PESSOA){
-      //   await this.usuarioPessoaRepository.update({id: usuarioEncontrado.usuarioPessoa.id}, {
-      //     dataNascimento: novosDados.pessoa.dataNascimento,
-      //     genero: novosDados.pessoa.genero,
-      //     situacao: novosDados.pessoa.situacao
-      //   })
-      // }
-      // else if(usuarioEncontrado.tipoUsuario === TipoUsuarioEnum.INSTITUICAO){
-      //   await this.usuarioInstituicaoRepository.update({id: usuarioEncontrado.usuarioPessoa.id}, {
-      //     dataFundacao: novosDados.instituicao.dataFundacao,
-      //     segmento: novosDados.instituicao.segmento
-      //   }) 
-      // }
-      // else
-      //   throw new NotFoundException('Erro ao relacionar cadastro.');
+      if(usuarioEncontrado.tipoUsuario === TipoUsuarioEnum.PESSOA){
+        await this.usuarioPessoaRepository.update({id: usuarioEncontrado.usuarioPessoa.id}, {
+          dataNascimento: novosDados.pessoa.dataNascimento,
+          genero: novosDados.pessoa.genero,
+          situacao: novosDados.pessoa.situacao
+        })
+      }
+      else if(usuarioEncontrado.tipoUsuario === TipoUsuarioEnum.INSTITUICAO){
+        await this.usuarioInstituicaoRepository.update({id: usuarioEncontrado.usuarioPessoa.id}, {
+          dataFundacao: novosDados.instituicao.dataFundacao,
+          segmento: novosDados.instituicao.segmento
+        }) 
+      }
       
       return {statusCode:200, message:'Atualizado com sucesso.'}
 
@@ -280,7 +277,7 @@ export class UsuarioService {
 
       if(erro instanceof NotFoundException)
         throw erro
-      console.log(erro)
+
       throw new InternalServerErrorException('Erro ao atualizar cadastro. Tente novamente.');
     }
   }
@@ -310,6 +307,7 @@ export class UsuarioService {
   async deletar(id: number){
     try{
       const usuarioEncontrado:UsuarioEntity = await this.buscar(id);
+      console.log(usuarioEncontrado)
       /*let publicacaoEncontrada: PublicacaoEntity | null = null;
 
       if(usuarioEncontrado.publicacoes.length > 0){
@@ -336,25 +334,39 @@ export class UsuarioService {
 
       if(erro instanceof NotFoundException || erro instanceof BadRequestException)
         throw erro
-      
+      console.log(erro)
       throw new InternalServerErrorException('Erro interno. Tente novamente.')
     }    
   }
 
   validaPropriedades(param: any){
-    if (param == null || param === undefined || param.trim?.() === '' || param.length < 3) 
-      throw new BadRequestException(`Valor inválido. ${param}`);
     
-    else if (typeof param === 'object'){
+    if (param == null || param === undefined) {
+      throw new BadRequestException(`Valor inválido: ${param}`);
+    }
 
-      for (let item in param){
-
-        if (param[item]) return this.validaPropriedades(param[item])
-
-        else throw new BadRequestException(`${item} é invalido.`)
+    if (typeof param === 'string') {
+      if (param.trim() === '' || param.length < 3) {
+        throw new BadRequestException('Texto inválido. Verifique os dados.');
       }
     }
+    
+    if (typeof param === 'object' && !Array.isArray(param)) {
+      const plain = instanceToPlain(param);
+      const entries = Object.entries(plain); 
+
+      //const entries = Object.entries(param); 
+      //const objetoVazio = entries.length === 0 || entries.every(([_, v]) => v === undefined);
+      // if (objetoVazio) {
+      //   throw new BadRequestException('Objeto vazio ou sem valores válidos. Verifique os dados.');
+      // }
+
+      for (let [chave, valor] of entries){
+        if (chave && typeof valor)
+          this.validaPropriedades(valor); 
+      } 
   }
+}
   
   validarCPF(cpf: string){
     let cpfLista = cpf.split('');

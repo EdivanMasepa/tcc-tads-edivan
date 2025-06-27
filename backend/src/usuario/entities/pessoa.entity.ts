@@ -15,7 +15,7 @@ export class PessoaEntity{
     @Column({name: 'cpf', type: 'varchar', nullable:false})
     cpf: string;  
 
-    @Column({name: 'data_nascimento', type: 'timestamp', nullable:false})
+    @Column({name: 'data_nascimento', type: 'datetime', nullable:false})
     dataNascimento: Date;
 
     @Column({name: 'genero', type: 'enum', enum: GeneroPessoaEnum, nullable:false})
