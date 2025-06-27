@@ -14,7 +14,7 @@ const Cabecalho: React.FC = () => {
 
   const [abreCriarPublicacao, setCriarPublicacao] = useState(false);
   const criarPublicacaoRef = useRef<HTMLDivElement>(null);
-  const abrirCriarPublicacao = () => {setCriarPublicacao(!abreMenu)};
+  const abrirCriarPublicacao = () => {setCriarPublicacao(!abreCriarPublicacao)};
 
   const navigate = useNavigate();
   const pesquisar = () => {navigate('/pesquisa')};
@@ -46,6 +46,8 @@ const Cabecalho: React.FC = () => {
   }, [abreMenu]);
 
   return(
+    <>
+    
       <div className="divCabecalho">
           <div className="divLogoCabecalho">
               <a href='/paginaInicial' className='aLogo'><h3 className='logo'>LOGO</h3></a>
@@ -67,9 +69,11 @@ const Cabecalho: React.FC = () => {
                 {abreMenu ? <IoClose className='iconeMenu'/> : <img src='./perfil.png' alt="menu" className='imgMenu'/>}
             </button> 
           </div>
-          {abreMenu && <Menu ref={menuRef} />}  
-          {abreCriarPublicacao && <CriarPublicacao ref={criarPublicacaoRef}/>}
+          
       </div>
+      {abreMenu && <Menu ref={menuRef} />}  
+      {abreCriarPublicacao && <CriarPublicacao ref={criarPublicacaoRef}/>}
+    </>
   )
 }
 export default Cabecalho;
