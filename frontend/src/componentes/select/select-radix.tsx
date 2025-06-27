@@ -27,10 +27,9 @@ const SelectDemo:React.FC<SelectDemoProps> = ({ value, onValueChange }) => (
 				<Select.Viewport className="SelectViewport">
 
 					<Select.Group>
-						<SelectItem value="riscoCritico">Risco crítico</SelectItem>
-						<SelectItem value="risco">Risco moderado</SelectItem>
-						<SelectItem value="alerta">Alerta</SelectItem>
-						<SelectItem value="semRisco">Sem risco</SelectItem>
+						<SelectItem value="pedidoAjuda">Pedido de Ajuda</SelectItem>
+						<SelectItem value="informacaoPublica">Informação pública</SelectItem>
+						<SelectItem value="acaoSolidaria">Ação solidária</SelectItem>
 					</Select.Group>
 
 				</Select.Viewport>
