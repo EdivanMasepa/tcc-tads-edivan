@@ -5,6 +5,7 @@ import { Type } from 'class-transformer';
 
 
 export class AtualizaUsuarioDTO{
+    
     @IsOptional()
     @IsString({message:'NOME deve ser do tipo texto.'})
     @MinLength(5, {message:'NOME deve ter no mínimo 5 caracteres'})
@@ -20,12 +21,10 @@ export class AtualizaUsuarioDTO{
     telefone?: string;
 
     @ValidateNested() 
-    @Type(() => Object)
-    @IsOptional()
+    @Type(() => AtualizaPessoaDTO)
     pessoa?: AtualizaPessoaDTO;
 
     @ValidateNested()
-    @Type(() => Object)
-    @IsOptional()
+    @Type(() => AtualizaInstituicaoDTO)
     instituicao?: AtualizaInstituicaoDTO;
 }

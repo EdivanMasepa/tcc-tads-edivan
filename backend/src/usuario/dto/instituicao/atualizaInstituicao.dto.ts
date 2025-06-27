@@ -3,9 +3,9 @@ import { SegmentoInstituicaoEnum } from "../../enum/segmentoInstituicao.enum";
 
 export class AtualizaInstituicaoDTO{
 
+    @IsOptional()
     @IsDate({message:"DATA DE FUNDAÇÃO tem tipo inválido."})
     @MaxDate(new Date())
-    @IsOptional()
     dataFundacao: Date;
 
     @IsOptional()

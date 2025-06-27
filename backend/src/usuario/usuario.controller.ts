@@ -16,7 +16,7 @@ export class UsuarioController {
   
   @UseGuards(AuthGuard)
   @Patch('atualizar')
-  async alterar(@Req() req:any, @Body() novosDados: Partial<AtualizaUsuarioDTO>){
+  async alterar(@Req() req:any, @Body() novosDados: AtualizaUsuarioDTO){
     return await this.usuarioService.alterar(req.user.sub, novosDados);
   }
 
