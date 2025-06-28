@@ -5,19 +5,8 @@ import SelectDemo from "../select/select-radix";
 import { toast } from "react-toastify";
 import { api } from "../../api";
 import axios from "axios";
-
-{/* tipoAcao:string;
-
-    titulo:string;
-
-    status: string;
-
-    dataInicial: Date;
-
-    dataFinal: Date;
-
-    descricao:string;
-*/}
+import { jwtDecode, JwtPayload } from "jwt-decode";
+import Cookies from "js-cookie"
 
 enum CategoriaPublicacaoEnum{
     PEDIDO_AJUDA = 'Pedido de ajuda' ,
@@ -32,8 +21,11 @@ interface DadosPublicacaoInterface {
     data: Date;
 }
 
-const CriarPublicacao = forwardRef<HTMLDivElement>((props, ref) => {
-    //const [categoriaPublicacao, setCategoriaPublicacao] = useState<CategoriaPublicacaoEnum>(CategoriaPublicacaoEnum.INFORMACAO_PUBLICA);
+interface CriarPublicacaoProps {
+  onCancelar: () => void;
+} 
+
+const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCancelar }, ref) => {
     const [categoriaPublicacao, setCategoriaPublicacao] = useState<string | null>(null);
     const [titulo, setTitulo] = useState<string | null>(null);
     const [descricao, setDescricao] = useState<string | null>(null);
@@ -44,7 +36,6 @@ const CriarPublicacao = forwardRef<HTMLDivElement>((props, ref) => {
         descricao: descricao   
     }
 
-
     const publicar = async (dadosPublicacao: DadosPublicacaoInterface) => {
         for(let campo in listaCamposCadastro){
             if (!campo) {
@@ -53,118 +44,78 @@ const CriarPublicacao = forwardRef<HTMLDivElement>((props, ref) => {
                 return;
             }
         }
+        const token = Cookies.get('token') ;
+        let decodeToken: JwtPayload;
+        if (token) decodeToken = jwtDecode(token);
+
         try{
-            console.log(dadosPublicacao)
-            const response = await api.patch('publicacao/criar', dadosPublicacao)
-            console.log(response)
+            const response = await api.post('publicacao/criar', dadosPublicacao);
+            toast.dismiss();
+            toast.success(response.data.message || 'Cadastrado com sucesso.');
+            onCancelar();      
+        } catch (erro) {
+            const msg = axios.isAxiosError(erro)
+                ? erro.response?.data?.message || 'Erro ao cadastrar.'
+                : 'Erro inesperado.';
 
-            toast.success('Cadastrado com sucesso.')      
-            }
-            catch(erro){
-            if (axios.isAxiosError(erro) && erro.response){
-                console.log('erro')
-
-                if(erro.response.data.message){
-                    console.log(erro.response.data.message)
-                    toast.dismiss()
-                    toast.error(erro.response.data.message);
-                }
-                else {
-                    toast.dismiss
-                    toast.error('Erro ao cadastrar.')
-                }
-            } 
-            else {
-                console.log('Erro desconhecido. ', erro);
-            }
+            console.error('Erro ao publicar:', erro);
+            setTimeout(() => {
+                toast.dismiss();
+                toast.error(msg);
+            }, 100);
         }
-    }
+    };
 
  return(
         <div className='divFundo'>
+            <div  ref={ref} className="divCriarPublicacao">
 
-                {/* <div className='divLegendaTipoPublicacao'>
-                    <p>Tipo de publicação:</p>
-                </div>   
-                <div className="opcoespublicacao">
-                    {buttons.map((botao) => (
-                        <button
-                            value={TipoPublicacao.ajuda}
-                            onChange={() =>{setTipoPublicacao}}
-                            key={botao.id}
-                            className={
-                                opcao === botao.id ? `buttonOpcaoPublicacao buttonOpcaoPublicacaoSelecionado  ${botao.boxShadow}` : 'buttonOpcaoPublicacao'}
-                            onClick={() => alteraOpcaoPublicacao(botao.id)}>
-                            {botao.legenda}
-                        </button>
-                    ))}
-                </div> */}
-
-                <div className="divCriarPublicacao">
-                    <div className="divCriarPublicacaoSecao">
-                        <label className="labelCriarPublicacaoSecao" htmlFor="titulo" >Titulo:</label>
-                        <input 
-                            className="inputCrairPublicacaoSecao" 
-                            value={titulo ?? ""} 
-                            onChange={(e) => setTitulo(e.target.value)}
-                            type="text" 
-                            id="titulo" 
-                            name="titulo" 
-                            placeholder="Digite o titulo"
-                        />
-                    </div>
-                    <div className="divCriarPublicacaoSecao">
-                        <label className="labelCriarPublicacaoSecao" htmlFor="status">Status:</label>
-                        <SelectDemo value={categoriaPublicacao} onValueChange={setCategoriaPublicacao}/>
-                    </div>
-                    <div className="divCriarPublicacaoSecao">
-                        <label className="labelCriarPublicacaoSecao posicaoLabelDescricao" htmlFor="descricao">Descrição</label>
-                        <textarea
-                            className="inputCrairPublicacaoSecao alturaInputDescricao"
-                            value={descricao ?? ""}
-                            onChange={(e) => setDescricao(e.target.value)}
-                            id="descricao"
-                            rows={5} 
-                            cols={40}
-                            placeholder="Descreva aqui o conteúdo da publicação"
-                        />
-                    </div>
-                    {/* <div className="divCriarPublicacaoSecao">
-                        <label className="labelCriarPublicacaoSecao" htmlFor="dataInicio">Data de início:</label>
-                        <input 
-                            className="inputCrairPublicacaoSecao" 
-                            value={dataInicial ?? ""}
-                            onChange={(e) => setDataInicial(e.target.value)}
-                            type="text" 
-                            id="dataInicio" 
-                            name="dataInicio" 
-                            placeholder="00/00/0000"
-                        />
-                    </div>
-                    <div className="divCriarPublicacaoSecao">
-                        <label className="labelCriarPublicacaoSecao" htmlFor="dataFim">Data de término:</label>
-                        <input 
-                            className="inputCrairPublicacaoSecao" 
-                            value={dataFinal ?? ""}
-                            onChange={(e) => setDataFinal(e.target.value)}
-                            type="text" 
-                            id="dataFim" 
-                            name="dataFim" 
-                            placeholder="00/00/0000"
-                        />
-                    </div> */}
+                <div className="divCriarPublicacaoSecao">
+                    <label className="labelCriarPublicacaoSecao">Categoria:</label>
+                    <SelectDemo 
+                        value={categoriaPublicacao} 
+                        onValueChange={setCategoriaPublicacao}
+                        options={[
+                            { key : 1, label: CategoriaPublicacaoEnum.PEDIDO_AJUDA , value: CategoriaPublicacaoEnum.PEDIDO_AJUDA },
+                            { key : 2, label: CategoriaPublicacaoEnum.INFORMACAO_PUBLICA, value: CategoriaPublicacaoEnum.INFORMACAO_PUBLICA },
+                            { key : 3, label: CategoriaPublicacaoEnum.ACAO_SOLIDARIA, value: CategoriaPublicacaoEnum.ACAO_SOLIDARIA },
+                        ]}
+                    />
                 </div>
-                
-                <div className="divPublicar">
-                    <Button legenda='Publicar' onClick={() => publicar(dados)}/>
-                    {/* <Button legenda='Publicar' onClick={() => cancelar}/> */}
 
+                <div className="divCriarPublicacaoSecao">
+                    <label className="labelCriarPublicacaoSecao" htmlFor="titulo" >Titulo:</label>
+                    <input 
+                        className="inputCriarPublicacaoSecao" 
+                        value={titulo ?? ""} 
+                        onChange={(e) => setTitulo(e.target.value)}
+                        type="text" 
+                        id="titulo" 
+                        name="titulo" 
+                        placeholder="Digite o titulo"
+                    />
                 </div>
-                
+
+                <div className="divCriarPublicacaoSecao">
+                    <label className="labelCriarPublicacaoSecao posicaoLabelDescricao" htmlFor="descricao">Descrição</label>
+                    <textarea
+                        className="inputCriarPublicacaoSecao alturaInputDescricao"
+                        value={descricao ?? ""}
+                        onChange={(e) => setDescricao(e.target.value)}
+                        id="descricao"
+                        rows={5} 
+                        cols={40}
+                        placeholder="Descreva aqui o conteúdo da publicação"
+                    />
+                </div>
             </div>
-
-
-
+            
+            <div className="divPublicar">
+                <Button legenda='Publicar' onClick={() => publicar(dados)}/>
+                <Button legenda='Cancelar' onClick={onCancelar} classNameButton='buttonCancelar'/>
+            </div>
+            
+        </div>
     )
 })
 export default CriarPublicacao;
