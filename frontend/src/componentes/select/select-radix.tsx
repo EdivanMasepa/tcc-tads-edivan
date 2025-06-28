@@ -3,44 +3,52 @@ import * as Select from "@radix-ui/react-select";
 import classnames from "classnames";
 import "./styles.css";
 
-interface SelectDemoProps {
-	value: string | null;
-	onValueChange: (value: string | null) => void;
-  }
+interface OptionInterface {
+	key:number;
+  	label: string;
+  	value: string;
+};
 
-const SelectDemo:React.FC<SelectDemoProps> = ({ value, onValueChange }) => (
-	<Select.Root value={value ?? ""} onValueChange={onValueChange}>
+interface SelectDemoPropsInterface {
+  value: string | null;
+  onValueChange: (value: string | null) => void;
+  options: OptionInterface[];
+};
 
-		<Select.Trigger className="SelectTrigger" aria-label="Food">
-			<Select.Value placeholder="Selecione uma opção" />
-			<Select.Icon className="SelectIcon">
-			</Select.Icon>
-		</Select.Trigger>
+const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, options }) => (
+	<div key='uniqueKey'>
+		<Select.Root value={value ?? ""} onValueChange={onValueChange}>
 
-		<Select.Portal>
-			<Select.Content className="SelectContent">
+			<Select.Trigger className="SelectTrigger" aria-label="Food">
+				<Select.Value placeholder="Selecione uma opção" />
+				<Select.Icon className="SelectIcon"/>
+			</Select.Trigger>
 
-				<Select.ScrollUpButton className="SelectScrollButton">
-					{/* <ChevronUpIcon /> */}
-				</Select.ScrollUpButton>
+			<Select.Portal>
+				<Select.Content className="SelectContent">
 
-				<Select.Viewport className="SelectViewport">
+					<Select.ScrollUpButton className="SelectScrollButton">
+						{/* <ChevronUpIcon /> */}
+					</Select.ScrollUpButton>
 
-					<Select.Group>
-						<SelectItem value="pedidoAjuda">Pedido de Ajuda</SelectItem>
-						<SelectItem value="informacaoPublica">Informação pública</SelectItem>
-						<SelectItem value="acaoSolidaria">Ação solidária</SelectItem>
-					</Select.Group>
+					<Select.Viewport className="SelectViewport">
+						<Select.Group>
+							{options.map((option) => (
+								<SelectItem key={option.key} value={option.value}>
+									{option.label}
+								</SelectItem>
+							))}
+						</Select.Group>
+					</Select.Viewport>
 
-				</Select.Viewport>
-
-				<Select.ScrollDownButton className="SelectScrollButton">
-					{/* <ChevronDownIcon /> */}
-				</Select.ScrollDownButton>
-                
-			</Select.Content>
-		</Select.Portal>
-	</Select.Root>
+					<Select.ScrollDownButton className="SelectScrollButton">
+						{/* <ChevronDownIcon /> */}
+					</Select.ScrollDownButton>
+					
+				</Select.Content>
+			</Select.Portal>
+		</Select.Root>
+	</div>
 );
 
 const SelectItem = React.forwardRef<HTMLDivElement, Select.SelectItemProps>(
