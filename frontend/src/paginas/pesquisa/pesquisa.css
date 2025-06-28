@@ -1,50 +1,71 @@
-.alturaCriarPublicacaoDivPrincipal{
-    height: 100vh;
+.divPesquisa{
+    width: 100vw;
+
+    display: flex;
+    flex-direction: column;
+
+    background-color: var(--cor-terciaria);
 }
-.divLegendaTipoPublicacao{
-    position: absolute;
-    top: 50px;
+.divPaginaCabecalhoPesquisa{
+    width: 100%;
+    height: 50px;
+
+    display: flex;
+    flex-direction: row;
+
+    border-bottom: 2px solid var(--cor-primaria);
+}
+.divIconePesquisa{
+    width: 15%;
 
     display: flex;
     justify-content: center;
-    color: #455FA3;
-    margin-bottom: 5px;
+    align-items: center;
 }
-.opcoespublicacao{
-    width: 80%;
-    height: 40px;
-
-    position: absolute;
-    top: 80px;
-
-    display: flex;
-    border: 1px solid #455fa3;
-    border-right: none;
+.iconePesquisaBorda{
+    width: 100%;
+    border-right: 1px solid #b1b1b1;
 }
-.buttonOpcaoPublicacao{
-    width: 33.3%;
+.divInputPesquisa{
+    width: 70%;
+    height: 100%;
+}
+.inputPesquisa{
+    width: 100%;
     height: 100%;
 
-    background-color: #fff;
-    color: #455fa3;
-
+    border: none ;
+    outline: none;
+    padding-left: 12px;
+    line-height: 15px;
+}
+input:focus-visible {
+    box-shadow: none;
     border: none;
-    border-right: 1px solid #455fa3
 }
-.buttonOpcaoPublicacaoSelecionado{
-    background-color: #455fa3;
-    color: #fff;
-    outline: 1px solid #455fa3;
-    
-    z-index: 1;
-    position: relative;
+.divResultadosPesquisa{
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: start;
 }
-.shadowEsquerda{
-    box-shadow: -2px 0px 5px #00000090;
-  }
-.shadowDireita{
-    box-shadow: 2px 0px 5px #00000090;
+.divItemResultado{
+    width: 100%;
+    border-bottom: 1px solid gray;
+    padding: 5px;
 }
-.shadowDuplo{
-    box-shadow: 2px 0 5px #00000090, -2px 0 5px #00000090;
+.pItemUsuario{
+
+}
+.pItemTitulo{
+
+}
+.aVoltar{
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-self: center;
 }

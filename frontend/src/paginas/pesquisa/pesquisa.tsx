@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import Cookies from "js-cookie"
 import axios from 'axios'
 import { jwtDecode, JwtPayload } from 'jwt-decode'
+import { IoClose, IoSearch } from "react-icons/io5";
 
 enum TipoPublicacao{
     ajuda = 'Pedir ajuda' ,
@@ -27,6 +28,12 @@ const Pesquisa: React.FC = () => {
         { id: 1, legenda: 'Promover campanha', boxShadow: 'shadowDuplo', value:TipoPublicacao.campanha, setValue:setTipoPublicacao },
         { id: 2, legenda: 'Informativo', boxShadow: 'shadowEsquerda', value:TipoPublicacao.informativa, setValue:setTipoPublicacao },
       ];
+    const resultados = [
+        { id: 0, usuairo: 'Vegetti Pirata', tituloPublicacao: 'Caminhão disponível' },
+        { id: 1, usuairo: 'Fulano da silva', tituloPublicacao: 'Preciso de caminhão de mudança' },
+        { id: 2, usuairo: 'Fulano da silva', tituloPublicacao: 'Caminhão quebrou' },
+        { id: 3, usuairo: 'Caminhão do tião' }
+    ];
     let decodeToken: JwtPayload;
     
     const publicar = async () => {
@@ -67,8 +74,33 @@ const Pesquisa: React.FC = () => {
 
     return(
         <>
-            <div className='divPrincipal alturaCriarPublicacaoDivPrincipal'>
-                <div className='divLegendaTipoPublicacao'>
+            <div className='divPesquisa'>
+                <div className="divPaginaCabecalhoPesquisa">
+                    <div className='divIconePesquisa'> 
+                        <IoSearch className='iconePesquisa iconePesquisaBorda' />
+                    </div>
+
+                    <div className='divInputPesquisa '> 
+                        <input type="text" className='inputPesquisa' placeholder='Pesquisar'/> 
+                    </div> 
+                             
+                    <div className='divIconePesquisa'> <a href='./paginaInicial' className='aVoltar' target="_self">
+                        <IoClose className='iconeMenu'/></a> 
+                    </div>
+                </div>
+
+                <div className='divResultadosPesquisa'>
+                    {resultados.map((resultado) =>(
+                        <div className='divItemResultado' key={resultado.id}>
+                            <p className='pItemUsuario'>Usuario: {resultado.usuairo}</p>
+                            {resultado.tituloPublicacao && 
+                            <p className='pItemTitulo'>Publicação: {resultado.tituloPublicacao}</p>
+                            }
+                        </div>
+                    ))}    
+                </div>
+
+                {/* <div className='divLegendaTipoPublicacao'>
                     <p>Tipo de publicação:</p>
                 </div>   
                 <div className="opcoespublicacao">
@@ -83,7 +115,7 @@ const Pesquisa: React.FC = () => {
                             {botao.legenda}
                         </button>
                     ))}
-                </div>
+                </div> */}
             </div>
         </>
     )
