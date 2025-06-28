@@ -42,27 +42,27 @@ enum GeneroPessoaEnum{
   FEMININO = 'Feminino'
 }
 
-interface UsuarioPessoa {
+interface UsuarioPessoaInterface {
   cpf:string;
   dataNascimento:string;
   genero:GeneroPessoaEnum;
   situacao: string;
 }
 
-interface UsuarioInstituicao {
+interface UsuarioInstituicaoInterface {
   cnpj: string;
   dataFundacao:string;
   segmento:SegmentoInstituicaoEnum;
 }
 
-interface DadosCadastro{
+interface DadosCadastroInterface{
       tipoUsuario:TipoCadastroEnum;
       nome:string;
       email:string;
       telefone: string;
       senha:string;
       confirmaSenha:string;
-      usuario: UsuarioPessoa | UsuarioInstituicao;
+      usuario: UsuarioPessoaInterface | UsuarioInstituicaoInterface;
 }
 
 const Cadastro: React.FC = () => {
@@ -78,27 +78,25 @@ const Cadastro: React.FC = () => {
   const [situacao, setSituacao] = useState<string | null>(null);
   const listaCamposCadastro = [tipoCadastro, nome, email, telefone, senha, confirmaSenha, cpfOuCnpj, dataNascimentoOuFundacao, generoOuSegmento];
   const [opcaoCadastro, setOpcaoCadastro] = useState(true);
-  const alteraOpcaoCadastro = () =>{
-    setOpcaoCadastro(!opcaoCadastro)
-  };
+  const alteraOpcaoCadastro = () =>{setOpcaoCadastro(!opcaoCadastro)};
+  let campoVazio: boolean = false
   
   
-  
-  const dadosPessoa: UsuarioPessoa | any = {
+  const dadosPessoa: UsuarioPessoaInterface | any = {
       cpf: cpfOuCnpj,
       dataNascimento: dataNascimentoOuFundacao,
       genero: generoOuSegmento,
       situacao: situacao
   }
 
-  const dadosInstituicao: UsuarioInstituicao | any = {
+  const dadosInstituicao: UsuarioInstituicaoInterface | any = {
       cnpj: cpfOuCnpj,
       dataFundacao: dataNascimentoOuFundacao,
       segmento: generoOuSegmento,
       situacao: situacao
   }
 
-  const dados: DadosCadastro | any = {
+  const dados: DadosCadastroInterface | any = {
       tipoUsuario: tipoCadastro,
       nome: nome,
       email: email,
@@ -108,36 +106,41 @@ const Cadastro: React.FC = () => {
       pessoa: dadosPessoa
   }
   
-  const cadastrar =  async (dadosCadastro: DadosCadastro) => {
-          console.log(dados)
+  const cadastrar =  async (dadosCadastro: DadosCadastroInterface) => {
 
-    for(let campo in listaCamposCadastro){
-      if (!campo || campo == null || campo.trim() == '') {
-        console.log('oi')
-        toast.dismiss()
-        toast.error("Preencha todos os campos")
-      }
-    }
+    for(let campo of listaCamposCadastro){
+      if (!campo || campo == null || campo.trim() == '') 
+        campoVazio = true;
+    } 
+
+    setTimeout(() => {
+      campoVazio ? (toast.dismiss(), toast.error("Preencha todos os campos.")) : null;
+      return;
+    }, 1000);
+
     try{
-      const response = await api.post<RetornoRequisicao>('/usuario/cadastrar', dadosCadastro)
-      toast.dismiss()
-      toast.success(response.data.message)      
-    }
-    catch(erro){
-      if (axios.isAxiosError(erro) && erro.response){
-        console.log('erro')
+      const { data } = await api.post<RetornoRequisicao>('/usuario/cadastrar', dadosCadastro);
+      setNome(null);
+      setEmail(null);
+      setTelefone(null);
+      setSenha(null);
+      setDataNascimentoOuFundacao(null);
+      setCpfOuCnpj(null);
+      setGeneroOuSegmento(null);
+      setSituacao(null);
+      toast.dismiss();
+      toast.success(data.message || 'Cadastro realizado com sucesso!');
+    }catch (erro) {
+      const msg = axios.isAxiosError(erro)
+        ? erro.response?.data?.message || 'Erro ao cadastrar.'
+        : 'Erro inesperado. Tente novamente.';
 
-        if(erro.response.data.message){
-          console.log(erro.response.data.message)
-          toast.error(erro.response.data.message);
-        }
-        else {
-          toast.error('Erro ao cadastrar.')
-        }
-      } 
-      else {
-        console.log('Erro desconhecido', erro);
-      }
+      console.error('Erro no cadastro:', erro);
+
+      setTimeout(() => {
+      toast.dismiss();
+      toast.error(msg);
+      }, 100);
     }
   }
   return (
