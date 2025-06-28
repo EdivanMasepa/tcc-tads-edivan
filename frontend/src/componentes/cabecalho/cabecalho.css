@@ -102,6 +102,6 @@
     width: 30px;
     height: 30px;
 
-    color: #455fa3;
+    color: var(--cor-primaria);
     border: none;
 }
