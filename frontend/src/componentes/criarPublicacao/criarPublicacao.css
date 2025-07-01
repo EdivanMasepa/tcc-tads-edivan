@@ -45,7 +45,7 @@
     border: none;
 }
 .inputCriarPublicacaoSecao:focus-visible{
-    border: none !important;
+    outline: none !important;
 }
 .alturaInputDescricao{
     height: auto;

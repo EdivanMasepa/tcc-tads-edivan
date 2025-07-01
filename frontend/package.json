@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-select": "^2.2.5",
     "@types/classnames": "^2.3.4",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.7.3",

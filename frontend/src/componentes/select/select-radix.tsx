@@ -15,7 +15,10 @@ interface SelectDemoPropsInterface {
   options: OptionInterface[];
 };
 
-const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, options }) => (
+const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, options }) =>  {
+
+	console.log(value, options)
+	return (
 	<div key='uniqueKey'>
 		<Select.Root value={value ?? ""} onValueChange={onValueChange}>
 
@@ -27,23 +30,15 @@ const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, o
 			<Select.Portal>
 				<Select.Content className="SelectContent">
 
-					<Select.ScrollUpButton className="SelectScrollButton">
-						{/* <ChevronUpIcon /> */}
-					</Select.ScrollUpButton>
-
 					<Select.Viewport className="SelectViewport">
 						<Select.Group>
 							{options.map((option) => (
-								<SelectItem key={option.key} value={option.value}> 
-									{option.label} 
+								<SelectItem key={option.key} value={option.value}>
+									{option.label}
 								</SelectItem>
 							))}
 						</Select.Group>
 					</Select.Viewport>
-
-					<Select.ScrollDownButton className="SelectScrollButton">
-						{/* <ChevronDownIcon /> */}
-					</Select.ScrollDownButton>
 					
 				</Select.Content>
 			</Select.Portal>
@@ -51,6 +46,7 @@ const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, o
 	</div>
 );
 
+}
 const SelectItem = React.forwardRef<HTMLDivElement, Select.SelectItemProps>(
     ({ children, className, ...props }, forwardedRef) => {
       return (
