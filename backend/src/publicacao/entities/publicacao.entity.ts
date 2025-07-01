@@ -21,10 +21,10 @@ export class PublicacaoEntity{
     @Column({name: 'data', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: false })
     data: Date;
 
-    @Column({name: 'aprovada', type: 'boolean', nullable: false})
+    @Column({name: 'aprovada', type: 'boolean', default: false, nullable: false})
     aprovada: boolean;
 
-    @Column({name: 'imagem', type: 'varchar', nullable: false})
+    @Column({name: 'imagem', type: 'varchar', nullable: true})
     imagem: string;
 
     @ManyToOne(() =>UsuarioEntity, usuarioResponsavel => usuarioResponsavel.publicacoes, {onDelete:'CASCADE'})
