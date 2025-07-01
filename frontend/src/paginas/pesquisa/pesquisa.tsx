@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./pesquisa.css"
 import '../../index.css'
 import Button from "../../componentes/botao/botao";
@@ -8,69 +8,61 @@ import Cookies from "js-cookie"
 import axios from 'axios'
 import { jwtDecode, JwtPayload } from 'jwt-decode'
 import { IoClose, IoSearch } from "react-icons/io5";
+import { api } from "../../api";
 
-enum TipoPublicacao{
+enum CategoriaPublicacaoEnum{
     ajuda = 'Pedir ajuda' ,
     campanha = 'Promover campanha',
     informativa = 'informativa'
 }
-  
+
+interface ResultadoPesquisaInterface{
+    id: number,
+    categoria: CategoriaPublicacaoEnum,
+    titulo: string,
+    descricao: string,
+    data: string,
+    aprovada: boolean,
+    nomeUsuarioResponsavel: string
+ }
+
 
 const Pesquisa: React.FC = () => {
-    const [tipoPublicacao, setTipoPublicacao] = useState<TipoPublicacao>(TipoPublicacao.informativa);
+    const [valor, setValor] = useState("");
+    const [resultados, setResultados] = useState<ResultadoPesquisaInterface[]>([]);
 
+    const [tipoPublicacao, setTipoPublicacao] = useState<CategoriaPublicacaoEnum>(CategoriaPublicacaoEnum.informativa);
     const [opcao, setOpcao] = useState<number | null>(0);
     const alteraOpcaoPublicacao = (buttonSelecionado: number) => {
         setOpcao(buttonSelecionado)
     };
     const buttons = [
-        { id: 0, legenda: 'Pedir ajuda', boxShadow: 'shadowDireita', value:TipoPublicacao.ajuda, setValue:setTipoPublicacao },
-        { id: 1, legenda: 'Promover campanha', boxShadow: 'shadowDuplo', value:TipoPublicacao.campanha, setValue:setTipoPublicacao },
-        { id: 2, legenda: 'Informativo', boxShadow: 'shadowEsquerda', value:TipoPublicacao.informativa, setValue:setTipoPublicacao },
+        { id: 0, legenda: 'Pedir ajuda', boxShadow: 'shadowDireita', value:CategoriaPublicacaoEnum.ajuda, setValue:setTipoPublicacao },
+        { id: 1, legenda: 'Promover campanha', boxShadow: 'shadowDuplo', value:CategoriaPublicacaoEnum.campanha, setValue:setTipoPublicacao },
+        { id: 2, legenda: 'Informativo', boxShadow: 'shadowEsquerda', value:CategoriaPublicacaoEnum.informativa, setValue:setTipoPublicacao },
       ];
-    const resultados = [
-        { id: 0, usuairo: 'Vegetti Pirata', tituloPublicacao: 'Caminhão disponível' },
-        { id: 1, usuairo: 'Fulano da silva', tituloPublicacao: 'Preciso de caminhão de mudança' },
-        { id: 2, usuairo: 'Fulano da silva', tituloPublicacao: 'Caminhão quebrou' },
-        { id: 3, usuairo: 'Caminhão do tião' }
-    ];
-    let decodeToken: JwtPayload;
+
+
+    useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (valor.trim() !== "") {
+        pesquisar(valor);
+      } else {
+        setResultados([]); 
+      }
+        }, 500); 
+
+        return () => clearTimeout(timeout); 
+    }, [valor]);
     
-    const publicar = async () => {
-        try{
-            const token = Cookies.get('token') ;
-            
-            if(token){
-                decodeToken = jwtDecode(token)
-            }
-
-            const response = await axios.patch('http://localhost:3000/acao/criar-acao',{
-                method: 'PATCH',
-                headers: {'Authorization': `Bearer ${token}`}
-            })
-            console.log(response)
-
-            toast.success('Cadastrado com sucesso.')      
-            }
-            catch(erro){
-            if (axios.isAxiosError(erro) && erro.response){
-                console.log('erro')
-
-                if(erro.response.data.message){
-                console.log(erro.response.data.message)
-                toast.dismiss()
-                toast.error(erro.response.data.message);
-                }
-                else {
-                toast.dismiss
-                toast.error('Erro ao cadastrar.')
-                }
-            } 
-            else {
-                console.log('Erro desconhecido', erro);
-            }
-        }
+    const pesquisar = async (texto: string) => {
+    try {
+      const response = await api.get(`publicacao/buscar-por-texto/${encodeURIComponent(texto)}`);
+      setResultados(response.data); console.log(response.data)
+    } catch (error) {
+      console.error("Erro ao buscar publicações:", error);
     }
+  };
 
     return(
         <>
@@ -81,7 +73,18 @@ const Pesquisa: React.FC = () => {
                     </div>
 
                     <div className='divInputPesquisa '> 
-                        <input type="text" className='inputPesquisa' placeholder='Pesquisar'/> 
+                        <input
+                            type='text'
+                            className='inputPesquisa'
+                            value={valor}
+                            onChange={(e) => setValor(e.target.value)}
+                            placeholder='Pesquisar'
+                        />
+                    {/* <ul>
+                        {resultados.map((item, index) => (
+                        <li key={index}>{JSON.stringify(item)}</li>
+                        ))}
+                    </ul> */}
                     </div> 
                              
                     <div className='divIconePesquisa'> <a href='./paginaInicial' className='aVoltar' target="_self">
@@ -92,9 +95,9 @@ const Pesquisa: React.FC = () => {
                 <div className='divResultadosPesquisa'>
                     {resultados.map((resultado) =>(
                         <div className='divItemResultado' key={resultado.id}>
-                            <p className='pItemUsuario'>Usuario: {resultado.usuairo}</p>
-                            {resultado.tituloPublicacao && 
-                            <p className='pItemTitulo'>Publicação: {resultado.tituloPublicacao}</p>
+                            <p className='pItemUsuario'>Usuario: {resultado.nomeUsuarioResponsavel}</p>
+                            {resultado.titulo && 
+                            <p className='pItemTitulo'>Publicação: {resultado.titulo}</p>
                             }
                         </div>
                     ))}    
