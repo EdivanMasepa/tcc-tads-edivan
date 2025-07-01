@@ -29,7 +29,7 @@ export class PublicacaoService {
       publicacaoEntity.categoria = publicacao.categoria;
       publicacaoEntity.titulo = publicacao.titulo;
       publicacaoEntity.descricao = publicacao.descricao;
-      publicacaoEntity.usuarioResponsavel = usuarioEncontrado,
+      publicacaoEntity.usuarioResponsavel = usuarioEncontrado;
       publicacaoEntity.imagem = null;
    
       await this.publicacaoRepository.save(publicacaoEntity)
@@ -37,7 +37,7 @@ export class PublicacaoService {
       return {statuscode:201, message: 'Publicação enviada para análise.'}
     
     }catch(erro){
-      console.log(erro)
+
       if(erro instanceof NotFoundException)
         throw erro;
 
@@ -47,7 +47,10 @@ export class PublicacaoService {
 
   async listar(aprovada: boolean | null){
     try{
-      const listaPublicacao:PublicacaoEntity[] = await this.publicacaoRepository.find({where:{aprovada:aprovada}, relations:{usuarioResponsavel:true}})
+      const listaPublicacao:PublicacaoEntity[] = await this.publicacaoRepository.find({
+        where:{aprovada:aprovada}, 
+        relations:{usuarioResponsavel:true}
+      })
 
       return listaPublicacao.map((publicacao)=> new ListaPublicacaoDTO(
           publicacao.id,
@@ -84,7 +87,7 @@ export class PublicacaoService {
         'publicacao.data',
         'publicacao.aprovada',
       ])
-       .innerJoinAndSelect('publicacao.usuarioResponsavel', 'usuarioResponsavel')
+      .innerJoinAndSelect('publicacao.usuarioResponsavel', 'usuarioResponsavel')
       .where('lower(publicacao.titulo) like concat("%", lower(:text), "%")', {text})
       .getMany();
 

@@ -33,11 +33,11 @@ export class CriaUsuarioDTO{
     confirmaSenha: string;
 
     @ValidateNested() 
-    @Type(() => CriaPessoaDTO)
+    @Type(() => Object)
     pessoa?: CriaPessoaDTO;
 
     @ValidateNested()
-    @Type(() => CriaInstituicaoDTO)
+    @Type(() => Object)
     instituicao?: CriaInstituicaoDTO;
     
 }
