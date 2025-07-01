@@ -38,8 +38,8 @@ const Login: React.FC = () => {
 
     try{
       const {data} = await api.post('/auth/login', dadosLogin)
-      
-      Cookies.set('token', data.token, {sameSite: "Strict", secure: true})
+      console.log(data.token)
+      Cookies.set('token', data.token, {sameSite: "None", secure: true})
       
       navigate('/paginaInicial')  
       

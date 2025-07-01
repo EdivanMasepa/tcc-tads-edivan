@@ -34,8 +34,8 @@ const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, o
 					<Select.Viewport className="SelectViewport">
 						<Select.Group>
 							{options.map((option) => (
-								<SelectItem key={option.key} value={option.value}>
-									{option.label}
+								<SelectItem key={option.key} value={option.value}> 
+									{option.label} 
 								</SelectItem>
 							))}
 						</Select.Group>
@@ -59,7 +59,7 @@ const SelectItem = React.forwardRef<HTMLDivElement, Select.SelectItemProps>(
           {...props}
           ref={forwardedRef}
         >
-          <Select.ItemText>{children}</Select.ItemText>
+          <Select.ItemText> {children} </Select.ItemText>
           <Select.ItemIndicator className="SelectItemIndicator">
             {/* <CheckIcon /> */}
           </Select.ItemIndicator>
