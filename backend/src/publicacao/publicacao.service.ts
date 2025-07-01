@@ -29,14 +29,15 @@ export class PublicacaoService {
       publicacaoEntity.categoria = publicacao.categoria;
       publicacaoEntity.titulo = publicacao.titulo;
       publicacaoEntity.descricao = publicacao.descricao;
-      publicacaoEntity.usuarioResponsavel = usuarioEncontrado
+      publicacaoEntity.usuarioResponsavel = usuarioEncontrado,
+      publicacaoEntity.imagem = null;
    
       await this.publicacaoRepository.save(publicacaoEntity)
       
       return {statuscode:201, message: 'Publicação enviada para análise.'}
     
     }catch(erro){
-
+      console.log(erro)
       if(erro instanceof NotFoundException)
         throw erro;
 
@@ -75,7 +76,15 @@ export class PublicacaoService {
   async buscarPorTexto(text: string){
     const publicacoes: PublicacaoEntity[] = await this.publicacaoRepository
       .createQueryBuilder('publicacao')
-      .select(['publicacao.id', 'publicacao.titulo', 'publicacao.descricao'])
+      .select([
+        'publicacao.id', 
+        'publicacao.categoria', 
+        'publicacao.titulo', 
+        'publicacao.descricao', 
+        'publicacao.data',
+        'publicacao.aprovada',
+      ])
+       .innerJoinAndSelect('publicacao.usuarioResponsavel', 'usuarioResponsavel')
       .where('lower(publicacao.titulo) like concat("%", lower(:text), "%")', {text})
       .getMany();
 
