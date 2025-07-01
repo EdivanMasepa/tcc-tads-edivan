@@ -27,18 +27,26 @@ const PaginaInicial: React.FC = () => {
     const [opcao, setOpcao] = useState<number | null>(0);
     const alteraOpcaoPaginaInicial = (buttonSelecionado: number) => {setOpcao(buttonSelecionado)};
     const [publicacoes, setPublicacoes] = useState<DadosPublicacao[]>([]);
-    const value = true
+    const value = false
     const buttons = [
         { id: 0, legenda: 'Tudo', boxShadow: 'shadowDireita' },
         { id: 1, legenda: 'Solicitações', boxShadow: 'shadowDuplo' },
         { id: 2, legenda: 'Campanhas', boxShadow: 'shadowEsquerda' },
-    ];
+    ];  
+    const formatarData = (isoDate: string) => {
+        const data = new Date(isoDate);
+        return new Intl.DateTimeFormat('pt-BR', {
+        dateStyle: 'short',
+        timeStyle: 'short',
+        }).format(data);
+    };
 
     useEffect(() => {
         const listarPublicacoes = async ():Promise<DadosPublicacao[]> => {
             try{                
                 const {data} = await api.get<DadosPublicacao[]>(`/publicacao/listar?aprovada=${value}`);
                 setPublicacoes(data); 
+                console.log(data)
                 return data;
 
             }catch(erro:unknown){
@@ -64,20 +72,19 @@ const PaginaInicial: React.FC = () => {
             </div>
             <div className='divPaginaInicial'>
 
-                {publicacoes.map((acao: any)=>(  
-                    <div  className='divPublicacao' key={acao.id}>
+                {publicacoes.map((publicacao: any)=>(  
+                    <div  className='divPublicacao' key={publicacao.id}>
                         <div className='divCabecalhoPublicacao'>
-                            <p className="usuarioPublicacao">{acao.usuarioSolicitante}</p>
-                            <p className="dataPublicacao">{acao.dataInicial} - {acao.dataFinal}</p>
+                            <p className="usuarioPublicacao">{publicacao.nomeUsuarioResponsavel}</p>
+                            <p className="dataPublicacao">{formatarData(publicacao.data)}</p>
                         </div>
                         <div className='divConteudoPublicacao'>
                             <div className='divCabecalhoConteudoPublicacao'>
-                                <p>tipo: {acao.tipoAcao}</p>
-                                <p>status: {acao.status}</p>
+                                <p className='pCategoria'> {publicacao.categoria} </p>
                             </div>
                             <div className='divConteudo1'>
-                                <p>{acao.titulo}</p>
-                                <p>{acao.descricao}</p>
+                                <p>{publicacao.titulo}</p>
+                                <p>{publicacao.descricao}</p>
                             </div>
                         </div>
                     
