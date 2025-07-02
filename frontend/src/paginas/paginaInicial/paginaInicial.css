@@ -2,29 +2,30 @@
     height:auto;
 }
 .opcoesConteudo{
-    width: 80%;
-    height: 40px;
+    width: 98.75%;
+    height: 50px;
 
     position: absolute;
     top: 80px;
+    display: flex;
 
-    border: 1px solid #455fa3;
+    border: 1px solid var(--cor-primaria);
     border-right: none;
 }
 .buttonOpcaoConteudo{
-    width: 33.3%;
+    width: 25%;
     height: 100%;
 
-    background-color: #fff;
-    color: #455fa3;
+    background-color: var(--cor-terciaria);
+    color: var(--cor-primaria);
 
     border: none;
-    border-right: 1px solid #455fa3
+    border-right: 1px solid var(--cor-primaria)
 }
 .buttonOpcaoConteudoSelecionado{
-    background-color: #455fa3;
-    color: #fff;
-    outline: 1px solid #455fa3;
+    background-color: var(--cor-primaria);
+    color: var(--cor-terciaria);
+    outline: 1px solid var(--cor-primaria);
     
     z-index: 1;
     position: relative;
@@ -51,45 +52,76 @@
     padding: 10px;
     margin-top: 20px;
 
-    background-color: #fff;
+    background-color: var(--cor-terciaria);
     
     display: flex;
     flex-direction: column;
 
 }
 .divCabecalhoPublicacao{
+    width: 100%;
+
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 
 }
-.usuarioPublicacao{
-    font-weight: 600;
+.divCabecalhoUsuarioPublicacao{
+    width: 50%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.imgUsuarioPublicacao{
+    width: 30px;
+    height: 30px;
+
+}
+.divUsuarioPublicacao{
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+}
+.pUsuarioPublicacao{
+    font-weight: 650;
+    color: var(--cor-primaria);
+}
+.pSituacaoUsuarioPublicacao{
+    font-size: 14px !important;
+    font-weight: 100;
+    color: #1b6977c9;
 }
 .dataPublicacao{
-    color: gray;
+    color: #555555;
 }
 .divConteudoPublicacao{
     display: flex;
     flex-direction: column;
-
 }
 .divCabecalhoConteudoPublicacao{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     justify-content: center;
-
 }
 .pCategoria{
-
+    font-size: 18px;
+    line-height: 35px;
+    margin-top: 5px;
+    color: var(--cor-quaternaria);
 }
-.divConteudo1{
+.divConteudoPrincipalPublicacao1{
     display: flex;
     flex-direction: column;
 
-    border:1px solid #c0c0c0;
-
-    margin-top: 10px;
     padding: 5px;
+}
+.pTituloPublicacao{
+    font-weight: 650;
+    color: #3B3B3B;
+
+}
+.pDescricaoPublicacao{
+    margin-top: 10px;
+    color: #3B3B3B;
 }

@@ -30,15 +30,18 @@ const PaginaInicial: React.FC = () => {
     const value = false
     const buttons = [
         { id: 0, legenda: 'Tudo', boxShadow: 'shadowDireita' },
-        { id: 1, legenda: 'Solicitações', boxShadow: 'shadowDuplo' },
-        { id: 2, legenda: 'Campanhas', boxShadow: 'shadowEsquerda' },
+        { id: 1, legenda: 'Pedidos de ajuda', boxShadow: 'shadowDuplo' },
+        { id: 2, legenda: 'Ações solidárias', boxShadow: 'shadowDuplo' },
+        { id: 3, legenda: 'Informações públicas', boxShadow: 'shadowEsquerda' },
     ];  
     const formatarData = (isoDate: string) => {
         const data = new Date(isoDate);
-        return new Intl.DateTimeFormat('pt-BR', {
-        dateStyle: 'short',
-        timeStyle: 'short',
+        const formatada = new Intl.DateTimeFormat('pt-BR', {
+            dateStyle: 'short',
+            timeStyle: 'short',
         }).format(data);
+
+        return formatada.replace(',', ' -');
     };
 
     useEffect(() => {
@@ -46,7 +49,6 @@ const PaginaInicial: React.FC = () => {
             try{                
                 const {data} = await api.get<DadosPublicacao[]>(`/publicacao/listar?aprovada=${value}`);
                 setPublicacoes(data); 
-                console.log(data)
                 return data;
 
             }catch(erro:unknown){
@@ -74,17 +76,23 @@ const PaginaInicial: React.FC = () => {
 
                 {publicacoes.map((publicacao: any)=>(  
                     <div  className='divPublicacao' key={publicacao.id}>
-                        <div className='divCabecalhoPublicacao'>
-                            <p className="usuarioPublicacao">{publicacao.nomeUsuarioResponsavel}</p>
+                        <div className='divCabecalhoPublicacao'> 
+                            <div className='divCabecalhoUsuarioPublicacao'>
+                                <img src='./perfil.png' alt="menu" className='imgUsuarioPublicacao'/>
+                                <div className='divUsuarioPublicacao'>
+                                    <p className="pUsuarioPublicacao">{publicacao.nomeUsuarioResponsavel}</p>
+                                    <p className="pSituacaoUsuarioPublicacao">situacao</p>
+                                </div>
+                            </div>
                             <p className="dataPublicacao">{formatarData(publicacao.data)}</p>
                         </div>
                         <div className='divConteudoPublicacao'>
                             <div className='divCabecalhoConteudoPublicacao'>
                                 <p className='pCategoria'> {publicacao.categoria} </p>
                             </div>
-                            <div className='divConteudo1'>
-                                <p>{publicacao.titulo}</p>
-                                <p>{publicacao.descricao}</p>
+                            <div className='divConteudoPrincipalPublicacao1'>
+                                <p className='pTituloPublicacao'>{publicacao.titulo}</p>
+                                <p className='pDescricaoPublicacao'>{publicacao.descricao}</p>
                             </div>
                         </div>
                     
