@@ -9,6 +9,7 @@ import Perfil from './paginas/perfil/perfil.tsx'
 import PaginaInicial from './paginas/paginaInicial/paginaInicial.tsx'
 import RotaProtegida from './componentes/rotaProtegida.tsx'
 import Pesquisa from './paginas/pesquisa/pesquisa.tsx'
+import { ErrorBoundary } from './componentes/errorBoundary.tsx'
 
 const router = createBrowserRouter([
   {
@@ -33,7 +34,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/paginaInicial',
-    element: <RotaProtegida><PaginaInicial /></RotaProtegida>
+    element: <ErrorBoundary> <RotaProtegida><PaginaInicial /></RotaProtegida> </ErrorBoundary>
   },
   {
     path: '/pesquisa',
