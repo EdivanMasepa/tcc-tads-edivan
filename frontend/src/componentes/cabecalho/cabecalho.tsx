@@ -70,10 +70,18 @@ const Cabecalho: React.FC = () => {
           </div>
           
       </div>
-      {abreMenu && !abreCriarPublicacao && <Menu ref={menuRef} />} 
-      {abreCriarPublicacao && (
-        <CriarPublicacao ref={criarPublicacaoRef} onCancelar={fecharCriarPublicacao}/>
-      )} 
+      {abreMenu && !abreCriarPublicacao && <Menu ref={menuRef} />}
+
+      {/* <CriarPublicacao ref={criarPublicacaoRef} onCancelar={() => {
+        setTimeout(() => setAbreCriarPublicacao(false), 150);
+        }} visivel={abreCriarPublicacao}
+      /> */}
+      <CriarPublicacao 
+        ref={criarPublicacaoRef} 
+        onCancelar={() => setAbreCriarPublicacao(false)}
+        visivel={abreCriarPublicacao}
+      />
+      {/* {abreCriarPublicacao && (<CriarPublicacao ref={criarPublicacaoRef} onCancelar={fecharCriarPublicacao}/>)}  */}
     </>
   )
 }

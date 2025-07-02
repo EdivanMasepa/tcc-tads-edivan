@@ -2,6 +2,7 @@ import React from "react";
 import * as Select from "@radix-ui/react-select";
 import classnames from "classnames";
 import "./styles.css";
+import { IoIosArrowDown } from "react-icons/io";
 
 interface OptionInterface {
 	key:number;
@@ -19,12 +20,11 @@ const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, o
 
 	console.log(value, options)
 	return (
-	<div key='uniqueKey'>
 		<Select.Root value={value ?? ""} onValueChange={onValueChange}>
 
 			<Select.Trigger className="SelectTrigger" aria-label="Food">
 				<Select.Value placeholder="Selecione uma opção" />
-				<Select.Icon className="SelectIcon"/>
+				<Select.Icon className="SelectIcon"><IoIosArrowDown className="iconeArrowSelect"/></Select.Icon>
 			</Select.Trigger>
 
 			<Select.Portal>
@@ -43,7 +43,6 @@ const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, o
 				</Select.Content>
 			</Select.Portal>
 		</Select.Root>
-	</div>
 );
 
 }
