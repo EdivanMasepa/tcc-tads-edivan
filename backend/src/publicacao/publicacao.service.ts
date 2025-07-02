@@ -49,7 +49,8 @@ export class PublicacaoService {
     try{
       const listaPublicacao:PublicacaoEntity[] = await this.publicacaoRepository.find({
         where:{aprovada:aprovada}, 
-        relations:{usuarioResponsavel:true}
+        relations:{usuarioResponsavel:true},
+        order:{data: 'DESC'}
       })
 
       return listaPublicacao.map((publicacao)=> new ListaPublicacaoDTO(
