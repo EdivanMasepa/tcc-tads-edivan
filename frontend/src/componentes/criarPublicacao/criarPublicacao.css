@@ -9,8 +9,14 @@
 
     background-color: #00000095;
     z-index: 2;
-}
 
+    transition: opacity 0.2s ease;
+    opacity: 1;
+}
+.divFundo[style*="display: none"] {
+  opacity: 0;
+  pointer-events: none;
+}
 .divCriarPublicacao{
     width: 100%;
     display: flex;
@@ -58,6 +64,10 @@
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
+}
+.divButtonCancelar{
+    width: 35%;
+    height: 30%;
 }
 .buttonCancelar{
     color: var(--cor-primaria);

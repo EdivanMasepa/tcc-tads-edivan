@@ -1,4 +1,4 @@
-import { forwardRef, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import './criarPublicacao.css'
 import Button from "../botao/botao";
 import SelectDemo from "../select/select-radix";
@@ -23,9 +23,11 @@ interface DadosPublicacaoInterface {
 
 interface CriarPublicacaoProps {
   onCancelar: () => void;
+  visivel: boolean;
 } 
 
-const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCancelar }, ref) => {
+const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCancelar, visivel }, ref) => {
+    const [exibir, setExibir] = useState(visivel);
     const [categoriaPublicacao, setCategoriaPublicacao] = useState<string | null>(null);
     const [titulo, setTitulo] = useState<string | null>(null);
     const [descricao, setDescricao] = useState<string | null>(null);
@@ -44,15 +46,14 @@ const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCa
                 return;
             }
         }
-        const token = Cookies.get('token') ;
-        let decodeToken: JwtPayload;
-        if (token) decodeToken = jwtDecode(token);
 
         try{
             const response = await api.post('publicacao/criar', dadosPublicacao);
             toast.dismiss();
             toast.success(response.data.message || 'Cadastrado com sucesso.');
-            onCancelar();      
+            setTimeout(() => {
+                onCancelar();
+            }, 100);    
         } catch (erro) {
             const msg = axios.isAxiosError(erro)
                 ? erro.response?.data?.message || 'Erro ao cadastrar.'
@@ -65,9 +66,22 @@ const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCa
             }, 100);
         }
     };
+    useEffect(() => {
+        if (visivel) {
+        setExibir(true); // mostra imediatamente
+        } else {
+        // espera 300ms antes de desmontar, tempo para o portal fechar corretamente
+        const timer = setTimeout(() => {
+            setExibir(false);
+        }, 300);
+        return () => clearTimeout(timer);
+        }
+    }, [visivel]);
+
+  if (!exibir) return null;
 
  return(
-        <div className='divFundo'>
+        <div className='divFundo' style={{ display: visivel ? 'block' : 'none' }}>
             <div  ref={ref} className="divCriarPublicacao">
 
                 <div className="divCriarPublicacaoSecao">
@@ -110,9 +124,22 @@ const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCa
                 </div>
             </div>
             
-            <div className="divPublicar">
-                <Button legenda='Publicar' onClick={() => publicar(dados)}/>
-                <Button legenda='Cancelar' onClick={onCancelar} classNameButton='buttonCancelar'/>
+            <div className='divPublicar'>
+                <div className='divButtonCancelar'>
+                    <Button 
+                        legenda='Cancelar' 
+                        classNameButton='buttonCancelar'
+                        onClick={() => {
+                            setTimeout(() => {
+                                onCancelar();
+                            }, 100);
+                        }}                     
+                    />  
+                </div>
+                <div className='divButtonCancelar'>
+                    <Button legenda='Publicar' onClick={() => publicar(dados)}/>
+                </div>
+                
             </div>
             
         </div>
