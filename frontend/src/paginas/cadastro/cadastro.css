@@ -47,7 +47,7 @@ height: 7.5%;
 }
 .hrDescricao{
   width: 20%;
-  border-top: 1px solid white;
+  border-top: 1px solid var(--cor-terciaria);
   border-right: none;
   border-bottom: none;
   border-left: none;

@@ -74,7 +74,7 @@
 .buttonCadastrar a{
   text-decoration: none;
   background-color: inherit;
-  color: #fff;
+  color: var(--cor-terciaria);
 }
 .labelCadastrar{
   background-color: transparent;

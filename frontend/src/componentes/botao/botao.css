@@ -19,7 +19,7 @@
     border: none;
     border-radius: 50px;
     background-color: var(--cor-primaria);
-    color:  var(--cor-secundaria);
+    color:  var(--cor-terciaria);
     font-weight: 500;
   }
   .button:focus{

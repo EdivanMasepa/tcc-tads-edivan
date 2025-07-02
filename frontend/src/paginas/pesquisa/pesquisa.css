@@ -53,7 +53,7 @@ input:focus-visible {
 }
 .divItemResultado{
     width: 100%;
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid var(--cor-secundaria);
     padding: 5px;
 }
 .pItemUsuario{
