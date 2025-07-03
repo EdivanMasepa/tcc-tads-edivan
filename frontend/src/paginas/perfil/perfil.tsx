@@ -21,15 +21,15 @@ enum TipoConteudoEnum{
     PUBLICACOES='PUBLICAÇÕES',
 }
 
-const Perfil: React.FC = () => {
+const Perfil: React.FC = () => { 
+    const [opcaoCadastro, setOpcaoCadastro] = useState(true);
+    const alteraOpcaoCadastro = () =>{setOpcaoCadastro(!opcaoCadastro)};
+    const [tipoCadastro, setTipoCadastro] = useState<TipoConteudoEnum>(TipoConteudoEnum.INFORMACOES);
+    
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
     const [telefone, setTelefone] = useState('');
-    const [senha, setSenha] = useState('');
-    const [confirmarSenha, setConfirmarSenha] = useState('');
-    const [tipoCadastro, setTipoCadastro] = useState<TipoConteudoEnum>(TipoConteudoEnum.INFORMACOES);
-    const [opcaoCadastro, setOpcaoCadastro] = useState(true);
-    const alteraOpcaoCadastro = () =>{setOpcaoCadastro(!opcaoCadastro)};
+   
     let decodeToken: JwtPayload;
 
     const decodificaUsuario = () => {
@@ -71,67 +71,73 @@ const Perfil: React.FC = () => {
     },[])
     
     return(
-        <div className='divPrincipal'>
+        <div className='divPrincipal alturaPerfil'>
             <Cabecalho />
+            <div className='divPaiPerfil'>
 
-            <div className='divPerfil cabecalhoPerfil'>
+                <div className='divPerfil cabecalhoPerfil'>
 
-                <div className='divFotoPerfil'>
-                    <img src='./perfil.png' alt="menu" className='imgUsuarioPerfil'/>     
-                </div>
-                <div className='divEditarFotoPerfil'>
-                    <button className='buttonEditarFotoPerfil'><FiEdit className='iconeEditarFotoPerfil'/></button>
-                </div>
-                <div className='divNomeUsuarioPerfil'>
-                    <p className='pNomeUsuarioPerfil'>Fulano da silva</p>
-                </div>
-                <div className='divSituacaoPerfil'>
-                    <p className='pSituacaoPerfil'>Situação</p>
-                </div>
-
-                {/* <div className='divH2Titulo'>
-                    <h2 className='h2Titulo'>ALTERAR PERFIL</h2>
-                </div>
-
-                <div className='divAlterarPerfil'>
-                    <Input value = {nome} setValue={setNome} label='Nome' placeholder='' type='text'/>
-                                
-                    <Input value = {email} setValue={setEmail} label='Email' placeholder=''  type='text'/>
-
-                    <Input value = {telefone} setValue={setTelefone} label='Telefone' placeholder=''  type='text'/>
-
-                    <Input value = {senha} setValue={setSenha} label='Senha' placeholder=''  type='text'/>
+                    <div className='divFotoPerfil'>
+                        <img src='./perfil.png' alt="menu" className='imgUsuarioPerfil'/>     
+                    </div>
                     
-                    <Input value = {confirmarSenha} setValue={setConfirmarSenha} label='Confirmar senha' placeholder=''  type='text'/>
+                    <div className='divEditarFotoPerfil'>
+                        <button className='buttonEditarFotoPerfil'><FiEdit className='iconeEditarFotoPerfil'/></button>
+                    </div>
 
-                    <Button legenda='Salvar' />
+                    <div className='divNomeUsuarioPerfil'>
+                        <p className='pNomeUsuarioPerfil'>Fulano da silva</p>
+                    </div>
 
-                </div> */}
-            </div>
-            
-            <div className='divTipoConteudoPerfil'>
-                <button 
-                value='INFORMAÇÕES'
-                onChange={() =>{setTipoCadastro}}
-                type='submit' 
-                className={opcaoCadastro ? 'buttonOpcaoConteudoPerfil buttonSelecionadoPerfil shadowRightPerfil' : 'buttonOpcaoConteudoPerfil'}
-                onClick={alteraOpcaoCadastro}>INFORMAÇÕES
-                </button>
-
-                <button 
-                value='PUBLICAÇÕES'
-                onChange={() =>{setTipoCadastro}}
-                type='submit' 
-                className={opcaoCadastro ? 'buttonOpcaoConteudoPerfil' : 'buttonOpcaoConteudoPerfil buttonSelecionadoPerfil shadowLeftPerfil'}
-                onClick={alteraOpcaoCadastro}>PUBLICAÇÕES
-                </button>
-          </div>
-
-            <div className='divPerfil conteudoPerfil'>
-                <div className='divItemConteudoPerfil'>
+                    <div className='divSituacaoPerfil'>
+                        <p className='pSituacaoPerfil'>Situação</p>
+                    </div>
 
                 </div>
+                
+                <div className='divTipoConteudoPerfil'>
+                    <button 
+                    value='INFORMAÇÕES'
+                    onChange={() =>{setTipoCadastro}}
+                    type='submit' 
+                    className={opcaoCadastro ? 'buttonOpcaoConteudoPerfil buttonSelecionadoPerfil shadowRightPerfil' : 'buttonOpcaoConteudoPerfil'}
+                    onClick={alteraOpcaoCadastro}>INFORMAÇÕES
+                    </button>
+
+                    <button 
+                    value='PUBLICAÇÕES'
+                    onChange={() =>{setTipoCadastro}}
+                    type='submit' 
+                    className={opcaoCadastro ? 'buttonOpcaoConteudoPerfil' : 'buttonOpcaoConteudoPerfil buttonSelecionadoPerfil shadowLeftPerfil'}
+                    onClick={alteraOpcaoCadastro}>PUBLICAÇÕES
+                    </button>
+                </div>
+
+                <div className='divPerfil conteudoPerfil'>
+                    <div className='divItemConteudoPerfil'>
+
+                    </div>
+                </div>
+
             </div>
+{/* <div className='divH2Titulo'>
+                        <h2 className='h2Titulo'>ALTERAR PERFIL</h2>
+                    </div>
+
+                    <div className='divAlterarPerfil'>
+                        <Input value = {nome} setValue={setNome} label='Nome' placeholder='' type='text'/>
+                                    
+                        <Input value = {email} setValue={setEmail} label='Email' placeholder=''  type='text'/>
+
+                        <Input value = {telefone} setValue={setTelefone} label='Telefone' placeholder=''  type='text'/>
+
+                        <Input value = {senha} setValue={setSenha} label='Senha' placeholder=''  type='text'/>
+                        
+                        <Input value = {confirmarSenha} setValue={setConfirmarSenha} label='Confirmar senha' placeholder=''  type='text'/>
+
+                        <Button legenda='Salvar' />
+
+                    </div> */}
         </div>
 
     )
