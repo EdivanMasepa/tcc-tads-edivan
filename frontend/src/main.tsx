@@ -34,7 +34,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/paginaInicial',
-    element: <ErrorBoundary> <RotaProtegida><PaginaInicial /></RotaProtegida> </ErrorBoundary>
+    element: <RotaProtegida><PaginaInicial /></RotaProtegida>
   },
   {
     path: '/pesquisa',
