@@ -12,15 +12,14 @@ import { FiEdit } from 'react-icons/fi'
 import { FaRegCalendarAlt, FaTransgender } from 'react-icons/fa'
 import { HiOutlineMail, HiOutlinePhone } from 'react-icons/hi'
 
-interface dadosUsuario {
-    nome: string,
-    email:string,
-    telefone:string
-}
-
 enum TipoConteudoEnum{
     INFORMACOES='INFORMAÇÕES',
     PUBLICACOES='PUBLICAÇÕES',
+}
+
+enum TipoUsuarioEnum{
+    PESSOA = 'Pessoa',
+    INSTITUICAO ='Instituição',
 }
 
 enum CategoriaPublicacaoEnum {
@@ -29,12 +28,36 @@ enum CategoriaPublicacaoEnum {
     ACAO_SOLIDARIA = 'Ação solidária'
 }
 
-interface DadosPublicacao {
-    id: number
+interface UsuarioPessoaInterface {
+  cpf:string;
+  dataNascimento:string;
+  genero:string;
+  situacao: string;
+}
+
+interface UsuarioInstituicaoInterface {
+  cnpj: string;
+  dataFundacao:string;
+  segmento:string;
+}
+
+interface DadosUsuarioInterface {
+    id: number;
+    tipoUsuario: TipoUsuarioEnum;
+    nome: string;
+    email:string;
+    telefone:string;
+    especificacao: UsuarioPessoaInterface | UsuarioInstituicaoInterface;
+    publicacoes: DadosPublicacaoInterface[];
+
+}
+
+interface DadosPublicacaoInterface {
+    id: number;
     categoria:CategoriaPublicacaoEnum;
     titulo:string;
     descricao: string;
-    data: string;
+    data: Date;
     usuarioResponsavel: string;
 }
 
@@ -42,7 +65,8 @@ const Perfil: React.FC = () => {
     const [opcaoCadastro, setOpcaoCadastro] = useState(true);
     const alteraOpcaoCadastro = () =>{setOpcaoCadastro(!opcaoCadastro)};
     const [tipoCadastro, setTipoCadastro] = useState<TipoConteudoEnum>(TipoConteudoEnum.INFORMACOES);
-    const [publicacoes, setPublicacoes] = useState<DadosPublicacao[]>([]);
+    const [usuario, setUsuario] = useState<DadosUsuarioInterface>();
+    const [publicacoes, setPublicacoes] = useState<DadosPublicacaoInterface[]>([]);
     
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
@@ -63,9 +87,20 @@ const Perfil: React.FC = () => {
         }
      };
 
+    const formatarData = (isoDate: string, exibirHora = false) => {
+        const data = new Date(isoDate);
+        const opcoes: Intl.DateTimeFormatOptions = {dateStyle: 'short'};
+
+        if (exibirHora) opcoes.timeStyle = 'short';
+
+        const formatada = new Intl.DateTimeFormat('pt-BR', opcoes).format(data);
+
+        return exibirHora ? formatada.replace(',', ' -') : formatada;
+    };
+
     const buscarUsuario = async (usuario: number) => {
         try{
-            const response = await api.get<dadosUsuario>(`/usuario/buscar/${usuario}`)
+            const response = await api.get<DadosUsuarioInterface>(`/usuario/buscar/${usuario}`)
             return response.data
         }catch(erro){
             console.error('Erro ao buscar usuário:', erro);
@@ -73,39 +108,31 @@ const Perfil: React.FC = () => {
         }
     }
 
-    const formatarData = (isoDate: string) => {
-        const data = new Date(isoDate);
-        const formatada = new Intl.DateTimeFormat('pt-BR', {
-            dateStyle: 'short',
-            timeStyle: 'short',
-        }).format(data);
-
-        return formatada.replace(',', ' -');
-    };
-
     useEffect(()=>{
         const carregarDados = async () => {
             const usuarioId = decodificaUsuario();
             if (usuarioId === null) return;
         
             const response = await buscarUsuario(usuarioId);
+            setUsuario(response ?? undefined)
+            setPublicacoes(response?.publicacoes ?? []);
             if (!response) return;
 
             setNome(response.nome);
             setEmail(response.email);
             setTelefone(response.telefone);
         }
-        const listarPublicacoes = async ():Promise<DadosPublicacao[]> => {
-            try{                
-                const {data} = await api.get<DadosPublicacao[]>(`/publicacao/listar?aprovada=${false}`);
-                setPublicacoes(data); 
-                return data;
+        // const listarPublicacoes = async ():Promise<DadosPublicacaoInterface[]> => {
+        //     try{                
+        //         const {data} = await api.get<DadosPublicacaoInterface[]>(`/publicacao/listar?aprovada=${false}`);
+        //         setPublicacoes(data); 
+        //         return data;
 
-            }catch(erro:unknown){
-                throw new Error(isAxiosError(erro) ? erro.message : 'Falha ao buscar publicações.');
-            }
-        };
-        listarPublicacoes();
+        //     }catch(erro:unknown){
+        //         throw new Error(isAxiosError(erro) ? erro.message : 'Falha ao buscar publicações.');
+        //     }
+        // };
+        // listarPublicacoes();
         carregarDados()
     },[]);
     
@@ -160,39 +187,57 @@ const Perfil: React.FC = () => {
 
                                 <div className='divSubItemInformacao'>
                                     <div className='divSubItemLegenda'>
-                                        <p className='pLegendaPerfil'>Data de nascimento</p> <FaRegCalendarAlt className='iconeInformacaoPerfil'/>
-                                    </div>
-                                    <div className='divSubItemValor'>
-                                        <p className='pValorPerfil'>30/02/2001</p>
-                                    </div>
-                                </div>
-
-                                <div className='divSubItemInformacao'>
-                                    <div className='divSubItemLegenda'>
-                                        <p className='pLegendaPerfil'>Gênero</p> <FaTransgender className='iconeInformacaoPerfil'/>
-                                    </div>
-                                    <div className='divSubItemValor'>
-                                        <p className='pValorPerfil'>Masculino</p>
-                                    </div>
-                                </div>
-
-                                
-                                <div className='divSubItemInformacao'>
-                                    <div className='divSubItemLegenda'>
                                         <p className='pLegendaPerfil'>Telefone</p> <HiOutlinePhone className='iconeInformacaoPerfil'/>
                                     </div>
                                     <div className='divSubItemValor'>
-                                        <p className='pValorPerfil'>(42) 988775566</p>
+                                        <p className='pValorPerfil'>{usuario?.telefone}</p>
                                     </div>
                                 </div>
 
-                                
-                                <div className='divSubItemInformacao' style={{border: 'none'}}>
+                                <div className='divSubItemInformacao'>
                                     <div className='divSubItemLegenda'>
                                         <p className='pLegendaPerfil'>E-mail</p> <HiOutlineMail className='iconeInformacaoPerfil'/>
                                     </div>
                                     <div className='divSubItemValor'>
-                                        <p className='pValorPerfil'>edivan@gmail.com</p>
+                                        <p className='pValorPerfil'>{usuario?.email}</p>
+                                    </div>
+                                </div>
+
+                                <div className='divSubItemInformacao'>
+                                    <div className='divSubItemLegenda'>
+                                        <p className='pLegendaPerfil'>{usuario?.tipoUsuario === TipoUsuarioEnum.PESSOA ? 'Data de nascimento' : 'Data de fundação'}</p> <FaRegCalendarAlt className='iconeInformacaoPerfil'/>
+                                    </div>
+                                    <div className='divSubItemValor'>
+                                        {usuario?.tipoUsuario === TipoUsuarioEnum.PESSOA && (
+                                            <p className='pValorPerfil'>
+                                                {formatarData((usuario.especificacao as UsuarioPessoaInterface).dataNascimento)}
+                                            </p>
+                                        )}
+
+                                        {usuario?.tipoUsuario === TipoUsuarioEnum.INSTITUICAO && (
+                                            <p className='pValorPerfil'>
+                                                {formatarData((usuario.especificacao as UsuarioInstituicaoInterface).dataFundacao)}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className='divSubItemInformacao' style={{border: 'none'}}>
+                                    <div className='divSubItemLegenda'>
+                                        <p className='pLegendaPerfil'>{usuario?.tipoUsuario === TipoUsuarioEnum.PESSOA ? 'Gênero' : 'Segmento'}</p> <FaTransgender className='iconeInformacaoPerfil'/>
+                                    </div>
+                                    <div className='divSubItemValor'>
+                                        {usuario?.tipoUsuario === TipoUsuarioEnum.PESSOA && (
+                                            <p className='pValorPerfil'>
+                                                {(usuario?.especificacao as UsuarioPessoaInterface).genero}
+                                            </p>
+                                        )}
+
+                                        {usuario?.tipoUsuario === TipoUsuarioEnum.INSTITUICAO && (
+                                            <p className='pValorPerfil'>
+                                                {(usuario?.especificacao as UsuarioInstituicaoInterface).segmento}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -237,7 +282,7 @@ const Perfil: React.FC = () => {
                 </div>
 
             </div>
-{/* <div className='divH2Titulo'>
+                {/* <div className='divH2Titulo'>
                         <h2 className='h2Titulo'>ALTERAR PERFIL</h2>
                     </div>
 
