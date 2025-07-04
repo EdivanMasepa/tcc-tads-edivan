@@ -94,10 +94,16 @@ const Pesquisa: React.FC = () => {
 
                 <div className='divResultadosPesquisa'>
                     {resultados.map((resultado) =>(
-                        <div className='divItemResultado' key={resultado.id}>
-                            <p className='pItemUsuario'>Usuario: {resultado.nomeUsuarioResponsavel}</p>
+                        <div className='divItemResultado' key={resultado.id}> 
+                            <div className='divItemResultadoPesquisa'>
+                                <p className='pItemResultado'>Usuario: </p> 
+                                <p className='pItemResultadoValor'>{resultado.nomeUsuarioResponsavel}</p>
+                            </div>
                             {resultado.titulo && 
-                            <p className='pItemTitulo'>Publicação: {resultado.titulo}</p>
+                                <div className='divItemResultadoPesquisa'>
+                                    <p className='pItemResultado'>Publicação: </p> 
+                                    <p className='pItemResultadoValor'>{resultado.titulo}</p>
+                                </div>
                             }
                         </div>
                     ))}    
