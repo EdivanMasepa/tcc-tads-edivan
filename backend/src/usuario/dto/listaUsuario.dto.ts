@@ -1,3 +1,4 @@
+import { ListaPublicacaoDTO } from "../../publicacao/dto/listaPublicacao.dto";
 import { ListaInstituicaoDTO } from "./instituicao/listaInstituicao.dto";
 import { ListaPessoaDTO } from "./pessoa/listaPessoa.dto";
 
@@ -8,8 +9,8 @@ export class ListaUsuarioDTO{
         private readonly nome:string, 
         private readonly email:string, 
         private readonly telefone:string,
-        private readonly publicacoes:number,
-        private readonly especificacao: ListaPessoaDTO | ListaInstituicaoDTO
+        private readonly especificacao: ListaPessoaDTO | ListaInstituicaoDTO,
+        private readonly publicacoes:number | ListaPublicacaoDTO[]
 
     ){}
 }

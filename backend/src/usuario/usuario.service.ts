@@ -14,6 +14,7 @@ import { AtualizaUsuarioDTO } from './dto/atualizaUsuario.dto';
 import { AlteraSenhaDTO } from './dto/alteraSenha.dto';
 import { PublicacaoService } from '../publicacao/publicacao.service';
 import { instanceToPlain } from 'class-transformer';
+import { ListaPublicacaoDTO } from '../publicacao/dto/listaPublicacao.dto';
 
 
 @Injectable()
@@ -132,25 +133,25 @@ export class UsuarioService {
         if(opcao === 1){
           return usuarios.map((usuario) => {
             if(usuario.tipoUsuario === TipoUsuarioEnum.PESSOA){
-              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.publicacoes.length, 
-                new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
+              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,
+                new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao), usuario.publicacoes.length)
             }else if(usuario.tipoUsuario === TipoUsuarioEnum.INSTITUICAO){
-              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.publicacoes.length, 
-                new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.segmento))
+              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,
+                new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.segmento), usuario.publicacoes.length)
             }
           }) 
         }else if(opcao === 2){
           return usuarios.map((usuario) => {
             if(usuario.tipoUsuario === TipoUsuarioEnum.PESSOA){
-              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.publicacoes.length,
-                new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao))
+              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,
+                new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao), usuario.publicacoes.length)
             }
           }) 
         }else if(opcao === 3){
           return usuarios.map((usuario) => {
             if(usuario.tipoUsuario === TipoUsuarioEnum.INSTITUICAO){
-              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,usuario.publicacoes.length,
-                new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.segmento))
+              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,
+                new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.segmento), usuario.publicacoes.length)
             }
           }) 
         }
@@ -228,6 +229,13 @@ export class UsuarioService {
   async buscarUsuarioFormatado(parametro:any){
       const usuarioBuscado: UsuarioEntity = await this.buscar(parametro);
       let especificacao: ListaPessoaDTO | ListaInstituicaoDTO;
+      let publicacoes: ListaPublicacaoDTO[];
+
+      publicacoes = usuarioBuscado.publicacoes.map(
+        (publicacao) => new ListaPublicacaoDTO(
+          publicacao.id, publicacao.categoria, publicacao.titulo, publicacao.descricao, publicacao.data, publicacao.aprovada, usuarioBuscado.nome
+
+      ));
 
       if(usuarioBuscado.usuarioPessoa){
         especificacao = new ListaPessoaDTO(
@@ -238,7 +246,7 @@ export class UsuarioService {
       }
 
       return new ListaUsuarioDTO(
-        usuarioBuscado.id, usuarioBuscado.tipoUsuario, usuarioBuscado.nome, usuarioBuscado.email, usuarioBuscado.telefone, usuarioBuscado.publicacoes.length, especificacao
+        usuarioBuscado.id, usuarioBuscado.tipoUsuario, usuarioBuscado.nome, usuarioBuscado.email, usuarioBuscado.telefone, especificacao, publicacoes
       ); 
   }
 
