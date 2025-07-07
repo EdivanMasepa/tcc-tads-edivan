@@ -179,7 +179,7 @@ export class PublicacaoService {
       if(publicacaoEncontradaUsuario == null)  
         throw new NotFoundException('Erro ao relacionar publicação.');
       
-      await this.publicacaoRepository.delete(publicacaoEncontradaUsuario);
+      await this.publicacaoRepository.remove(publicacaoEncontradaUsuario);
 
       return {statuscode:200, message:'Publicação excluída com sucesso.'};
 
