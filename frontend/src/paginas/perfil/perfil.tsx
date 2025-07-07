@@ -87,7 +87,7 @@ const Perfil: React.FC = () => {
         }
      };
 
-    const formatarData = (isoDate: string, exibirHora = false) => {
+    const formatarDataInformacao = (isoDate: string, exibirHora = false) => {
         const data = new Date(isoDate);
         const opcoes: Intl.DateTimeFormatOptions = {dateStyle: 'short'};
 
@@ -96,6 +96,16 @@ const Perfil: React.FC = () => {
         const formatada = new Intl.DateTimeFormat('pt-BR', opcoes).format(data);
 
         return exibirHora ? formatada.replace(',', ' -') : formatada;
+    };
+
+    const formatarDataPublicacao = (isoDate: string) => {
+        const data = new Date(isoDate);
+        const formatada = new Intl.DateTimeFormat('pt-BR', {
+            dateStyle: 'short',
+            timeStyle: 'short',
+        }).format(data);
+
+        return formatada.replace(',', ' -');
     };
 
     const buscarUsuario = async (usuario: number) => {
@@ -115,6 +125,7 @@ const Perfil: React.FC = () => {
         
             const response = await buscarUsuario(usuarioId);
             setUsuario(response ?? undefined)
+            console.log(response?.publicacoes)
             setPublicacoes(response?.publicacoes ?? []);
             if (!response) return;
 
@@ -152,11 +163,11 @@ const Perfil: React.FC = () => {
                     </div>
 
                     <div className='divNomeUsuarioPerfil'>
-                        <p className='pNomeUsuarioPerfil'>Fulano da silva</p>
+                        <p className='pNomeUsuarioPerfil'>Edivan Masepa</p>
                     </div>
 
                     <div className='divSituacaoPerfil'>
-                        <p className='pSituacaoPerfil'>Situação</p>
+                        <p className='pSituacaoPerfil'>Fora de risco</p>
                     </div>
 
                 </div>
@@ -210,13 +221,13 @@ const Perfil: React.FC = () => {
                                     <div className='divSubItemValor'>
                                         {usuario?.tipoUsuario === TipoUsuarioEnum.PESSOA && (
                                             <p className='pValorPerfil'>
-                                                {formatarData((usuario.especificacao as UsuarioPessoaInterface).dataNascimento)}
+                                                {formatarDataInformacao((usuario.especificacao as UsuarioPessoaInterface).dataNascimento)}
                                             </p>
                                         )}
 
                                         {usuario?.tipoUsuario === TipoUsuarioEnum.INSTITUICAO && (
                                             <p className='pValorPerfil'>
-                                                {formatarData((usuario.especificacao as UsuarioInstituicaoInterface).dataFundacao)}
+                                                {formatarDataInformacao((usuario.especificacao as UsuarioInstituicaoInterface).dataFundacao)}
                                             </p>
                                         )}
                                     </div>
@@ -253,12 +264,12 @@ const Perfil: React.FC = () => {
 
                                                 <div className='divUsuarioPublicacao'>
                                                     <p className="pUsuarioPublicacao">{publicacao.nomeUsuarioResponsavel}</p>
-                                                    <p className="pSituacaoUsuarioPublicacao">situacao</p>
+                                                    <p className="pSituacaoUsuarioPublicacao">Fora de risco</p>
                                                 </div>
 
                                             </div>
 
-                                            <p className="dataPublicacao">{formatarData(publicacao.data)}</p>
+                                            <p className="dataPublicacao">{formatarDataPublicacao(publicacao.data)}</p>
 
                                         </div>
 
