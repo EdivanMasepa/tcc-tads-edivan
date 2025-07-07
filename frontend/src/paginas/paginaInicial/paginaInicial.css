@@ -87,8 +87,8 @@
     color: var(--cor-primaria);
 }
 .pSituacaoUsuarioPublicacao{
-    font-size: 14px !important;
-    font-weight: 100;
+    font-size: 13px !important;
+    font-weight: 350;
     color: #1b6977c9;
 }
 .dataPublicacao{

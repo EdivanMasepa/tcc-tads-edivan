@@ -5,7 +5,6 @@ import './paginaInicial.css'
 import { ToastContainer } from 'react-toastify';
 import  'react-toastify/dist/ReactToastify.css' ;
 import { isAxiosError } from 'axios'
-
 import { api } from '../../api';
 
 enum CategoriaPublicacaoEnum {
@@ -81,7 +80,7 @@ const PaginaInicial: React.FC = () => {
                                 <img src='./perfil.png' alt="menu" className='imgUsuarioPublicacao'/>
                                 <div className='divUsuarioPublicacao'>
                                     <p className="pUsuarioPublicacao">{publicacao.nomeUsuarioResponsavel}</p>
-                                    <p className="pSituacaoUsuarioPublicacao">situacao</p>
+                                    <p className="pSituacaoUsuarioPublicacao">Fora de risco</p>
                                 </div>
                             </div>
                             <p className="dataPublicacao">{formatarData(publicacao.data)}</p>
