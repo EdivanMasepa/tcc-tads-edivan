@@ -21,7 +21,7 @@ export class PublicacaoEntity{
     @Column({name: 'data', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: false })
     data: Date;
 
-    @Column({name: 'aprovada', type: 'boolean', default: false, nullable: false})
+    @Column({name: 'aprovada', type: 'boolean', nullable: true})
     aprovada: boolean;
 
     @Column({name: 'imagem', type: 'varchar', nullable: true})

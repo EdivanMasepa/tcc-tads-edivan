@@ -8,9 +8,6 @@ export class InstituicaoEntity{
     @PrimaryGeneratedColumn()
     id:number;
 
-    @Column({name:'id_usuario', type: 'number', nullable:false})
-    idUsuario: number;
-
     @Column({name: 'cnpj', type: 'varchar', nullable:false})
     cnpj: string;
 

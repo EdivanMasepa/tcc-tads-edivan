@@ -9,9 +9,6 @@ export class PessoaEntity{
     @PrimaryGeneratedColumn()
     id:number;
 
-    @Column({name:'id_usuario', nullable:false})
-    idUsuario: number;
-
     @Column({name: 'cpf', type: 'varchar', nullable:false})
     cpf: string;  
 
