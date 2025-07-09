@@ -1,34 +1,5 @@
-.divMenu{
-    width: 60%;
-    height: 100vh;
-
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    padding-top: 70px;
-
-    background-color: var(--cor-terciaria);
-    z-index: 2;
-}
-.ulMenu{
-    width: 100%;
-    height: auto;
-}
-.liMenu{
-    width: 100%;
-    height: auto;
-    
-    padding:20px 30px;
-    
-    font-size: 17px;
-    font-weight: 500;
-    list-style: none;
-}
-.liMenu:active, .liMenu:hover{
-    background-color: var(--cor-quaternaria);
-}
 .divBackgroundMenu{
-    position: absolute;
+    position: fixed;
     top: 0px;
     left: 0px;
     background-color: #00000090;
@@ -36,7 +7,89 @@
     width:40% ;
     z-index: 2;
 }
+.divMenu{
+    width: 60%;
+    height: 100vh;
+
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    padding-top: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    background-color: var(--cor-terciaria);
+    z-index: 2;
+}
+.divPerfilMenu{
+    height: 30%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.imgUsuarioMenu{
+    width: 100px;
+    height: 100px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.divNomeUsuarioMenu{
+    margin-top: 15px;
+}
+.pNomeUsuarioMenu{
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--cor-primaria);
+}
+.divListaMenu{
+    height: 55%;
+}
+.ulMenu{
+    width: 100%;
+    height: auto;
+    border-top: 1px solid var(--cor-primaria);
+}
 .linkMenu{
     text-decoration: none;
     color: var(--cor-primaria);
+}
+.liMenu{
+    width: 100%;
+    height: auto;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding:10px 20px 10px 10px;
+    font-size: 15px;
+    font-weight: 500;
+    list-style: none;
+    border-bottom: 1px solid var(--cor-primaria);
+}
+.liMenu:active, .liMenu:hover{
+    background-color: var(--cor-secundaria);
+}
+.iconeListaMenu{
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+.divRodapeMenu{
+    height: 15%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.aSobre{
+    font-family:  Arial, Helvetica, sans-serif;;
+    font-size: 15px;
+    color: #777777;
 }
