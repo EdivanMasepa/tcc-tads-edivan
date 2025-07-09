@@ -37,6 +37,11 @@ export class UsuarioController {
   async buscar(@Param('parametro') parametro: any) {
     return await this.usuarioService.buscarUsuarioFormatado(parametro); 
   }
+  
+  @Get('buscar-por-texto/:parametro')
+  async buscarPorTexto(@Param('parametro') parametro: string) {
+    return await this.usuarioService.buscarPorTexto(parametro); 
+  }
 
   @UseGuards(AuthGuard)
   @Delete('deletar')

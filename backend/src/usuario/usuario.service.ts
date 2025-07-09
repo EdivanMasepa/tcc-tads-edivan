@@ -1,7 +1,7 @@
 import { BadRequestException, forwardRef, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PessoaEntity } from './entities/pessoa.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { InstituicaoEntity } from './entities/instituicao.entity';
 import { UsuarioEntity } from './entities/usuario.entity';
@@ -15,7 +15,9 @@ import { AlteraSenhaDTO } from './dto/alteraSenha.dto';
 import { PublicacaoService } from '../publicacao/publicacao.service';
 import { instanceToPlain } from 'class-transformer';
 import { ListaPublicacaoDTO } from '../publicacao/dto/listaPublicacao.dto';
-
+import { PublicacaoEntity } from '../publicacao/entities/publicacao.entity';
+import { PesquisaUsuarioDTO } from './dto/pesquisaUsuario';
+import { PesquisaPublicacaoDTO } from '../publicacao/dto/pesquisaPublicacao.dto copy';
 
 @Injectable()
 export class UsuarioService {
@@ -61,7 +63,6 @@ export class UsuarioService {
 
         const usuarioCriado: UsuarioEntity = await this.usuarioRepository.save(usuarioEntity);
 
-        usuarioPessoaEntity.idUsuario = usuarioCriado.id;
         usuarioPessoaEntity.cpf = usuario.pessoa.cpf;
         usuarioPessoaEntity.dataNascimento = usuario.pessoa.dataNascimento;
         usuarioPessoaEntity.genero = usuario.pessoa.genero;
@@ -91,8 +92,6 @@ export class UsuarioService {
           throw new BadRequestException('CNPJ já cadastrado.')
 
         const usuarioCriado = await this.usuarioRepository.save(usuarioEntity);
-
-        usuarioInstituicaoEntity.idUsuario = usuarioEntity.id;
         usuarioInstituicaoEntity.cnpj = usuario.instituicao.cnpj;
         usuarioInstituicaoEntity.dataFundacao = usuario.instituicao.dataFundacao;
         usuarioInstituicaoEntity.segmento = usuario.instituicao.segmento;
@@ -133,24 +132,24 @@ export class UsuarioService {
         if(opcao === 1){
           return usuarios.map((usuario) => {
             if(usuario.tipoUsuario === TipoUsuarioEnum.PESSOA){
-              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,
+              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.moderador,
                 new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao), usuario.publicacoes.length)
             }else if(usuario.tipoUsuario === TipoUsuarioEnum.INSTITUICAO){
-              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,
+              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.moderador,
                 new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.segmento), usuario.publicacoes.length)
             }
           }) 
         }else if(opcao === 2){
           return usuarios.map((usuario) => {
             if(usuario.tipoUsuario === TipoUsuarioEnum.PESSOA){
-              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,
+              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.moderador,
                 new ListaPessoaDTO(usuario.usuarioPessoa.id, usuario.usuarioPessoa.dataNascimento, usuario.usuarioPessoa.genero, usuario.usuarioPessoa.situacao), usuario.publicacoes.length)
             }
           }) 
         }else if(opcao === 3){
           return usuarios.map((usuario) => {
             if(usuario.tipoUsuario === TipoUsuarioEnum.INSTITUICAO){
-              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone,
+              return new ListaUsuarioDTO(usuario.id, usuario.tipoUsuario, usuario.nome, usuario.email, usuario.telefone, usuario.moderador,
                 new ListaInstituicaoDTO(usuario.usuarioInstituicao.id, usuario.usuarioInstituicao.cnpj, usuario.usuarioInstituicao.dataFundacao, usuario.usuarioInstituicao.segmento), usuario.publicacoes.length)
             }
           }) 
@@ -182,14 +181,14 @@ export class UsuarioService {
           usuarioPessoa = await this.usuarioPessoaRepository.findOne({where:{cpf: parametro}});
           
           if(usuarioPessoa){
-            usuario = await this.usuarioRepository.findOne({where:{id: usuarioPessoa.idUsuario}});
+            usuario = await this.usuarioRepository.findOne({where:{id: usuarioPessoa.usuario.id}});
             return usuario;
           }
           else{
             usuarioInstituicao = await this.usuarioInstituicaoRepository.findOne({where:{cnpj: parametro}});
 
             if(usuarioInstituicao){
-              usuario = await this.usuarioRepository.findOne({where:{id: usuarioInstituicao.idUsuario}});
+              usuario = await this.usuarioRepository.findOne({where:{id: usuarioInstituicao.usuario.id}});
 
               if(!usuario)
                 return null
@@ -246,8 +245,29 @@ export class UsuarioService {
       }
 
       return new ListaUsuarioDTO(
-        usuarioBuscado.id, usuarioBuscado.tipoUsuario, usuarioBuscado.nome, usuarioBuscado.email, usuarioBuscado.telefone, especificacao, publicacoes
+        usuarioBuscado.id, usuarioBuscado.tipoUsuario, usuarioBuscado.nome, usuarioBuscado.email, usuarioBuscado.telefone, usuarioBuscado.moderador, especificacao, publicacoes
       ); 
+  }
+
+  async buscarPorTexto(texto: string){
+    try{
+      const publicacoes: PesquisaPublicacaoDTO[] = await this.publicacaoService.buscarPorTexto(texto);
+      const buscaUsuarios: UsuarioEntity[] = await this.usuarioRepository
+        .createQueryBuilder('usuario')
+        .select([
+        'usuario.id', 
+        'usuario.nome', 
+      ])
+      .where('lower(usuario.nome) like concat("%", lower(:texto), "%")', {texto})
+      .getMany();
+
+      const usuarios: PesquisaUsuarioDTO[] | null = buscaUsuarios.length > 0 ? buscaUsuarios.map((usuario) => new PesquisaUsuarioDTO(usuario.id, usuario.nome)) : null;
+
+      return {usuarios, publicacoes};
+
+    }catch(erro){
+      throw new BadRequestException('Erro ao buscar dados.')
+    }
   }
 
   async alterar(idUsuario: number, novosDados: AtualizaUsuarioDTO) {
