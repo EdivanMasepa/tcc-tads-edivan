@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { UsuarioService } from 'src/usuario/usuario.service';
 import { ListaPublicacaoDTO } from './dto/listaPublicacao.dto';
 import { AvaliaPublicacaoDTO } from './dto/avaliaPublicacao.dto';
+import { PesquisaPublicacaoDTO } from './dto/pesquisaPublicacao.dto copy';
 
 @Injectable()
 export class PublicacaoService {
@@ -77,30 +78,20 @@ export class PublicacaoService {
       return publicacaoEncontrada;
   }
 
-  async buscarPorTexto(text: string){
-    const publicacoes: PublicacaoEntity[] = await this.publicacaoRepository
+  async buscarPorTexto(texto: string){
+    const buscaPublicacoes: PublicacaoEntity[] = await this.publicacaoRepository
       .createQueryBuilder('publicacao')
       .select([
-        'publicacao.id', 
-        'publicacao.categoria', 
-        'publicacao.titulo', 
-        'publicacao.descricao', 
-        'publicacao.data',
-        'publicacao.aprovada',
+        'publicacao.id',
+        'publicacao.titulo',
       ])
-      .innerJoinAndSelect('publicacao.usuarioResponsavel', 'usuarioResponsavel')
-      .where('lower(publicacao.titulo) like concat("%", lower(:text), "%")', {text})
+      .where('lower(publicacao.titulo) like concat("%", lower(:texto), "%")', {texto})
+      .orWhere('lower(publicacao.descricao) like concat("%", lower(:texto), "%")', {texto})
       .getMany();
 
-    return publicacoes.map((publicacao)=> new ListaPublicacaoDTO(
-        publicacao.id,
-        publicacao.categoria,          
-        publicacao.titulo, 
-        publicacao.descricao, 
-        publicacao.data,    
-        publicacao.aprovada,      
-        publicacao.usuarioResponsavel.nome
-      ));
+    const publicacoes: PesquisaPublicacaoDTO[] | null = buscaPublicacoes.length > 0 ? buscaPublicacoes.map((publicacao) => new PesquisaPublicacaoDTO(publicacao.id, publicacao.titulo)) : null
+  
+    return publicacoes;
   }
 
   async editar(idUsuario: number, idPublicacao:number, novosDadosPublicacao: AtualizaPublicacaoDTO){

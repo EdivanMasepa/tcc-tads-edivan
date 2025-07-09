@@ -37,11 +37,6 @@ export class PublicacaoController {
     return await this.publicacaoService.buscar(parametro); 
   }
 
-  @Get('buscar-por-texto/:parametro')
-  async buscarPorTexto(@Param('parametro') parametro: string) {
-    return await this.publicacaoService.buscarPorTexto(parametro); 
-  }
-
   @Delete('deletar/:parametro')
   async deletar(@Req() req:any, @Param('parametro') id:number){
       return await this.publicacaoService.deletar(req.user.sub, Number(id))
