@@ -17,8 +17,6 @@ interface SelectDemoPropsInterface {
 };
 
 const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, options }) =>  {
-
-	console.log(value, options)
 	return (
 		<Select.Root value={value ?? ""} onValueChange={onValueChange}>
 

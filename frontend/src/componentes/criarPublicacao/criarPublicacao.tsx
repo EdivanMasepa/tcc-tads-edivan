@@ -5,8 +5,6 @@ import SelectDemo from "../select/select-radix";
 import { toast } from "react-toastify";
 import { api } from "../../api";
 import axios from "axios";
-import { jwtDecode, JwtPayload } from "jwt-decode";
-import Cookies from "js-cookie"
 
 enum CategoriaPublicacaoEnum{
     PEDIDO_AJUDA = 'Pedido de ajuda' ,
@@ -48,7 +46,7 @@ const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCa
         }
 
         try{
-            const response = await api.post('publicacao/criar', dadosPublicacao);
+            const response = await api.post('publicacao/cadastrar', dadosPublicacao);
             toast.dismiss();
             toast.success(response.data.message || 'Cadastrado com sucesso.');
             setTimeout(() => {
@@ -68,9 +66,8 @@ const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCa
     };
     useEffect(() => {
         if (visivel) {
-        setExibir(true); // mostra imediatamente
+        setExibir(true); 
         } else {
-        // espera 300ms antes de desmontar, tempo para o portal fechar corretamente
         const timer = setTimeout(() => {
             setExibir(false);
         }, 300);
