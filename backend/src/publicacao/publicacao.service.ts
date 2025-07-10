@@ -9,6 +9,7 @@ import { UsuarioService } from 'src/usuario/usuario.service';
 import { ListaPublicacaoDTO } from './dto/listaPublicacao.dto';
 import { AvaliaPublicacaoDTO } from './dto/avaliaPublicacao.dto';
 import { PesquisaPublicacaoDTO } from './dto/pesquisaPublicacao.dto copy';
+import { CategoriaPublicacaoEnum } from './enum/categoriaPublicacao.enum';
 
 @Injectable()
 export class PublicacaoService {
@@ -33,8 +34,8 @@ export class PublicacaoService {
       publicacaoEntity.usuarioResponsavel = usuarioEncontrado;
       publicacaoEntity.imagem = null;
    
-      await this.publicacaoRepository.save(publicacaoEntity)
-      
+      await this.publicacaoRepository.save(publicacaoEntity);
+            
       return {statuscode:201, message: 'Publicação enviada para análise.'}
     
     }catch(erro){
@@ -46,10 +47,16 @@ export class PublicacaoService {
     }
   }
 
-  async listar(aprovada: boolean | null){
+  async listar(aprovada: boolean | null, categoria: CategoriaPublicacaoEnum | string){
     try{
+        const where: any = {};
+        where.aprovada = aprovada
+
+        if(categoria === CategoriaPublicacaoEnum.PEDIDO_AJUDA || categoria === CategoriaPublicacaoEnum.ACAO_SOLIDARIA || categoria === CategoriaPublicacaoEnum.INFORMACAO_PUBLICA)
+          where.categoria = categoria;
+
       const listaPublicacao:PublicacaoEntity[] = await this.publicacaoRepository.find({
-        where:{aprovada:aprovada}, 
+        where, 
         relations:{usuarioResponsavel:true},
         order:{data: 'DESC'}
       })

@@ -4,6 +4,7 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { CriaPublicacaoDTO } from './dto/criaPublicacao.dto';
 import { AtualizaPublicacaoDTO } from './dto/atualizaPublicacao.dto';
 import { AvaliaPublicacaoDTO } from './dto/avaliaPublicacao.dto';
+import { CategoriaPublicacaoEnum } from './enum/categoriaPublicacao.enum';
 
 @UseGuards(AuthGuard)
 @Controller('publicacao')
@@ -28,8 +29,9 @@ export class PublicacaoController {
   }
 
   @Get('listar')
-  async listar(@Query('aprovada', ParseBoolPipe) aprovada: boolean,) {
-      return await this.publicacaoService.listar(aprovada);
+  async listar(@Query('aprovada', ParseBoolPipe) aprovada: boolean,
+               @Query('opcao') opcao: CategoriaPublicacaoEnum | string) {
+      return await this.publicacaoService.listar(aprovada, opcao);
   }
 
   @Get('buscar/:parametro')
