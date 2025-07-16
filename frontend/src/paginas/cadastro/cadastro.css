@@ -129,3 +129,12 @@ height: 7.5%;
   flex-wrap: wrap;
   justify-content: space-evenly;
 } 
+.divSelectCadastro{
+  width: 100%;
+}
+.labelSelectCadastro{
+  color: var(--cor-primaria);
+}
+.selectCadastro{
+  box-shadow: 0px -1px 7px #00000040;
+}
