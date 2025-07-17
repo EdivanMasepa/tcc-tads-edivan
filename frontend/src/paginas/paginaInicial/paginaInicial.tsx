@@ -21,6 +21,7 @@ interface DadosPublicacao {
     descricao: string;
     data: string;
     usuarioResponsavel: string;
+    idUsuarioResponsavel: number;
 }
 
 const PaginaInicial: React.FC = () => {
@@ -62,7 +63,7 @@ const PaginaInicial: React.FC = () => {
     return(
         <div className='divPrincipal alturaPaginaInicialDivPrincipal'>
             <Cabecalho />
-            <div className="opcoesConteudo">
+            <div className='opcoesConteudo'>
                 {buttons.map((botao) => (
                     <button
                         key={botao.id}
@@ -81,11 +82,11 @@ const PaginaInicial: React.FC = () => {
                             <div className='divCabecalhoUsuarioPublicacao'>
                                 <img src='./perfil.png' alt="menu" className='imgUsuarioPublicacao'/>
                                 <div className='divUsuarioPublicacao'>
-                                    <p className="pUsuarioPublicacao">{publicacao.nomeUsuarioResponsavel}</p>
-                                    <p className="pSituacaoUsuarioPublicacao">Fora de risco</p>
+                                    <a href={`./perfil/${publicacao.idUsuarioResponsavel}`} style={{textDecoration:'none'}}><p className="pUsuarioPublicacao">{publicacao.nomeUsuarioResponsavel}</p></a>
+                                    <p className='pSituacaoUsuarioPublicacao'>{publicacao.situacaoUsuarioResponsavel}</p>
                                 </div>
                             </div>
-                            <p className="dataPublicacao">{formatarData(publicacao.data)}</p>
+                            <p className='dataPublicacao'>{formatarData(publicacao.data)}</p>
                         </div>
                         <div className='divConteudoPublicacao'>
                             <div className='divCabecalhoConteudoPublicacao'>

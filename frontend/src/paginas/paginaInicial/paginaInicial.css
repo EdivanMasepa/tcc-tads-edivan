@@ -9,6 +9,7 @@
     position: absolute;
     top: 80px;
     display: flex;
+    align-items: center;
 
     border: 1px solid var(--cor-primaria);
     border-right: none;
@@ -32,13 +33,13 @@
     position: relative;
 }
 .shadowEsquerda{
-    box-shadow: -2px 0px 5px #00000090;
+    box-shadow: -2px 0px 4px #00000090;
   }
 .shadowDireita{
-    box-shadow: 2px 0px 5px #00000090;
+    box-shadow: 2px 0px 4px #00000090;
 }
 .shadowDuplo{
-    box-shadow: 2px 0 5px #00000090, -2px 0 5px #00000090;
+    box-shadow: 2px 0 4px #00000090, -2px 0 4px #00000090;
 }
 .divPaginaInicial{
     width: 90%;

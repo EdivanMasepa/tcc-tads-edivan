@@ -1,16 +1,19 @@
-import { useEffect, useState } from 'react'
+
 import Button from '../../componentes/botao/botao'
-import Cabecalho from '../../componentes/cabecalho/cabecalho'
 import Input from '../../componentes/input/input'
+import axios, { isAxiosError } from 'axios'
+import { FiEdit } from 'react-icons/fi'
+import { useEffect, useState } from 'react'
+import Cabecalho from '../../componentes/cabecalho/cabecalho'
 import '../../index.css'
 import './perfil.css'
+import imagem from '../../../public/perfil.png'
 import Cookies from "js-cookie"
-import axios, { isAxiosError } from 'axios'
 import { jwtDecode, JwtPayload } from 'jwt-decode'
 import { api } from '../../api'
-import { FiEdit } from 'react-icons/fi'
 import { FaRegCalendarAlt, FaTransgender } from 'react-icons/fa'
 import { HiOutlineMail, HiOutlinePhone } from 'react-icons/hi'
+import { useParams } from 'react-router-dom'
 
 enum TipoConteudoEnum{
     INFORMACOES='INFORMAÇÕES',
@@ -49,7 +52,6 @@ interface DadosUsuarioInterface {
     telefone:string;
     especificacao: UsuarioPessoaInterface | UsuarioInstituicaoInterface;
     publicacoes: DadosPublicacaoInterface[];
-
 }
 
 interface DadosPublicacaoInterface {
@@ -62,30 +64,17 @@ interface DadosPublicacaoInterface {
 }
 
 const Perfil: React.FC = () => { 
+    const { id } = useParams<{ id: string }>();
+    
     const [opcaoCadastro, setOpcaoCadastro] = useState(true);
     const alteraOpcaoCadastro = () =>{setOpcaoCadastro(!opcaoCadastro)};
-    const [tipoCadastro, setTipoCadastro] = useState<TipoConteudoEnum>(TipoConteudoEnum.INFORMACOES);
     const [usuario, setUsuario] = useState<DadosUsuarioInterface>();
     const [publicacoes, setPublicacoes] = useState<DadosPublicacaoInterface[]>([]);
-    
+
+    const [tipoCadastro, setTipoCadastro] = useState<TipoConteudoEnum>(TipoConteudoEnum.INFORMACOES);
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
     const [telefone, setTelefone] = useState('');
-   
-    let decodeToken: JwtPayload;
-
-    const decodificaUsuario = () => {
-        const token = Cookies.get('token');
-        if (!token) return null;
-
-        try {
-            const decodeToken = jwtDecode<JwtPayload>(token);
-            return Number(decodeToken.sub);
-        } catch (erro) {
-            console.error('Erro ao decodificar token:', erro);
-            return null;
-        }
-     };
 
     const formatarDataInformacao = (isoDate: string, exibirHora = false) => {
         const data = new Date(isoDate);
@@ -108,6 +97,19 @@ const Perfil: React.FC = () => {
         return formatada.replace(',', ' -');
     };
 
+    const decodificaUsuario = () => {
+        const token = Cookies.get('token');
+        if (!token) return null;
+
+        try {
+            const decodeToken = jwtDecode<JwtPayload>(token);
+            return Number(decodeToken.sub);
+        }catch (erro) {
+            console.error('Erro ao decodificar token:', erro);
+            return null;
+        }
+     };
+
     const buscarUsuario = async (usuario: number) => {
         try{
             const response = await api.get<DadosUsuarioInterface>(`/usuario/buscar/${usuario}`)
@@ -120,12 +122,16 @@ const Perfil: React.FC = () => {
 
     useEffect(()=>{
         const carregarDados = async () => {
-            const usuarioId = decodificaUsuario();
-            if (usuarioId === null) return;
+            if (!id) return;
+            const usuarioId = Number(id);
+            if (isNaN(usuarioId)) return;
+
+            // const usuarioId = decodificaUsuario();
+            // if (usuarioId === null) return;
         
             const response = await buscarUsuario(usuarioId);
+            console.log(response)
             setUsuario(response ?? undefined)
-            console.log(response?.publicacoes)
             setPublicacoes(response?.publicacoes ?? []);
             if (!response) return;
 
@@ -133,19 +139,8 @@ const Perfil: React.FC = () => {
             setEmail(response.email);
             setTelefone(response.telefone);
         }
-        // const listarPublicacoes = async ():Promise<DadosPublicacaoInterface[]> => {
-        //     try{                
-        //         const {data} = await api.get<DadosPublicacaoInterface[]>(`/publicacao/listar?aprovada=${false}`);
-        //         setPublicacoes(data); 
-        //         return data;
-
-        //     }catch(erro:unknown){
-        //         throw new Error(isAxiosError(erro) ? erro.message : 'Falha ao buscar publicações.');
-        //     }
-        // };
-        // listarPublicacoes();
-        carregarDados()
-    },[]);
+        carregarDados();
+    },[id]);
     
     return(
         <div className='divPrincipal'>
@@ -155,20 +150,22 @@ const Perfil: React.FC = () => {
                 <div className='divPerfil cabecalhoPerfil'>
 
                     <div className='divFotoPerfil'>
-                        <img src='./perfil.png' alt="menu" className='imgUsuarioPerfil'/>     
+                        <img src={imagem} alt="menu" className='imgUsuarioPerfil'/>     
                     </div>
                     
-                    <div className='divEditarFotoPerfil'>
+                    {/* <div className='divEditarFotoPerfil'>
                         <button className='buttonEditarFotoPerfil'><FiEdit className='iconeEditarFotoPerfil'/></button>
-                    </div>
+                    </div> */}
 
                     <div className='divNomeUsuarioPerfil'>
-                        <p className='pNomeUsuarioPerfil'>Edivan Masepa</p>
+                        <p className='pNomeUsuarioPerfil'>{usuario?.nome}</p>
                     </div>
 
-                    <div className='divSituacaoPerfil'>
-                        <p className='pSituacaoPerfil'>Fora de risco</p>
-                    </div>
+                    {usuario?.tipoUsuario === TipoUsuarioEnum.PESSOA && 
+                        <div className='divSituacaoPerfil'>
+                            <p className='pSituacaoPerfil'>{(usuario.especificacao as UsuarioPessoaInterface).situacao}</p>
+                        </div>
+                    }
 
                 </div>
                 
@@ -254,41 +251,43 @@ const Perfil: React.FC = () => {
 
                             </div>
                             : 
-                            publicacoes.map((publicacao: any)=>(  
-                                <div className='divItemConteudoPublicacao'>
+                            publicacoes
+                                .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+                                .map((publicacao: any)=>(  
+                                    <div key={publicacao.id} className='divItemConteudoPublicacao'>
 
-                                    <div  className='divPublicacao' style={{marginTop:'0px'}} key={publicacao.id}>
-                                        <div className='divCabecalhoPublicacao'> 
-                                            <div className='divCabecalhoUsuarioPublicacao'>
-                                                <img src='./perfil.png' alt="menu" className='imgUsuarioPublicacao'/>
+                                        <div  className='divPublicacao' style={{marginTop:'0px'}} key={publicacao.id}>
+                                            <div className='divCabecalhoPublicacao'> 
+                                                <div className='divCabecalhoUsuarioPublicacao'>
+                                                    <img src={imagem} alt="menu" className='imgUsuarioPublicacao'/>
 
-                                                <div className='divUsuarioPublicacao'>
-                                                    <p className="pUsuarioPublicacao">{publicacao.nomeUsuarioResponsavel}</p>
-                                                    <p className="pSituacaoUsuarioPublicacao">Fora de risco</p>
+                                                    <div className='divUsuarioPublicacao'>
+                                                        <p className="pUsuarioPublicacao">{publicacao.nomeUsuarioResponsavel}</p>
+                                                        <p className="pSituacaoUsuarioPublicacao">{publicacao.situacaoUsuarioResponsavel}</p>
+                                                    </div>
+
+                                                </div>
+
+                                                <p className="dataPublicacao">{formatarDataPublicacao(publicacao.data)}</p>
+
+                                            </div>
+
+                                            <div className='divConteudoPublicacao'>
+
+                                                <div className='divCabecalhoConteudoPublicacao'>
+                                                    <p className='pCategoria'>{publicacao.categoria}</p>
+                                                </div>
+
+                                                <div className='divConteudoPrincipalPublicacao1'>
+                                                    <p className='pTituloPublicacao'>{publicacao.titulo}</p>
+                                                    <p className='pDescricaoPublicacao'>{publicacao.descricao}</p>
                                                 </div>
 
                                             </div>
-
-                                            <p className="dataPublicacao">{formatarDataPublicacao(publicacao.data)}</p>
-
-                                        </div>
-
-                                        <div className='divConteudoPublicacao'>
-
-                                            <div className='divCabecalhoConteudoPublicacao'>
-                                                <p className='pCategoria'> {publicacao.categoria} </p>
-                                            </div>
-
-                                            <div className='divConteudoPrincipalPublicacao1'>
-                                                <p className='pTituloPublicacao'>{publicacao.titulo}</p>
-                                                <p className='pDescricaoPublicacao'>{publicacao.descricao}</p>
-                                            </div>
-
                                         </div>
                                     </div>
-                                </div>
-                            ))
-                        }  
+                                ))
+                            }  
                     </div>
                 </div>
 
@@ -315,4 +314,4 @@ const Perfil: React.FC = () => {
 
     )
 }
-export default Perfil
+export default Perfil;

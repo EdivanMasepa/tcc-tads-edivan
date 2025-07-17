@@ -29,7 +29,7 @@ const router = createBrowserRouter([
     element: <RedefinirSenha />
   },
   {
-    path: '/perfil',
+    path: '/perfil/:id',
     element: <RotaProtegida><Perfil /></RotaProtegida> 
   },
   {
