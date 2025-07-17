@@ -47,11 +47,13 @@ const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCa
 
         try{
             const response = await api.post('publicacao/cadastrar', dadosPublicacao);
+            setTitulo(null);
+            setDescricao(null);
             toast.dismiss();
             toast.success(response.data.message || 'Cadastrado com sucesso.');
             setTimeout(() => {
                 onCancelar();
-            }, 100);    
+            }, 50);    
         } catch (erro) {
             const msg = axios.isAxiosError(erro)
                 ? erro.response?.data?.message || 'Erro ao cadastrar.'
@@ -61,7 +63,7 @@ const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCa
             setTimeout(() => {
                 toast.dismiss();
                 toast.error(msg);
-            }, 100);
+            }, 50);
         }
     };
     useEffect(() => {
@@ -81,11 +83,12 @@ const CriarPublicacao = forwardRef<HTMLDivElement, CriarPublicacaoProps>(({ onCa
         <div className='divFundo' style={{ display: visivel ? 'block' : 'none' }}>
             <div  ref={ref} className="divCriarPublicacao">
 
-                <div className="divCriarPublicacaoSecao">
+                <div className="divCriarPublicacaoSecao tiraBorda">
                     <label className="labelCriarPublicacaoSecao">Categoria:</label>
                     <SelectDemo 
                         value={categoriaPublicacao} 
                         onValueChange={setCategoriaPublicacao}
+                        classNameTrigger="tirarBoxShadow"
                         options={[
                             { key : 1, label: CategoriaPublicacaoEnum.PEDIDO_AJUDA , value: CategoriaPublicacaoEnum.PEDIDO_AJUDA },
                             { key : 2, label: CategoriaPublicacaoEnum.INFORMACAO_PUBLICA, value: CategoriaPublicacaoEnum.INFORMACAO_PUBLICA },

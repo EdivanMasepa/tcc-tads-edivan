@@ -28,6 +28,9 @@
     flex-direction: column;
     border-bottom: 2px solid var(--cor-primaria);
 }
+.tiraBorda{
+    border-bottom: none;
+}
 .labelCriarPublicacaoSecao{
     width: 100%;
     height: auto;
@@ -42,6 +45,9 @@
     color: var(--cor-primaria);
     background-color: var(--cor-terciaria);
     padding-left: 10px;
+}
+.tirarBoxShadow{
+    box-shadow: none;
 }
 .inputCriarPublicacaoSecao{
     width: 100%;

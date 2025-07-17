@@ -14,24 +14,25 @@ interface SelectDemoPropsInterface {
   value: string | null;
   onValueChange: (value: string | null) => void;
   options: OptionInterface[];
+  classNameTrigger?: string;
 };
 
-const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, options }) =>  {
+const SelectDemo:React.FC<SelectDemoPropsInterface> = ({ value, onValueChange, options, classNameTrigger }) =>  {
 	return (
 		<Select.Root value={value ?? ""} onValueChange={onValueChange}>
 
-			<Select.Trigger className="SelectTrigger" aria-label="Food">
-				<Select.Value placeholder="Selecione uma opção" />
-				<Select.Icon className="SelectIcon"><IoIosArrowDown className="iconeArrowSelect"/></Select.Icon>
+			<Select.Trigger className={classnames("SelectTrigger", classNameTrigger)} aria-label="Select">
+				<Select.Value className="SelectTriggerValue" placeholder="Selecione uma opção" />
+				<Select.Icon className="SelectTriggerIcon"><IoIosArrowDown className="iconeArrowSelect"/></Select.Icon>
 			</Select.Trigger>
 
 			<Select.Portal>
 				<Select.Content className="SelectContent">
 
 					<Select.Viewport className="SelectViewport">
-						<Select.Group>
+						<Select.Group className="SelectGroup">
 							{options.map((option) => (
-								<SelectItem key={option.key} value={option.value}>
+								<SelectItem className="SelectItem" key={option.key} value={option.value}>
 									{option.label}
 								</SelectItem>
 							))}
