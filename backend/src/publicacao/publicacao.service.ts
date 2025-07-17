@@ -32,6 +32,7 @@ export class PublicacaoService {
       publicacaoEntity.titulo = publicacao.titulo;
       publicacaoEntity.descricao = publicacao.descricao;
       publicacaoEntity.usuarioResponsavel = usuarioEncontrado;
+      publicacaoEntity.aprovada = false;
       publicacaoEntity.imagem = null;
    
       await this.publicacaoRepository.save(publicacaoEntity);
@@ -68,7 +69,9 @@ export class PublicacaoService {
           publicacao.descricao, 
           publicacao.data,    
           publicacao.aprovada,      
-          publicacao.usuarioResponsavel.nome
+          publicacao.usuarioResponsavel.nome,
+          publicacao.usuarioResponsavel.usuarioPessoa.situacao,
+          publicacao.usuarioResponsavel.id
         )
       );
     }catch{
@@ -111,14 +114,17 @@ export class PublicacaoService {
         throw new NotFoundException('Erro ao relacionar usuário.');
 
       for(let publicacao of usuarioEncontrado.publicacoes){
-        if(publicacao.id === publicacaoEncontrada.id)
+        if(publicacao.id === publicacaoEncontrada.id){
           publicacaoEncontradaUsuario = publicacao;
+          publicacaoEncontrada.descricao = novosDadosPublicacao.descricao
+        }               
       }
 
       if(publicacaoEncontradaUsuario == null)  
         throw new NotFoundException('Erro ao relacionar publicação.');
 
-      await this.publicacaoRepository.update(publicacaoEncontrada, novosDadosPublicacao)
+      const a = await this.publicacaoRepository.save(publicacaoEncontrada)
+      console.log(publicacaoEncontrada, novosDadosPublicacao)
 
       return {statuscode:200, message: 'Alteração feita com sucesso.'};
 

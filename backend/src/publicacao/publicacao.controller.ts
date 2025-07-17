@@ -29,8 +29,10 @@ export class PublicacaoController {
   }
 
   @Get('listar')
-  async listar(@Query('aprovada', ParseBoolPipe) aprovada: boolean,
-               @Query('opcao') opcao: CategoriaPublicacaoEnum | string) {
+  async listar(
+    @Query('aprovada', ParseBoolPipe) aprovada: boolean,
+    @Query('opcao') opcao: CategoriaPublicacaoEnum | string
+  ){
       return await this.publicacaoService.listar(aprovada, opcao);
   }
 

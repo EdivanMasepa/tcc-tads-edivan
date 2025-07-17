@@ -114,7 +114,6 @@ export class UsuarioService {
 
       if(erro instanceof BadRequestException)
         throw erro;
-      console.log(erro)
       throw new InternalServerErrorException('Erro interno. Verifique as informações e tente novamente.')
     } 
   }
@@ -213,7 +212,6 @@ export class UsuarioService {
 
       if(!(usuarioBuscado instanceof UsuarioEntity))
         throw new NotFoundException('Nenhum cadastro localizado.');
-    
       return usuarioBuscado; 
 
     }catch(erro){
@@ -232,8 +230,7 @@ export class UsuarioService {
 
       publicacoes = usuarioBuscado.publicacoes.map(
         (publicacao) => new ListaPublicacaoDTO(
-          publicacao.id, publicacao.categoria, publicacao.titulo, publicacao.descricao, publicacao.data, publicacao.aprovada, usuarioBuscado.nome
-
+          publicacao.id, publicacao.categoria, publicacao.titulo, publicacao.descricao, publicacao.data, publicacao.aprovada, usuarioBuscado.nome, usuarioBuscado.usuarioPessoa.situacao, usuarioBuscado.id
       ));
 
       if(usuarioBuscado.usuarioPessoa){
@@ -370,7 +367,7 @@ export class UsuarioService {
   validaPropriedades(param: any){
     
     if (param == null || param === undefined) {
-      throw new BadRequestException(`Valor inválido: ${param}`);
+      throw new BadRequestException(`Valor inválido ${param}`);
     }
 
     if (typeof param === 'string') {
@@ -393,7 +390,7 @@ export class UsuarioService {
         if (chave && typeof valor)
           this.validaPropriedades(valor); 
       } 
-  }
+    }
 }
   
   validarCPF(cpf: string){

@@ -6,6 +6,8 @@ export class ListaPublicacaoDTO{
         private readonly descricao:string,
         private readonly data: Date,
         private readonly aprovada: boolean,
-        private readonly nomeUsuarioResponsavel: string
+        private readonly nomeUsuarioResponsavel: string,
+        private readonly situacaoUsuarioResponsavel: string,
+        private readonly idUsuarioResponsavel: number
     ){}
 }
