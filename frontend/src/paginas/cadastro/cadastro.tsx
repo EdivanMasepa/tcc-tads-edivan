@@ -245,7 +245,6 @@ const Cadastro: React.FC = () => {
                       options={opcoesGenero.map( (opcao) => (
                         { key : opcao.id, label: opcao.label , value: opcao.value }
                       ))}
-                      className='selectCadastro'
                     />
                   </> 
                   :

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { IoMdAddCircle, IoMdAddCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import CriarPublicacao from '../criarPublicacao/criarPublicacao';
+import imagem from '../../../public/perfil.png'
 
 const Cabecalho: React.FC = () => {
   const [abreMenu, setAbreMenu] = useState(false);
@@ -65,7 +66,7 @@ const Cabecalho: React.FC = () => {
 
           <div className="divCabecalhoMenu">
             <button className='buttonMenu' onClick={abrirMenu}>                
-                {abreMenu && !abreCriarPublicacao ? <IoClose className='iconeMenu'/> : <img src='./perfil.png' alt="menu" className='imgMenu'/>}
+                {abreMenu && !abreCriarPublicacao ? <IoClose className='iconeMenu'/> : <img src={imagem} alt="menu" className='imgMenu'/>}
             </button> 
           </div>
           
