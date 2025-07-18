@@ -17,6 +17,14 @@ enum TipoCadastroEnum{
   INSTITUICAO='Instituição'
 }
 
+enum SituacaoPessoaEnum {
+    FORA_DE_RISCO = 'Fora de risco',
+    MODERADO = 'Moderado',
+    EM_ALERTA = 'Em alerta', 
+    EMERGENCIA = 'Emergência',
+    EXTREMA_URGENCIA = 'Extrema urgência' 
+}
+
 enum SegmentoInstituicaoEnum {
     ADMINISTRACAO_PUBLICA = 'Administração Pública',
     AGRICULTURA = 'Agricultura',
@@ -118,7 +126,6 @@ const Cadastro: React.FC = () => {
   }
   
   const cadastrar =  async (dadosCadastro: DadosCadastroInterface) => {
-
     for(let campo of listaCamposCadastro){
       if (!campo || campo == null || campo.trim() == '') 
         campoVazio = true;
@@ -127,9 +134,9 @@ const Cadastro: React.FC = () => {
     setTimeout(() => {
       campoVazio ? (toast.dismiss(), toast.error("Preencha todos os campos.")) : null;
       return;
-    }, 1000);
+    }, 10);
 
-    try{
+    try{     
       const { data } = await api.post<RetornoRequisicao>('/usuario/cadastrar', dadosCadastro);
       toast.dismiss();
       toast.success(data.message || 'Cadastro realizado com sucesso!');
@@ -151,6 +158,14 @@ const Cadastro: React.FC = () => {
       { id : 1, label: GeneroPessoaEnum.MASCULINO , value: GeneroPessoaEnum.MASCULINO },
       { id : 2, label: GeneroPessoaEnum.FEMININO, value: GeneroPessoaEnum.FEMININO }
     ]
+
+  const situacaoPessoa = [
+    { id : 1, label: SituacaoPessoaEnum.FORA_DE_RISCO, value: SituacaoPessoaEnum.FORA_DE_RISCO },
+    { id : 2, label: SituacaoPessoaEnum.EM_ALERTA , value: SituacaoPessoaEnum.EM_ALERTA },
+    { id : 3, label: SituacaoPessoaEnum.MODERADO, value: SituacaoPessoaEnum.MODERADO },
+    { id : 4, label: SituacaoPessoaEnum.EMERGENCIA, value: SituacaoPessoaEnum.EMERGENCIA },
+    { id : 5, label: SituacaoPessoaEnum.EXTREMA_URGENCIA, value: SituacaoPessoaEnum.EXTREMA_URGENCIA }
+  ]
 
   const opcoesSegmento = [
     { id : 1, label: SegmentoInstituicaoEnum.ADMINISTRACAO_PUBLICA , value: SegmentoInstituicaoEnum.ADMINISTRACAO_PUBLICA },
@@ -261,14 +276,28 @@ const Cadastro: React.FC = () => {
                 }
               </div>
               
-
-              {opcaoCadastro && <Input value={situacao ?? ""} setValue={setSituacao} label='Situação' placeholder='' type='text'/>} 
+              <div className='divSelectCadastro'>
+                {opcaoCadastro && 
+                  <>
+                    <label className='labelSelectCadastro'>Situação</label>
+                    <SelectDemo 
+                      value={situacao} 
+                      onValueChange={setSituacao}
+                      options={situacaoPessoa.map((situacao) => (
+                        { key : situacao.id, label: situacao.label , value: situacao.value }
+                      ))}
+                    />
+                  </>
+                }
+              </div>
+    
+              {/* <Input value={situacao ?? ""} setValue={setSituacao} label='Situação' placeholder='' type='text'/>  */}
 
               <Input value={senha ?? ""} setValue={setSenha} label='Senha' placeholder='••••••••' type='text'/>
 
               <Input value={confirmaSenha ?? ""} setValue={setConfirmarSenha} label='Confirmar senha' placeholder='••••••••' type='text'/>
 
-              <Button legenda='Cadastrar' onClick={() => cadastrar(dados)}/>
+              <Button legenda='Cadastrar' onClick={() => cadastrar(dados) }/>
             </div>
           </div>
 
