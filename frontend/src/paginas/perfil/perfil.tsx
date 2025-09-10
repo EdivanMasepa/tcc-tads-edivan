@@ -7,13 +7,13 @@ import { useEffect, useState } from 'react'
 import Cabecalho from '../../componentes/cabecalho/cabecalho'
 import '../../index.css'
 import './perfil.css'
-import imagem from '../../../public/perfil.png'
-import Cookies from "js-cookie"
-import { jwtDecode, JwtPayload } from 'jwt-decode'
+import imagem from '../../perfil.png'
 import { api } from '../../api'
 import { FaRegCalendarAlt, FaTransgender } from 'react-icons/fa'
 import { HiOutlineMail, HiOutlinePhone } from 'react-icons/hi'
 import { useParams } from 'react-router-dom'
+import { jwtDecode, JwtPayload } from 'jwt-decode'
+import Cookies from 'js-cookie'
 
 enum TipoConteudoEnum{
     INFORMACOES='INFORMAÇÕES',

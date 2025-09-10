@@ -6,7 +6,7 @@ import { TbLogout } from 'react-icons/tb'
 import { IoKeyOutline } from 'react-icons/io5'
 import { jwtDecode, JwtPayload } from 'jwt-decode'
 import { Link } from 'react-router-dom'
-import imagem from '../../../public/perfil.png'
+import imagem from '../../perfil.png'
 
 const Menu = forwardRef<HTMLDivElement>((props, ref) => {
     const deslogar = ()=>{

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { IoMdAddCircle, IoMdAddCircleOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import CriarPublicacao from '../criarPublicacao/criarPublicacao';
-import imagem from '../../../public/perfil.png'
+import imagem from '../../perfil.png'
 
 const Cabecalho: React.FC = () => {
   const [abreMenu, setAbreMenu] = useState(false);
